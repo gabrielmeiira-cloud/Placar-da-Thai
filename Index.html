@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Placar da Thai</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%2250%22 height=%22100%22 fill=%22%23007bff%22/><rect x=%2250%22 width=%2250%22 height=%22100%22 fill=%22%23dc3545%22/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- FIGURINHA INICIAL AO ABRIR (SOME AO CLICAR/TOCAR NA TELA) -->
+    <div class="figurinha-inicial-overlay" id="overlayFigurinhaInicial" style="display: none;" onclick="this.style.display='none'; this.remove();">
+        <img src="Thai01.webp" alt="Figurinha 01" class="figurinha-inicial-img" onclick="event.stopPropagation(); this.parentElement.style.display='none'; this.parentElement.remove();">
+    </div>
+
+    <!-- ===================== HEADER UNIFICADO DO PLACAR COM SCROLLSPY ===================== -->
+    <div class="controles-wrapper">
+        <header class="controles-topo placar-header" id="placarHeader">
+            <!-- MENU HAMBÚRGUER À ESQUERDA -->
+            <div class="menu-container">
+                <button class="btn-menu" id="btnMenuToggle" type="button" title="Menu">☰</button>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <div class="dropdown-item" id="btnToggleFigurinhas" style="cursor: pointer;">
+                        <span>🖼️ Figurinhas: Ativadas</span>
+                        <label class="switch" onclick="event.stopPropagation();">
+                            <input type="checkbox" id="checkFigurinhas">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="dropdown-item" id="btnToggleTema" style="cursor: pointer;">
+                        <span id="labelTema">☀️ Tema: Vidro</span>
+                        <label class="switch" onclick="event.stopPropagation();">
+                            <input type="checkbox" id="checkTema">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTÕES DE ATALHO / SCROLLSPY FIXOS DA ESQUERDA PARA A DIREITA -->
+            <div class="botoes-atalho-container">
+                <a href="#secao-placar" class="btn-atalho ativo" data-target="secao-placar">
+                    <span class="icone-placar-quadrado"></span> Placar
+                </a>
+                <a href="#secao-jogadores" class="btn-atalho" data-target="secao-jogadores">👤 Jogadores</a>
+                <a href="#secao-sorteio" class="btn-atalho" data-target="secao-sorteio">🎲 Sorteio</a>
+                <a href="#secao-partidas" class="btn-atalho" data-target="secao-partidas">📋 Partidas</a>
+                <a href="#secao-ranking" class="btn-atalho" data-target="secao-ranking">🏆 Ranking</a>
+                <button class="btn" id="btnFullscreen" type="button">🖥️ Tela Cheia</button>
+                <button class="btn" id="btnReset" type="button">↺ Zerar</button>
+            </div>
+        </header>
+
+        <!-- BOTÃO COM DUPLA SETA PARA RECOLHER/EXPANDIR O HEADER -->
+        <button class="btn-atalho" id="btnToggleControlesTopo" type="button" title="Minimizar/Maximizar controles">
+            <span class="seta-animada"></span>
+            <span class="seta-animada"></span>
+        </button>
+    </div>
+
+    <!-- ==========================================================================
+         SEÇÃO 1: PLACAR AO VIVO (100dvh)
+         ========================================================================== -->
+    <section id="secao-placar">
+        <div class="versao-placar">Placar da Thai V2.0</div>
+
+        <div class="controles-centro">
+            <button class="btn-central" id="btnInverterLados" type="button" title="Inverter placar">⇄</button>
+        </div>
+
+        <div class="controles-baixo">
+            <button class="btn-central" id="btnResetBaixo" type="button" title="Zerar placar">↺</button>
+        </div>
+
+        <!-- LADO AZUL -->
+        <div class="lado-azul" id="btnAzul">
+            <span class="lado-tag-time" id="labelNomeTimeAzul" style="display: none;">Time Azul</span>
+            <div class="pontos" id="pontosAzul">0</div>
+        </div>
+
+        <!-- LADO VERMELHO -->
+        <div class="lado-vermelho" id="btnVermelho">
+            <span class="lado-tag-time" id="labelNomeTimeVermelho" style="display: none;">Time Vermelho</span>
+            <div class="pontos" id="pontosVermelho">0</div>
+        </div>
+
+        <a href="#secao-jogadores" class="indicador-rolagem-baixo">
+            <span>Rolar para Gestão</span> ⬇
+        </a>
+    </section>
+
+    <!-- ==========================================================================
+         SEÇÃO 2: JOGADORES
+         ========================================================================== -->
+    <section id="secao-jogadores" class="secao-conteudo">
+        <div class="secao-cabecalho">
+            <h2 class="secao-titulo">👤 Cadastro de Jogadores</h2>
+            <a href="#secao-placar" class="btn-atalho">⬆ Voltar ao Placar <span class="icone-placar-quadrado"></span></a>
+        </div>
+
+        <div class="card-painel">
+            <div class="card-painel-titulo">➕ Novo Jogador</div>
+            <div class="grupo-form-linha">
+                <input type="text" id="inputNome" class="input-padrao" placeholder="Nome do Jogador" autocomplete="off" style="flex: 2; min-width: 150px;">
+                <div class="radio-group" style="display: flex; gap: 6px;">
+                    <label class="radio-chip">
+                        <input type="radio" name="sexo" value="m" checked> 🚹 Masc
+                    </label>
+                    <label class="radio-chip">
+                        <input type="radio" name="sexo" value="f"> 🚺 Fem
+                    </label>
+                </div>
+                <select id="selectEstrelas" class="input-padrao" style="flex: 1; min-width: 130px;">
+                    <option value="1">⭐ (Iniciante)</option>
+                    <option value="2">⭐⭐ (Básico)</option>
+                    <option value="3" selected>⭐⭐⭐ (Médio)</option>
+                    <option value="4">⭐⭐⭐⭐ (Avançado)</option>
+                    <option value="5">⭐⭐⭐⭐⭐ (Pro)</option>
+                </select>
+                <button class="btn-sucesso" id="btnAdicionar" type="button">Cadastrar</button>
+            </div>
+        </div>
+
+        <div class="card-painel">
+            <div class="card-painel-titulo">
+                <span>📋 Jogadores Cadastrados</span>
+                <span style="font-size: 0.9rem; color: var(--texto-secundario);">Total: <strong id="contadorJogadores">0</strong></span>
+            </div>
+            <div class="lista-itens" id="listaJogadores"></div>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+         SEÇÃO 3: SORTEIO DE TIMES
+         ========================================================================== -->
+    <section id="secao-sorteio" class="secao-conteudo">
+        <div class="secao-cabecalho">
+            <h2 class="secao-titulo">🎲 Sorteio & Equilíbrio de Times</h2>
+            <a href="#secao-placar" class="btn-atalho">⬆ Voltar ao Placar <span class="icone-placar-quadrado"></span></a>
+        </div>
+
+        <div class="card-painel">
+            <div class="card-painel-titulo">
+                <span>1. Selecionar Presentes (<span id="contadorSelecionados">0 / 0</span>)</span>
+                <div style="display: flex; gap: 6px;">
+                    <button class="btn-atalho" type="button" onclick="SorteioModule.selecionarTodos(true)">Marcar Todos</button>
+                    <button class="btn-atalho" type="button" onclick="SorteioModule.selecionarTodos(false)">Limpar</button>
+                </div>
+            </div>
+            <div class="grade-selecao" id="gradeJogadores"></div>
+        </div>
+
+        <div class="card-painel">
+            <div class="card-painel-titulo">2. Formato do Sorteio</div>
+            <div class="grupo-form-linha">
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <span style="font-size: 0.9rem; color: var(--texto-secundario);">Tamanho do Time:</span>
+                    <label class="radio-chip"><input type="radio" name="tamanho" value="2" checked> Dupla (2)</label>
+                    <label class="radio-chip"><input type="radio" name="tamanho" value="3"> Trio (3)</label>
+                    <label class="radio-chip"><input type="radio" name="tamanho" value="4"> Quarteto (4)</label>
+                </div>
+            </div>
+
+            <div class="grupo-form-linha" style="margin-top: 4px;">
+                <span style="font-size: 0.9rem; color: var(--texto-secundario);">Modo:</span>
+                <label class="radio-chip"><input type="radio" name="modo" value="normal" checked> ⚖️ Equilibrado (Nível)</label>
+                <label class="radio-chip"><input type="radio" name="modo" value="misto"> 👫 Misto (H/M + Nível)</label>
+                <label class="radio-chip"><input type="radio" name="modo" value="manual"> ✋ Montagem Manual</label>
+            </div>
+
+            <button class="btn-acao-sorteio btn-sucesso" id="btnAcaoSorteio" type="button" onclick="SorteioModule.iniciarGeracao()">
+                🎲 Sortear Times (Equilibrado)
+            </button>
+        </div>
+
+        <!-- Seção de Resultados dos Times Sorteados -->
+        <div class="card-painel" id="secaoResultados" style="display: none;">
+            <div class="card-painel-titulo">
+                <span id="tituloResultados">Times Gerados</span>
+                <div id="acoesManuaisExtra" style="display: flex; gap: 6px;">
+                    <button class="btn-atalho" type="button" onclick="SorteioModule.adicionarTimeManual()">+ Novo Time</button>
+                    <button class="btn-perigo" style="padding: 4px 10px; font-size: 0.8rem;" type="button" onclick="SorteioModule.limparTodosTimes()">🗑️ Limpar</button>
+                </div>
+            </div>
+
+            <div id="instrucaoManual" style="display: none; font-size: 0.85rem; color: var(--cor-amarelo);">
+                👉 Toque em um time para selecioná-lo e depois toque nos jogadores do banco para transferir.
+            </div>
+
+            <div id="bancoManual" class="banco-chips" style="display: none;"></div>
+
+            <div class="container-times-grid" id="containerTimes"></div>
+
+            <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+                <a href="#secao-partidas" class="btn-sucesso" style="flex: 1; padding: 12px; text-decoration: none; text-align: center;">
+                    📋 Ir para Fila de Partidas ▶
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+         SEÇÃO 4: FILA DE PARTIDAS
+         ========================================================================== -->
+    <section id="secao-partidas" class="secao-conteudo">
+        <div class="secao-cabecalho">
+            <h2 class="secao-titulo">📋 Fila de Partidas</h2>
+            <a href="#secao-placar" class="btn-atalho">⬆ Voltar ao Placar <span class="icone-placar-quadrado"></span></a>
+        </div>
+
+        <div class="card-painel">
+            <div class="card-painel-titulo">Gerador Automático da Rodada</div>
+            <div id="infoTimesStatus"></div>
+            <div class="grupo-form-linha" style="margin-top: 8px;">
+                <span style="font-size: 0.9rem; color: var(--texto-secundario);">Duração prevista:</span>
+                <select id="selectHoras" class="input-padrao" style="width: auto; min-width: 140px;">
+                    <option value="1">1 hora (~12 jogos)</option>
+                    <option value="2" selected>2 horas (~24 jogos)</option>
+                    <option value="3">3 horas (~36 jogos)</option>
+                    <option value="4">4 horas (~48 jogos)</option>
+                </select>
+                <button class="btn-sucesso" id="btnGerarLista" type="button">📅 Gerar Fila</button>
+                <button class="btn-atalho" id="btnAddPartidaManual" type="button">+ Jogo Avulso</button>
+                <button class="btn-perigo" id="btnLimparPartidas" type="button">🗑️ Limpar</button>
+            </div>
+        </div>
+
+        <div class="card-painel">
+            <div class="card-painel-titulo">Confrontos da Rodada</div>
+            <div class="lista-partidas" id="listaPartidasCorpo"></div>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+         SEÇÃO 5: RANKING & PODIUM (ÚLTIMA SEÇÃO)
+         ========================================================================== -->
+    <section id="secao-ranking" class="secao-conteudo">
+        <div class="secao-cabecalho">
+            <h2 class="secao-titulo">🏆 Pódio & Ranking Geral</h2>
+            <a href="#secao-placar" class="btn-atalho">⬆ Voltar ao Placar <span class="icone-placar-quadrado"></span></a>
+        </div>
+
+        <div id="secaoSemTimes" class="card-painel" style="display: none;">
+            <div class="aviso-vazio">
+                Nenhuma partida registrada ainda. Jogue no placar para ver o pódio e o ranking serem calculados!
+            </div>
+        </div>
+
+        <div class="card-painel" id="secaoPodio">
+            <div class="card-painel-titulo" style="justify-content: center;">🏅 Pódio dos Campeões</div>
+            <div class="podio-container" id="containerPodio"></div>
+        </div>
+
+        <div class="card-painel" id="secaoRankingCompleto">
+            <div class="card-painel-titulo">Classificação Geral dos Times</div>
+            <div class="lista-itens" id="listaRankingCompleta"></div>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+         MODAIS
+         ========================================================================== -->
+    <!-- Modal Zerar Placar -->
+    <div class="modal-overlay" id="modalZerarPlacar" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-icone-status">⚠️</div>
+            <div class="modal-titulo">Zerar Placar</div>
+            <div class="modal-texto">Tem certeza que deseja zerar os pontos do jogo atual?</div>
+            <div class="modal-botoes">
+                <button class="modal-btn modal-btn-cancelar" type="button" id="btnCancelarZerar">Não</button>
+                <button class="modal-btn modal-btn-confirmar" type="button" id="btnConfirmarZerar" style="background-color: #dc3545;">Sim, Zerar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Fim de Jogo / Salvar Partida -->
+    <div class="modal-overlay" id="modalFimJogo" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-icone-status">🏆</div>
+            <div class="modal-titulo">Fim de Jogo!</div>
+            <div class="modal-texto" id="textoVencedorModal">Time Venceu!</div>
+            <div class="modal-botoes" style="display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 15px;">
+                <button class="modal-btn modal-btn-confirmar" type="button" id="btnSalvarFimJogo" style="background-color: var(--cor-verde); width: 100%; padding: 12px; font-size: 1rem;">
+                    💾 Salvar e Ir para a Próxima Partida
+                </button>
+                <button class="modal-btn modal-btn-cancelar" type="button" id="btnVoltarPonto" style="width: 100%; padding: 10px; font-size: 0.95rem;">
+                    ↩ Voltar Ponto
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="index.js"></script>
+</body>
+
+</html>

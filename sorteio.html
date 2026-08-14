@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Placar da Thai - Sorteio</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%2250%22 height=%22100%22 fill=%22%23007bff%22/><rect x=%2250%22 width=%2250%22 height=%22100%22 fill=%22%23dc3545%22/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="modo-app">
+
+<!-- ===================== SORTEIO ===================== -->
+<section id="pagina-sorteio" class="pagina ativa">
+    <header class="app-header">
+        <h1>🎲 Sorteio e Times</h1>
+        <div class="topo-acoes">
+            <a href="jogadores.html" class="btn-acao">👤 Jogadores</a>
+            <a href="sorteio.html" class="btn-acao ativo">🎲 Sorteio</a>
+            <a href="ranking.html" class="btn-acao">🏆 Ranking</a>
+            <a href="partidas.html" class="btn-acao">📋 Partidas</a>
+            <a href="Index.html" class="btn-acao">
+                <span class="icone-placar-blocos">
+                    <span class="bloco-placar bloco-azul-claro"></span>
+                    <span class="bloco-placar bloco-vermelho-escuro"></span>
+                </span> Placar
+            </a>
+        </div>
+    </header>
+
+    <div class="secao">
+        <h2>
+            <span>Lista de Presença</span>
+            <span id="contadorSelecionados" style="color: #fff; font-size: 0.9rem;">0 / 0</span>
+        </h2>
+        <div class="acoes-rapidas">
+            <button class="btn-secundario" type="button" onclick="selecionarTodos(true)">Marcar Todos</button>
+            <button class="btn-secundario" type="button" onclick="selecionarTodos(false)">Desmarcar Todos</button>
+        </div>
+        <div class="grade-jogadores" id="gradeJogadores">
+            <span style="color: #777; font-size: 0.85rem; text-align: center; width: 100%; padding: 10px;">Nenhum jogador cadastrado. Vá em "Jogadores" primeiro.</span>
+        </div>
+    </div>
+
+    <div class="secao">
+        <h2>Configurações do Sorteio</h2>
+        <div class="form-grupo">
+            <label>Tamanho do Time:</label>
+            <div class="opcoes-grupo">
+                <input type="radio" id="tam2" name="tamanho" value="2" checked>
+                <label for="tam2" class="radio-label"><span class="icone-tamanho">👤👤</span> Duplas</label>
+                <input type="radio" id="tam3" name="tamanho" value="3">
+                <label for="tam3" class="radio-label"><span class="icone-tamanho">👤👤👤</span> Trios</label>
+                <input type="radio" id="tam4" name="tamanho" value="4">
+                <label for="tam4" class="radio-label"><span class="icone-tamanho">👤👤👤👤</span> Quartetos</label>
+            </div>
+        </div>
+        <div class="form-grupo">
+            <label>Modo de Geração:</label>
+            <div class="opcoes-grupo modo-botoes">
+                <input type="radio" id="modoNormal" name="modo" value="normal" checked>
+                <label for="modoNormal" class="radio-label">⚡ Normal</label>
+                <input type="radio" id="modoMisto" name="modo" value="misto">
+                <label for="modoMisto" class="radio-label">⚖️ Misto</label>
+                <input type="radio" id="modoManual" name="modo" value="manual">
+                <label for="modoManual" class="radio-label">✋ Manual</label>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-principal" id="btnAcao" type="button" onclick="iniciarGeracao()">🎲 Sortear Times</button>
+
+    <div class="secao" id="secaoResultados" style="display: none;">
+        <h2 id="tituloResultados">Times Gerados</h2>
+        <div id="instrucaoManual" style="display: none; font-size: 0.85rem; color: #ffc107; margin-bottom: 10px; text-align: center;">
+            Toque num time para selecioná-lo e depois nos jogadores do Banco para preencher.
+        </div>
+        <div id="bancoManual" class="banco-container" style="display: none;"></div>
+        <div class="times-container" id="containerTimes"></div>
+        <div id="acoesManuaisExtra" style="display: none; margin-top: 25px;">
+            <button class="btn-secundario" type="button" style="background-color: #17a2b8; width: 100%; font-size: 1rem; padding: 12px; margin-bottom: 10px;" onclick="adicionarTimeManual()">➕ Adicionar Novo Time</button>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-secundario" type="button" style="background-color: #dc3545; flex: 1; font-size: 0.95rem; padding: 12px; margin-top: 0;" onclick="confirmarExcluirTodos()">🗑️ Excluir Todos</button>
+                <button class="btn-principal" type="button" style="background-color: #28a745; flex: 1; margin-bottom: 0;" onclick="salvarTimesDefinitivo()">💾 Salvar Times</button>
+            </div>
+        </div>
+    </div>
+    <div id="modalSorteio"></div>
+</section>
+
+<script src="sorteio.js"></script>
+</body>
+</html>

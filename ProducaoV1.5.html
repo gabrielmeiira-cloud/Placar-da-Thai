@@ -1,0 +1,3420 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Placar da Thai V1.5</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%2250%22 height=%22100%22 fill=%22%23007bff%22/><rect x=%2250%22 width=%2250%22 height=%22100%22 fill=%22%23dc3545%22/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background-color: #222;
+            color: white;
+            width: 100vw;
+            position: relative;
+        }
+
+        body.modo-placar {
+            display: flex;
+            flex-direction: row;
+            height: 100dvh;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            touch-action: none;
+        }
+
+        body.modo-app {
+            display: block;
+            min-height: 100dvh;
+            overflow: auto;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        @media (orientation: portrait) {
+            body.modo-placar {
+                flex-direction: column;
+            }
+        }
+
+        .pagina {
+            display: none !important;
+        }
+
+        body.modo-placar #pagina-placar.ativa {
+            display: contents !important;
+        }
+
+        body.modo-app .pagina.ativa {
+            display: flex !important;
+            flex-direction: column;
+            min-height: 100dvh;
+            padding: 15px;
+            padding-bottom: 50px;
+        }
+
+        .versao-placar {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            z-index: 20;
+            pointer-events: none;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .lado-azul,
+        .lado-vermelho {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            position: relative;
+            overflow: hidden;
+            border: none;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .lado-azul {
+            background-color: #007bff;
+        }
+
+        .lado-azul:active {
+            background-color: #0056b3;
+        }
+
+        .lado-vermelho {
+            background-color: #dc3545;
+        }
+
+        .lado-vermelho:active {
+            background-color: #a71d2a;
+        }
+
+        .pontos {
+            font-size: 80vh;
+            line-height: 1;
+            font-weight: 600;
+            font-family: 'Fredoka', sans-serif;
+            text-shadow: 6px 6px 0px rgba(0, 0, 0, 0.3);
+            z-index: 2;
+            transition: transform 0.3s ease;
+        }
+
+        @media (orientation: portrait) {
+            .pontos {
+                font-size: 40vh;
+            }
+        }
+
+        /* ===================== HEADER UNIFICADO DO PLACAR ===================== */
+        .controles-wrapper {
+            position: fixed;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: none;
+            transition: top 0.4s ease-in-out, bottom 0.4s ease-in-out, left 0.4s ease-in-out, right 0.4s ease-in-out, transform 0.4s ease-in-out, width 0.4s ease-in-out;
+        }
+
+        /* Position Top (0°) */
+        .controles-wrapper.posicao-top,
+        .controles-wrapper:not(.posicao-right):not(.posicao-bottom):not(.posicao-left) {
+            top: 0;
+            bottom: auto;
+            left: 50%;
+            right: auto;
+            transform: translateX(-50%) rotate(0deg);
+            transform-origin: center center;
+            width: 100%;
+            max-width: 100vw;
+        }
+
+        /* Position Right (90°) - Direita Vertical Colado na Borda */
+        .controles-wrapper.posicao-right {
+            top: 50%;
+            right: 0;
+            bottom: auto;
+            left: auto;
+            transform: translate(calc(47.5% - 22px), -50%) rotate(90deg);
+            transform-origin: center center;
+            width: 100vh;
+            max-width: 100vh;
+        }
+
+        /* Position Bottom (180°) - Embaixo Colado na Borda */
+        .controles-wrapper.posicao-bottom {
+            top: auto;
+            bottom: 0;
+            left: 50%;
+            right: auto;
+            transform: translateX(-50%) rotate(180deg);
+            transform-origin: center center;
+            width: 100%;
+            max-width: 100vw;
+        }
+
+        /* Position Left (270°) - Esquerda Vertical Colado na Borda */
+        .controles-wrapper.posicao-left {
+            top: 50%;
+            left: 0;
+            bottom: auto;
+            right: auto;
+            transform: translate(calc(-47.5% + 22px), -50%) rotate(270deg);
+            transform-origin: center center;
+            width: 100vh;
+            max-width: 100vh;
+        }
+
+        .controles-wrapper>* {
+            pointer-events: auto;
+        }
+
+        .controles-topo.placar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 8px 12px;
+            background-color: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+            gap: 8px;
+            transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out, max-height 0.4s ease-in-out, margin 0.4s ease-in-out, padding 0.4s ease-in-out;
+            transform-origin: top center;
+            overflow: visible;
+        }
+
+        /* ===================== TEMA ESCURO (ESTILO ORIGINAL) ===================== */
+        body.tema-escuro .controles-topo.placar-header {
+            background-color: rgba(20, 20, 20, 0.88);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+        }
+
+        body.tema-escuro .btn,
+        body.tema-escuro .btn-atalho,
+        body.tema-escuro .btn-menu {
+            background-color: rgba(0, 0, 0, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        body.tema-escuro .btn:hover,
+        body.tema-escuro .btn-atalho:hover,
+        body.tema-escuro .btn-menu:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        body.tema-escuro #btnToggleControlesTopo {
+            background-color: rgba(0, 0, 0, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-top: none;
+        }
+
+        body.tema-escuro #btnToggleControlesTopo:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .controles-topo.escondido {
+            opacity: 0;
+            transform: translateY(-100%);
+            max-height: 0;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            margin: 0 !important;
+            border: none !important;
+            pointer-events: none;
+            overflow: hidden !important;
+        }
+
+        .menu-container {
+            position: relative;
+            z-index: 110;
+            flex-shrink: 0;
+        }
+
+        .btn-menu {
+            background-color: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: white;
+            padding: 6px 12px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            transition: background-color 0.2s ease, transform 0.15s ease, border-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 36px;
+        }
+
+        .btn-menu:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .btn-menu:active {
+            transform: scale(0.95);
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            background-color: rgba(34, 34, 34, 0.96);
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+            display: none;
+            flex-direction: column;
+            min-width: 220px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 6px;
+            z-index: 120;
+        }
+
+        .dropdown-menu.ativo {
+            display: flex;
+        }
+
+        .dropdown-item {
+            background: none;
+            border: none;
+            color: white;
+            padding: 10px 12px;
+            text-align: left;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.95rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        .dropdown-item:hover {
+            background-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #555;
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: #28a745;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(20px);
+        }
+
+        .botoes-atalho-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        #btnToggleControlesTopo {
+            width: 46px;
+            height: 32px;
+            padding: 0;
+            position: relative;
+            flex-shrink: 0;
+            margin-top: 0;
+            border-radius: 0 0 10px 10px;
+            background-color: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-top: none;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        #btnToggleControlesTopo:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        #btnToggleControlesTopo:active {
+            transform: scale(0.95);
+        }
+
+        .seta-animada {
+            position: absolute;
+            left: 17px;
+            width: 10px;
+            height: 10px;
+            border-top: 2.5px solid rgba(255, 255, 255, 0.85);
+            border-right: 2.5px solid rgba(255, 255, 255, 0.85);
+            transform: rotate(-45deg);
+            animation: animarSetaCima 1.6s infinite ease-in-out;
+        }
+
+        .seta-animada:nth-child(2) {
+            animation-delay: -0.8s;
+        }
+
+        @keyframes animarSetaCima {
+            0% {
+                top: 15px;
+                opacity: 0;
+            }
+
+            50% {
+                top: 8px;
+                opacity: 1;
+            }
+
+            100% {
+                top: 1px;
+                opacity: 0;
+            }
+        }
+
+        #btnToggleControlesTopo.revertido .seta-animada {
+            transform: rotate(135deg);
+            animation-name: animarSetaBaixo;
+        }
+
+        @keyframes animarSetaBaixo {
+            0% {
+                top: 1px;
+                opacity: 0;
+            }
+
+            50% {
+                top: 8px;
+                opacity: 1;
+            }
+
+            100% {
+                top: 15px;
+                opacity: 0;
+            }
+        }
+
+        .btn {
+            background-color: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: white;
+            padding: 8px 12px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.88rem;
+            border-radius: 10px;
+            cursor: pointer;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            transition: background-color 0.2s ease, transform 0.15s ease, border-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 36px;
+        }
+
+        .btn:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .controles-centro {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 25;
+            pointer-events: none;
+        }
+
+        .controles-baixo {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 25;
+            pointer-events: none;
+        }
+
+        .btn-central {
+            width: 56px;
+            height: 56px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.12);
+            color: white;
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            cursor: pointer;
+            pointer-events: auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            transition: transform 0.15s ease, background-color 0.2s ease;
+        }
+
+        .btn-central:active {
+            transform: scale(0.95);
+            background-color: rgba(255, 255, 255, 0.22);
+        }
+
+        .btn-atalho {
+            background-color: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: white;
+            padding: 8px 12px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.9rem;
+            border-radius: 10px;
+            cursor: pointer;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: background-color 0.2s ease, transform 0.15s ease, border-color 0.2s ease;
+            min-height: 36px;
+        }
+
+        .btn-atalho:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .btn-atalho:active {
+            transform: scale(0.95);
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes animFigurinhaPonto {
+            0% {
+                transform: translate(-50%, -50%) scale(0.1) rotate(0deg);
+                opacity: 0;
+            }
+
+            20% {
+                transform: translate(-50%, -50%) scale(1.0) rotate(-25deg);
+                opacity: 1;
+            }
+
+            40% {
+                transform: translate(-50%, -50%) scale(0.9) rotate(25deg);
+                opacity: 1;
+            }
+
+            60% {
+                transform: translate(-50%, -50%) scale(1.0) rotate(-25deg);
+                opacity: 1;
+            }
+
+            80% {
+                transform: translate(-50%, -50%) scale(0.95) rotate(15deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(0.1) rotate(0deg);
+                opacity: 0;
+            }
+        }
+
+        .figurinha-ponto {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 80vmin;
+            height: 80vmin;
+            object-fit: contain;
+            pointer-events: none;
+            z-index: 200;
+            animation: animFigurinhaPonto 1.2s ease-in-out forwards;
+            filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.6));
+        }
+
+        /* ESTILO DA FIGURINHA INICIAL AO ABRIR O PLACAR */
+        .figurinha-inicial-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100dvh;
+            background-color: rgba(0, 0, 0, 0.75);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            cursor: pointer;
+            padding: 20px;
+            pointer-events: none;
+        }
+
+        .figurinha-inicial-overlay.ativa {
+            display: flex !important;
+            pointer-events: auto !important;
+        }
+
+        .figurinha-inicial-img {
+            max-width: 90vw;
+            max-height: 90dvh;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.8));
+            animation: animEntradaInicial 0.3s ease-out forwards;
+        }
+
+        @keyframes animEntradaInicial {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .confete {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 12px;
+            height: 12px;
+            pointer-events: none;
+            z-index: 150;
+            will-change: transform;
+        }
+
+        .aviso-central {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.2);
+            font-size: 6rem;
+            color: #ffffff;
+            text-shadow: 0 0 30px rgba(0, 0, 0, 0.9), 6px 6px 0px rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            animation: animAvisoCentral 2s forwards;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        @keyframes animAvisoCentral {
+            0% {
+                transform: translate(-50%, -50%) scale(0.2);
+                opacity: 0;
+            }
+
+            30% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 1;
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.0);
+                opacity: 1;
+            }
+
+            80% {
+                transform: translate(-50%, -50%) scale(1.0);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1.3);
+                opacity: 0;
+            }
+        }
+
+        @keyframes animTrofeu {
+            0% {
+                transform: scale(0.2);
+                opacity: 0;
+            }
+
+            30% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.0);
+                opacity: 1;
+            }
+
+            70% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(0.2);
+                opacity: 0;
+            }
+        }
+
+        .trofeu-animado {
+            display: inline-block;
+            font-size: 0.8em;
+            animation: animTrofeu 2s forwards;
+        }
+
+        /* ===================== STICKY APP HEADER (SUBPÁGINAS) ===================== */
+        .app-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(30, 30, 30, 0.92);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 10px 15px;
+            margin: -15px -15px 15px -15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            gap: 10px;
+        }
+
+        .app-header h1 {
+            font-size: 1.15rem;
+            color: #ffc107;
+            margin: 0;
+            white-space: nowrap;
+            font-weight: 600;
+        }
+
+        .topo-acoes {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: nowrap;
+        }
+
+        .btn-acao {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: white;
+            padding: 7px 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-family: 'Fredoka', sans-serif;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-acao:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .btn-acao.ativo {
+            background-color: rgba(0, 210, 255, 0.25);
+            border-color: #00d2ff;
+            color: #ffffff;
+            font-weight: 600;
+            box-shadow: 0 0 8px rgba(0, 210, 255, 0.3);
+        }
+
+        .icone-placar-blocos {
+            display: inline-flex;
+            gap: 0;
+            vertical-align: middle;
+            font-size: 0;
+        }
+
+        .bloco-placar {
+            width: 18px;
+            height: 18px;
+            display: inline-block;
+        }
+
+        .bloco-azul-claro {
+            background-color: #007bff;
+        }
+
+        .bloco-vermelho-escuro {
+            background-color: #dc3545;
+        }
+
+        .secao {
+            background-color: #2a2a2a;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .secao h2 {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: #00d2ff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-grupo {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        label {
+            font-size: 0.9rem;
+            color: #bbb;
+        }
+
+        input[type="text"],
+        select {
+            background-color: #333;
+            border: 1px solid #444;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            font-family: 'Fredoka', sans-serif;
+            width: 100%;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            border-color: #00d2ff;
+        }
+
+        .opcoes-sexo,
+        .opcoes-grupo {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .opcoes-sexo input[type="radio"],
+        .opcoes-grupo input[type="radio"] {
+            display: none;
+        }
+
+        .radio-label {
+            flex: 1;
+            background-color: #333;
+            border: 1px solid #444;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            color: #ccc;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .opcoes-grupo .radio-label {
+            min-width: 30%;
+            flex-direction: column;
+            padding: 12px 5px;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+
+        .modo-botoes .radio-label {
+            flex-direction: row;
+            padding: 12px 5px;
+            gap: 8px;
+        }
+
+        .opcoes-sexo input[type="radio"]:checked+.radio-label,
+        .opcoes-grupo input[type="radio"]:checked+.radio-label {
+            border-color: #00d2ff;
+            background-color: rgba(0, 210, 255, 0.1);
+            color: white;
+            font-weight: 600;
+        }
+
+        .icone-m {
+            color: #007bff;
+        }
+
+        .icone-f {
+            color: #ff69b4;
+        }
+
+        .btn-principal {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s, filter 0.2s, color 0.2s;
+            font-family: 'Fredoka', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-principal:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn-secundario {
+            background-color: #444;
+            border: none;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            transition: background 0.2s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-secundario:hover {
+            background-color: #555;
+        }
+
+        .versao-app {
+            margin-top: auto;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.8rem;
+            padding-top: 20px;
+        }
+
+        .lista-jogadores {
+            max-height: 250px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .jogador-item {
+            background-color: #333;
+            padding: 10px 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .jogador-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .jogador-nome {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .jogador-detalhes {
+            display: flex;
+            gap: 8px;
+            font-size: 0.9rem;
+            align-items: center;
+        }
+
+        .jogador-estrelas {
+            color: #ffc107;
+        }
+
+        .btn-excluir {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .btn-excluir:hover {
+            background-color: #c82333;
+        }
+
+        .icone-tamanho {
+            font-size: 1.1rem;
+            letter-spacing: -3px;
+            filter: brightness(0) invert(1);
+        }
+
+        .grade-jogadores {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 8px;
+            max-height: 250px;
+            overflow-y: auto;
+            padding-bottom: 5px;
+        }
+
+        .card-selecao {
+            background-color: #333;
+            border: 2px solid #444;
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            transition: all 0.2s;
+            opacity: 0.6;
+        }
+
+        .card-selecao.selecionado {
+            border-color: #28a745;
+            background-color: rgba(40, 167, 69, 0.15);
+            opacity: 1;
+        }
+
+        .card-topo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-nome {
+            font-weight: 600;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-estrelas {
+            font-size: 0.8rem;
+            color: #ffc107;
+            text-align: center;
+        }
+
+        .acoes-rapidas {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .acoes-rapidas .btn-secundario {
+            margin-top: 0;
+            flex: 1;
+            padding: 8px;
+            font-size: 0.85rem;
+            border-radius: 6px;
+        }
+
+        .times-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .time-card {
+            background-color: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            border-left: 5px solid #555;
+            transition: all 0.2s;
+        }
+
+        .time-card.ativo {
+            border-left-color: #00d2ff;
+            box-shadow: 0 0 10px rgba(0, 210, 255, 0.2);
+        }
+
+        .time-header {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .time-card.interativo .time-header {
+            cursor: pointer;
+        }
+
+        .time-forca {
+            font-size: 0.85rem;
+            color: #ffc107;
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+
+        .time-lista {
+            padding: 10px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-height: 40px;
+        }
+
+        .jogador-item-lista {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.95rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background-color: rgba(255, 255, 255, 0.02);
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        .jogador-item-lista.clicavel {
+            cursor: pointer;
+        }
+
+        .jogador-item-lista.clicavel:active {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .jogador-item-lista:last-child {
+            border-bottom: none;
+        }
+
+        .j-nome-icone {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .banco-container {
+            background-color: #222;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 50px;
+        }
+
+        .chip-jogador {
+            background-color: #444;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .podio-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 10px;
+            margin: 10px 0 5px 0;
+        }
+
+        .podio-coluna {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 32%;
+            max-width: 110px;
+        }
+
+        .podio-info-topo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 6px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .podio-avatar {
+            font-weight: 600;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+
+        .podio-membros {
+            font-size: 0.7rem;
+            color: #aaa;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+
+        .podio-bloco {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            border-radius: 8px 8px 0 0;
+            font-weight: 600;
+            color: #111;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            padding: 8px 4px;
+            text-align: center;
+        }
+
+        .podio-1 {
+            min-height: 145px;
+            background: linear-gradient(135deg, #ffd700, #ffa500);
+            order: 2;
+        }
+
+        .podio-2 {
+            min-height: 120px;
+            background: linear-gradient(135deg, #e0e0e0, #b0b0b0);
+            order: 1;
+        }
+
+        .podio-3 {
+            min-height: 100px;
+            background: linear-gradient(135deg, #cd7f32, #a0522d);
+            color: #fff;
+            order: 3;
+        }
+
+        .podio-posicao-num {
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .podio-trofeus {
+            font-size: 0.65rem;
+            line-height: 1.3;
+            word-break: break-all;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+        }
+
+        .ranking-lista {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+
+        .ranking-card {
+            background-color: #333;
+            border-radius: 8px;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #555;
+        }
+
+        .ranking-card.lider {
+            border-left-color: #ffd700;
+        }
+
+        .ranking-card.vice {
+            border-left-color: #c0c0c0;
+        }
+
+        .ranking-card.terceiro {
+            border-left-color: #cd7f32;
+        }
+
+        .ranking-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ranking-pos {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #888;
+            width: 20px;
+        }
+
+        .ranking-nome-time {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .ranking-qtd-trofeus {
+            background-color: rgba(255, 193, 7, 0.15);
+            color: #ffc107;
+            padding: 6px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            max-width: 140px;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .info-times {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            background-color: #333;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border: 1px solid #444;
+            line-height: 1.4;
+        }
+
+        .lista-times-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 120px;
+            overflow-y: auto;
+            margin-top: 6px;
+            padding-right: 4px;
+        }
+
+        .item-time-lista {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            border-left: 3px solid #00d2ff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .contador-jogos-badge {
+            background-color: #007bff;
+            color: white;
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .select-horas {
+            background-color: #333;
+            border: 1px solid #444;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .select-horas:focus {
+            border-color: #00d2ff;
+        }
+
+        .tabela-container {
+            background-color: #2a2a2a;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tabela-header-row {
+            display: flex;
+            background-color: #333;
+            padding: 12px 16px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            color: #00d2ff;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .col-partida {
+            flex: 1.4;
+        }
+
+        .col-vencedor {
+            flex: 1.6;
+            text-align: right;
+        }
+
+        .lista-partidas-corpo {
+            display: flex;
+            flex-direction: column;
+            max-height: 45vh;
+            overflow-y: auto;
+        }
+
+        .partida-linha {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background-color 0.2s;
+            gap: 10px;
+        }
+
+        .partida-linha:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.015);
+        }
+
+        .partida-linha.bloqueada {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .partida-linha.ativa {
+            background-color: rgba(0, 123, 255, 0.15);
+            border-left: 4px solid #007bff;
+        }
+
+        .partida-info-texto {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .partida-numero {
+            font-size: 0.75rem;
+            color: #ffc107;
+        }
+
+        .vencedor-controles {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            justify-content: flex-end;
+        }
+
+        .select-vencedor {
+            background-color: #333;
+            border: 1px solid #444;
+            color: white;
+            padding: 8px 10px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            outline: none;
+            max-width: 140px;
+        }
+
+        .btn-ok {
+            background-color: #007bff;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-ok:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-ok:disabled {
+            background-color: #444;
+            color: #888;
+            cursor: not-allowed;
+        }
+
+        .badge-vencedor {
+            font-size: 0.85rem;
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .aviso-vazio {
+            color: #777;
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background-color: #2a2a2a;
+            border-radius: 12px;
+            padding: 20px;
+            width: 100%;
+            max-width: 320px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            border: 1px solid #444;
+        }
+
+        .modal-icone-status {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .modal-titulo {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .modal-texto {
+            font-size: 0.9rem;
+            color: #bbb;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .modal-botoes {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .modal-btn-cancelar {
+            background-color: #444;
+            color: #fff;
+        }
+
+        .modal-btn-confirmar {
+            background-color: #28a745;
+            color: #fff;
+        }
+
+        .link-interno {
+            color: #00d2ff;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font: inherit;
+            padding: 0;
+        }
+
+        /* Classes para orientação manual do placar */
+        body.modo-placar.manual-layout-portrait {
+            flex-direction: column !important;
+        }
+
+        body.modo-placar.manual-layout-portrait .pontos {
+            font-size: 40vh !important;
+        }
+
+        body.modo-placar.manual-layout-landscape {
+            flex-direction: row !important;
+        }
+
+        body.modo-placar.manual-layout-landscape .pontos {
+            font-size: 80vh !important;
+        }
+
+        /* ===================== MODOS RESPONSIVOS & MULTI-ROW FLEX ===================== */
+        @media (orientation: portrait),
+        (max-width: 768px) {
+
+            /* Header do Placar em Portrait */
+            .controles-topo.placar-header {
+                padding: 6px 8px;
+                gap: 6px;
+                align-items: center;
+            }
+
+            .botoes-atalho-container {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px 5px;
+                justify-content: center;
+                align-items: center;
+                flex: 1;
+                min-width: 0;
+            }
+
+            .botoes-atalho-container .btn-atalho,
+            .botoes-atalho-container .btn {
+                flex: 1 1 76px;
+                min-width: 76px;
+                padding: 6px 4px;
+                font-size: 0.78rem;
+                letter-spacing: -0.2px;
+                text-align: center;
+                justify-content: center;
+                border-radius: 6px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                gap: 3px;
+            }
+
+            /* Sticky App Header em Portrait */
+            .app-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+                padding: 8px 10px;
+                margin: -15px -15px 12px -15px;
+            }
+
+            .app-header h1 {
+                font-size: 1.05rem;
+                text-align: center;
+            }
+
+            .topo-acoes {
+                width: 100%;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px 5px;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .topo-acoes .btn-acao {
+                flex: 1 1 76px;
+                min-width: 76px;
+                padding: 6px 4px;
+                font-size: 0.78rem;
+                letter-spacing: -0.2px;
+                justify-content: center;
+                text-align: center;
+                border-radius: 6px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                gap: 3px;
+            }
+        }
+    </style>
+</head>
+
+<body class="modo-placar">
+
+    <!-- ===================== 1. SEÇÃO PLACAR ===================== -->
+    <section id="pagina-placar" class="pagina ativa">
+        <!-- FIGURINHA INICIAL AO ABRIR (SOME AO CLICAR/TOCAR NA TELA) -->
+        <div class="figurinha-inicial-overlay" id="overlayFigurinhaInicial" style="display: none;" onclick="this.style.display='none'; this.remove();">
+            <img src="Thai01.webp" alt="Figurinha 01" class="figurinha-inicial-img" onclick="event.stopPropagation(); this.parentElement.style.display='none'; this.parentElement.remove();">
+        </div>
+
+        <!-- HEADER UNIFICADO DO PLACAR -->
+        <div class="controles-wrapper">
+            <header class="controles-topo placar-header" id="placarHeader">
+                <div class="menu-container">
+                    <button class="btn-menu" id="btnMenuToggle" type="button" title="Menu">☰</button>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <div class="dropdown-item" id="btnToggleFigurinhas" style="cursor: pointer;">
+                            <span>🖼️ Figurinhas: Ativadas</span>
+                            <label class="switch" onclick="event.stopPropagation();">
+                                <input type="checkbox" id="checkFigurinhas">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="dropdown-item" id="btnToggleTema" style="cursor: pointer;">
+                            <span id="labelTema">☀️ Tema: Vidro</span>
+                            <label class="switch" onclick="event.stopPropagation();">
+                                <input type="checkbox" id="checkTema">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="botoes-atalho-container">
+                    <button type="button" onclick="navegarParaPagina('jogadores')" class="btn-atalho btn-nav btn-nav-jogadores">👤 Jogadores</button>
+                    <button type="button" onclick="navegarParaPagina('sorteio')" class="btn-atalho btn-nav btn-nav-sorteio">🎲 Sorteio</button>
+                    <button type="button" onclick="navegarParaPagina('ranking')" class="btn-atalho btn-nav btn-nav-ranking">🏆 Ranking</button>
+                    <button type="button" onclick="navegarParaPagina('partidas')" class="btn-atalho btn-nav btn-nav-partidas">📋 Partidas</button>
+                    <button class="btn" id="btnGirar" type="button">📱 Girar Tela</button>
+                    <button class="btn" id="btnFullscreen" type="button">🖥️ Tela Cheia</button>
+                    <button class="btn" id="btnReset" type="button">↺ Zerar</button>
+                </div>
+            </header>
+
+            <button class="btn-atalho" id="btnToggleControlesTopo" type="button" title="Minimizar/Maximizar controles">
+                <span class="seta-animada"></span>
+                <span class="seta-animada"></span>
+            </button>
+        </div>
+
+        <div class="versao-placar">Placar da Thai V1.5</div>
+
+        <div class="controles-centro">
+            <button class="btn-central" id="btnInverterLados" type="button" title="Inverter placar">⇄</button>
+        </div>
+
+        <div class="controles-baixo">
+            <button class="btn-central" id="btnResetBaixo" type="button" title="Zerar placar">↺</button>
+        </div>
+
+        <div class="lado-azul" id="btnAzul">
+            <div class="pontos" id="pontosAzul">0</div>
+        </div>
+        <div class="lado-vermelho" id="btnVermelho">
+            <div class="pontos" id="pontosVermelho">0</div>
+        </div>
+
+        <!-- MODAL DE CONFIRMAÇÃO PARA ZERAR PLACAR -->
+        <div class="modal-overlay" id="modalZerarPlacar" style="display: none;">
+            <div class="modal-card">
+                <div class="modal-icone-status">⚠️</div>
+                <div class="modal-titulo">Zerar Placar</div>
+                <div class="modal-texto">Tem certeza que deseja zerar o placar?</div>
+                <div class="modal-botoes">
+                    <button class="modal-btn modal-btn-cancelar" type="button" id="btnCancelarZerar">Não</button>
+                    <button class="modal-btn modal-btn-confirmar" type="button" id="btnConfirmarZerar" style="background-color: #dc3545;">Sim</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== 2. SEÇÃO JOGADORES ===================== -->
+    <section id="pagina-jogadores" class="pagina">
+        <header class="app-header">
+            <h1>👤 Jogadores</h1>
+            <div class="topo-acoes">
+                <button type="button" onclick="navegarParaPagina('jogadores')" class="btn-acao btn-nav btn-nav-jogadores ativo">👤 Jogadores</button>
+                <button type="button" onclick="navegarParaPagina('sorteio')" class="btn-acao btn-nav btn-nav-sorteio">🎲 Sorteio</button>
+                <button type="button" onclick="navegarParaPagina('ranking')" class="btn-acao btn-nav btn-nav-ranking">🏆 Ranking</button>
+                <button type="button" onclick="navegarParaPagina('partidas')" class="btn-acao btn-nav btn-nav-partidas">📋 Partidas</button>
+                <button type="button" onclick="navegarParaPagina('placar')" class="btn-acao btn-nav btn-nav-placar">
+                    <span class="icone-placar-blocos">
+                        <span class="bloco-placar bloco-azul-claro"></span>
+                        <span class="bloco-placar bloco-vermelho-escuro"></span>
+                    </span> Placar
+                </button>
+            </div>
+        </header>
+
+        <div class="secao">
+            <h2>Novo Jogador</h2>
+            <div class="form-grupo">
+                <label for="inputNome">Nome do Jogador:</label>
+                <input type="text" id="inputNome" placeholder="Digite o nome...">
+            </div>
+            <div class="form-grupo">
+                <label>Sexo:</label>
+                <div class="opcoes-sexo">
+                    <input type="radio" id="sexoM" name="sexo" value="m" checked>
+                    <label for="sexoM" class="radio-label">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="icone-m"><circle cx="10" cy="14" r="6"></circle><line x1="14.24" y1="9.76" x2="20" y2="4"></line><polyline points="15 4 20 4 20 9"></polyline></svg>
+                        Masculino
+                    </label>
+                    <input type="radio" id="sexoF" name="sexo" value="f">
+                    <label for="sexoF" class="radio-label">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="icone-f"><circle cx="12" cy="9" r="6"></circle><line x1="12" y1="15" x2="12" y2="22"></line><line x1="9" y1="19" x2="15" y2="19"></line></svg>
+                        Feminino
+                    </label>
+                </div>
+            </div>
+            <div class="form-grupo">
+                <label for="selectEstrelas">Nível (Estrelas):</label>
+                <select id="selectEstrelas">
+                    <option value="1">⭐ 1 Estrela</option>
+                    <option value="2">⭐⭐ 2 Estrelas</option>
+                    <option value="3">⭐⭐⭐ 3 Estrelas</option>
+                    <option value="4" selected>⭐⭐⭐⭐ 4 Estrelas</option>
+                    <option value="5">⭐⭐⭐⭐⭐ 5 Estrelas</option>
+                    <option value="6">⭐⭐⭐⭐⭐⭐ 6 Estrelas</option>
+                    <option value="7">⭐⭐⭐⭐⭐⭐⭐ 7 Estrelas</option>
+                </select>
+            </div>
+            <button class="btn-principal" id="btnAdicionar" type="button">Adicionar Jogador</button>
+        </div>
+
+        <div class="secao">
+            <h2>Cadastrados (<span id="contadorJogadores">0</span>)</h2>
+            <div class="lista-jogadores" id="listaJogadores">
+                <span style="color: #777; font-size: 0.85rem; text-align: center; padding: 10px;">Nenhum jogador cadastrado ainda.</span>
+            </div>
+        </div>
+        <div class="versao-app">Jogadores V1.9</div>
+    </section>
+
+    <!-- ===================== 3. SEÇÃO SORTEIO ===================== -->
+    <section id="pagina-sorteio" class="pagina">
+        <header class="app-header">
+            <h1>🎲 Sorteio e Times</h1>
+            <div class="topo-acoes">
+                <button type="button" onclick="navegarParaPagina('jogadores')" class="btn-acao btn-nav btn-nav-jogadores">👤 Jogadores</button>
+                <button type="button" onclick="navegarParaPagina('sorteio')" class="btn-acao btn-nav btn-nav-sorteio ativo">🎲 Sorteio</button>
+                <button type="button" onclick="navegarParaPagina('ranking')" class="btn-acao btn-nav btn-nav-ranking">🏆 Ranking</button>
+                <button type="button" onclick="navegarParaPagina('partidas')" class="btn-acao btn-nav btn-nav-partidas">📋 Partidas</button>
+                <button type="button" onclick="navegarParaPagina('placar')" class="btn-acao btn-nav btn-nav-placar">
+                    <span class="icone-placar-blocos">
+                        <span class="bloco-placar bloco-azul-claro"></span>
+                        <span class="bloco-placar bloco-vermelho-escuro"></span>
+                    </span> Placar
+                </button>
+            </div>
+        </header>
+
+        <div class="secao">
+            <h2>
+                <span>Lista de Presença</span>
+                <span id="contadorSelecionados" style="color: #fff; font-size: 0.9rem;">0 / 0</span>
+            </h2>
+            <div class="acoes-rapidas">
+                <button class="btn-secundario" type="button" onclick="selecionarTodos(true)">Marcar Todos</button>
+                <button class="btn-secundario" type="button" onclick="selecionarTodos(false)">Desmarcar Todos</button>
+            </div>
+            <div class="grade-jogadores" id="gradeJogadores">
+                <span style="color: #777; font-size: 0.85rem; text-align: center; width: 100%; padding: 10px;">Nenhum jogador cadastrado. Vá em "Jogadores" primeiro.</span>
+            </div>
+        </div>
+
+        <div class="secao">
+            <h2>Configurações do Sorteio</h2>
+            <div class="form-grupo">
+                <label>Tamanho do Time:</label>
+                <div class="opcoes-grupo">
+                    <input type="radio" id="tam2" name="tamanho" value="2" checked>
+                    <label for="tam2" class="radio-label"><span class="icone-tamanho">👤👤</span> Duplas</label>
+                    <input type="radio" id="tam3" name="tamanho" value="3">
+                    <label for="tam3" class="radio-label"><span class="icone-tamanho">👤👤👤</span> Trios</label>
+                    <input type="radio" id="tam4" name="tamanho" value="4">
+                    <label for="tam4" class="radio-label"><span class="icone-tamanho">👤👤👤👤</span> Quartetos</label>
+                </div>
+            </div>
+            <div class="form-grupo">
+                <label>Modo de Geração:</label>
+                <div class="opcoes-grupo modo-botoes">
+                    <input type="radio" id="modoNormal" name="modo" value="normal" checked>
+                    <label for="modoNormal" class="radio-label">⚡ Normal</label>
+                    <input type="radio" id="modoMisto" name="modo" value="misto">
+                    <label for="modoMisto" class="radio-label">⚖️ Misto</label>
+                    <input type="radio" id="modoManual" name="modo" value="manual">
+                    <label for="modoManual" class="radio-label">✋ Manual</label>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-principal" id="btnAcao" type="button" onclick="iniciarGeracao()">🎲 Sortear Times</button>
+
+        <div class="secao" id="secaoResultados" style="display: none;">
+            <h2 id="tituloResultados">Times Gerados</h2>
+            <div id="instrucaoManual" style="display: none; font-size: 0.85rem; color: #ffc107; margin-bottom: 10px; text-align: center;">
+                Toque num time para selecioná-lo e depois nos jogadores do Banco para preencher.
+            </div>
+            <div id="bancoManual" class="banco-container" style="display: none;"></div>
+            <div class="times-container" id="containerTimes"></div>
+            <div id="acoesManuaisExtra" style="display: none; margin-top: 25px;">
+                <button class="btn-secundario" type="button" style="background-color: #17a2b8; width: 100%; font-size: 1rem; padding: 12px; margin-bottom: 10px;" onclick="adicionarTimeManual()">➕ Adicionar Novo Time</button>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-secundario" type="button" style="background-color: #dc3545; flex: 1; font-size: 0.95rem; padding: 12px; margin-top: 0;" onclick="confirmarExcluirTodos()">🗑️ Excluir Todos</button>
+                    <button class="btn-principal" type="button" style="background-color: #28a745; flex: 1; margin-bottom: 0;" onclick="salvarTimesDefinitivo()">💾 Salvar Times</button>
+                </div>
+            </div>
+        </div>
+        <div id="modalSorteio"></div>
+    </section>
+
+    <!-- ===================== 4. SEÇÃO RANKING ===================== -->
+    <section id="pagina-ranking" class="pagina">
+        <header class="app-header">
+            <h1>🏆 Ranking</h1>
+            <div class="topo-acoes">
+                <button type="button" onclick="navegarParaPagina('jogadores')" class="btn-acao btn-nav btn-nav-jogadores">👤 Jogadores</button>
+                <button type="button" onclick="navegarParaPagina('sorteio')" class="btn-acao btn-nav btn-nav-sorteio">🎲 Sorteio</button>
+                <button type="button" onclick="navegarParaPagina('ranking')" class="btn-acao btn-nav btn-nav-ranking ativo">🏆 Ranking</button>
+                <button type="button" onclick="navegarParaPagina('partidas')" class="btn-acao btn-nav btn-nav-partidas">📋 Partidas</button>
+                <button type="button" onclick="navegarParaPagina('placar')" class="btn-acao btn-nav btn-nav-placar">
+                    <span class="icone-placar-blocos">
+                        <span class="bloco-placar bloco-azul-claro"></span>
+                        <span class="bloco-placar bloco-vermelho-escuro"></span>
+                    </span> Placar
+                </button>
+            </div>
+        </header>
+
+        <div class="secao" id="secaoPodio" style="display: none;">
+            <h2>Pódio dos Campeões</h2>
+            <div class="podio-container" id="containerPodio"></div>
+        </div>
+        <div class="secao" id="secaoRankingCompleto" style="display: none;">
+            <h2>Classificação Geral</h2>
+            <div class="ranking-lista" id="listaRankingCompleta"></div>
+        </div>
+        <div class="secao" id="secaoSemTimes" style="text-align: center; padding: 30px; display: none;">
+            <div style="font-size: 2.5rem; margin-bottom: 10px;">⚠️</div>
+            <div style="font-size: 1.1rem; font-weight: 600; margin-bottom: 5px;">Nenhum time encontrado</div>
+            <div style="font-size: 0.9rem; color: #aaa; margin-bottom: 20px;">Vá até a página de Sorteio, monte os times e clique em "Salvar Times".</div>
+            <button type="button" onclick="navegarParaPagina('sorteio')" class="btn-principal" style="display: inline-flex; max-width: 200px; margin: 0 auto;">Ir para o Sorteio</button>
+        </div>
+    </section>
+
+    <!-- ===================== 5. SEÇÃO PARTIDAS ===================== -->
+    <section id="pagina-partidas" class="pagina">
+        <header class="app-header">
+            <h1>📋 Partidas</h1>
+            <div class="topo-acoes">
+                <button type="button" onclick="navegarParaPagina('jogadores')" class="btn-acao btn-nav btn-nav-jogadores">👤 Jogadores</button>
+                <button type="button" onclick="navegarParaPagina('sorteio')" class="btn-acao btn-nav btn-nav-sorteio">🎲 Sorteio</button>
+                <button type="button" onclick="navegarParaPagina('ranking')" class="btn-acao btn-nav btn-nav-ranking">🏆 Ranking</button>
+                <button type="button" onclick="navegarParaPagina('partidas')" class="btn-acao btn-nav btn-nav-partidas ativo">📋 Partidas</button>
+                <button type="button" onclick="navegarParaPagina('placar')" class="btn-acao btn-nav btn-nav-placar">
+                    <span class="icone-placar-blocos">
+                        <span class="bloco-placar bloco-azul-claro"></span>
+                        <span class="bloco-placar bloco-vermelho-escuro"></span>
+                    </span> Placar
+                </button>
+            </div>
+        </header>
+
+        <div class="secao">
+            <h2>Gerenciador de Partidas</h2>
+            <div class="info-times" id="infoTimesStatus">
+                <span>Carregando times salvos do sorteio...</span>
+            </div>
+            <div class="form-grupo" style="margin-top: 12px;">
+                <label for="selectHoras">Duração do Baba:</label>
+                <select id="selectHoras" class="select-horas">
+                    <option value="1">1 Hora (~12 Partidas Base)</option>
+                    <option value="2" selected>2 Horas (~24 Partidas Base)</option>
+                    <option value="3">3 Horas (~36 Partidas Base)</option>
+                    <option value="4">4 Horas (~48 Partidas Base)</option>
+                </select>
+            </div>
+            <button class="btn-principal" id="btnGerarLista" type="button">🎲 Gerar Novas Partidas</button>
+        </div>
+
+        <div class="tabela-container">
+            <div class="tabela-header-row">
+                <div class="col-partida">Partida / Confronto</div>
+                <div class="col-vencedor">Vencedor</div>
+            </div>
+            <div class="lista-partidas-corpo" id="listaPartidasCorpo">
+                <div class="aviso-vazio">Clique no botão acima para gerar a lista de partidas!</div>
+            </div>
+        </div>
+
+        <button class="btn-secundario" type="button" onclick="adicionarPartidaManual()">➕ Adicionar Partida Manualmente</button>
+        <div id="modalPartidas"></div>
+        <div class="versao-app">Partidas V1.8</div>
+    </section>
+
+    <!-- ===================== CONSOLIDATED JAVASCRIPT LOGIC ===================== -->
+    <script>
+        // --- GERENCIADOR DE NAVEGAÇÃO SPA ---
+        function navegarParaPagina(paginaId) {
+            const paginas = document.querySelectorAll('.pagina');
+            paginas.forEach(p => p.classList.remove('ativa'));
+
+            const paginaAlvo = document.getElementById('pagina-' + paginaId);
+            if (paginaAlvo) {
+                paginaAlvo.classList.add('ativa');
+            }
+
+            if (paginaId === 'placar') {
+                document.body.classList.remove('modo-app');
+                document.body.classList.add('modo-placar');
+            } else {
+                document.body.classList.remove('modo-placar');
+                document.body.classList.add('modo-app');
+            }
+
+            // Atualizar destaque das abas
+            document.querySelectorAll('.btn-nav').forEach(btn => btn.classList.remove('ativo'));
+            document.querySelectorAll('.btn-nav-' + paginaId).forEach(btn => btn.classList.add('ativo'));
+
+            // Recarregar dados reativamente ao entrar na aba
+            if (paginaId === 'jogadores' && typeof carregarJogadoresCadastro === 'function') {
+                carregarJogadoresCadastro();
+            } else if (paginaId === 'sorteio' && typeof carregarJogadoresSorteio === 'function') {
+                carregarJogadoresSorteio();
+            } else if (paginaId === 'ranking' && typeof carregarDadosRanking === 'function') {
+                carregarDadosRanking();
+            } else if (paginaId === 'partidas' && typeof atualizarPaginaPartidas === 'function') {
+                atualizarPaginaPartidas();
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // SVG Icons Globais
+        const svgM = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="icone-m"><circle cx="10" cy="14" r="6"></circle><line x1="14.24" y1="9.76" x2="20" y2="4"></line><polyline points="15 4 20 4 20 9"></polyline></svg>`;
+        const svgF = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="icone-f"><circle cx="12" cy="9" r="6"></circle><line x1="12" y1="15" x2="12" y2="22"></line><line x1="9" y1="19" x2="15" y2="19"></line></svg>`;
+        const svgM14 = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="icone-m"><circle cx="10" cy="14" r="6"></circle><line x1="14.24" y1="9.76" x2="20" y2="4"></line><polyline points="15 4 20 4 20 9"></polyline></svg>`;
+        const svgF14 = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="icone-f"><circle cx="12" cy="9" r="6"></circle><line x1="12" y1="15" x2="12" y2="22"></line><line x1="9" y1="19" x2="15" y2="19"></line></svg>`;
+
+        // Declarar escopo de funções globais para binding inline
+        let carregarJogadoresCadastro;
+        let carregarJogadoresSorteio;
+        let carregarDadosRanking;
+        let atualizarPaginaPartidas;
+
+        (function () {
+            function initApp() {
+                // ==========================================
+                // 1. LÓGICA DO PLACAR (INDEX.JS)
+                // ==========================================
+                const IMAGENS_DA_THAI = ['Thai01.webp', 'Thai02.webp', 'Thai03.webp'];
+                let scoreAzul = 0;
+                let scoreVermelho = 0;
+                let rotacaoAtual = parseInt(localStorage.getItem('rotacao_atual')) || 0;
+                let jogoEncerrado = false;
+
+                const valFig = localStorage.getItem('figurinhas_ativas');
+                let figurinhasAtivas = valFig === null ? true : (valFig === 'true' || valFig === true);
+                let confetesAtivos = [];
+
+                const elAzul = document.getElementById('pontosAzul');
+                const elVermelho = document.getElementById('pontosVermelho');
+                const containerAzul = document.getElementById('btnAzul');
+                const containerVermelho = document.getElementById('btnVermelho');
+                const btnReset = document.getElementById('btnReset');
+                const btnResetBaixo = document.getElementById('btnResetBaixo');
+                const modalZerarPlacar = document.getElementById('modalZerarPlacar');
+                const btnCancelarZerar = document.getElementById('btnCancelarZerar');
+                const btnConfirmarZerar = document.getElementById('btnConfirmarZerar');
+                const btnFullscreen = document.getElementById('btnFullscreen');
+                const btnGirar = document.getElementById('btnGirar');
+                const btnMenuToggle = document.getElementById('btnMenuToggle');
+                const dropdownMenu = document.getElementById('dropdownMenu');
+                const btnToggleFigurinhas = document.getElementById('btnToggleFigurinhas');
+                const checkFigurinhas = document.getElementById('checkFigurinhas');
+                const btnToggleTema = document.getElementById('btnToggleTema');
+                const checkTema = document.getElementById('checkTema');
+                const labelTema = document.getElementById('labelTema');
+                let temaPlacar = localStorage.getItem('tema_placar') || 'claro';
+                const overlayFigurinhaInicial = document.getElementById('overlayFigurinhaInicial');
+                const btnToggleControlesTopo = document.getElementById('btnToggleControlesTopo');
+                const controlesTopo = document.querySelector('.controles-topo');
+                let controlesTopoEscondidos = localStorage.getItem('controles_topo_escondidos') === 'true';
+
+                function aplicarTema() {
+                    if (temaPlacar === 'escuro') {
+                        document.body.classList.add('tema-escuro');
+                        if (checkTema) checkTema.checked = false;
+                        if (labelTema) labelTema.textContent = '🌙 Tema: Escuro';
+                    } else {
+                        document.body.classList.remove('tema-escuro');
+                        if (checkTema) checkTema.checked = true;
+                        if (labelTema) labelTema.textContent = '☀️ Tema: Vidro';
+                    }
+                }
+
+                aplicarTema();
+
+                if (checkTema) {
+                    if (btnToggleTema) {
+                        btnToggleTema.addEventListener('click', (e) => {
+                            if (e.target.closest('.switch')) return;
+                            e.stopPropagation();
+                            temaPlacar = temaPlacar === 'claro' ? 'escuro' : 'claro';
+                            localStorage.setItem('tema_placar', temaPlacar);
+                            aplicarTema();
+                        });
+                    }
+
+                    checkTema.addEventListener('change', (e) => {
+                        e.stopPropagation();
+                        temaPlacar = checkTema.checked ? 'claro' : 'escuro';
+                        localStorage.setItem('tema_placar', temaPlacar);
+                        aplicarTema();
+                    });
+                }
+
+                if (overlayFigurinhaInicial) {
+                    if (figurinhasAtivas) {
+                        overlayFigurinhaInicial.classList.add('ativa');
+                        overlayFigurinhaInicial.style.display = 'flex';
+                        const fecharOverlay = (e) => {
+                            if (e) e.stopPropagation();
+                            overlayFigurinhaInicial.classList.remove('ativa');
+                            overlayFigurinhaInicial.style.display = 'none';
+                            overlayFigurinhaInicial.remove();
+                        };
+                        overlayFigurinhaInicial.addEventListener('click', fecharOverlay);
+                        overlayFigurinhaInicial.addEventListener('pointerup', fecharOverlay);
+                        overlayFigurinhaInicial.addEventListener('touchstart', fecharOverlay, { passive: true });
+                        const imgInterna = overlayFigurinhaInicial.querySelector('.figurinha-inicial-img');
+                        if (imgInterna) {
+                            imgInterna.addEventListener('click', fecharOverlay);
+                            imgInterna.addEventListener('pointerup', fecharOverlay);
+                            imgInterna.addEventListener('touchstart', fecharOverlay, { passive: true });
+                        }
+                    } else {
+                        overlayFigurinhaInicial.classList.remove('ativa');
+                        overlayFigurinhaInicial.style.display = 'none';
+                        overlayFigurinhaInicial.remove();
+                    }
+                }
+
+                function atualizarTextoFigurinhas() {
+                    if (btnToggleFigurinhas) {
+                        const span = btnToggleFigurinhas.querySelector('span');
+                        if (span) span.textContent = figurinhasAtivas ? '🖼️ Figurinhas: Ativadas' : '🖼️ Figurinhas: Desativadas';
+                    }
+                }
+
+                if (checkFigurinhas) {
+                    checkFigurinhas.checked = figurinhasAtivas;
+                    atualizarTextoFigurinhas();
+
+                    btnToggleFigurinhas.addEventListener('click', (e) => {
+                        if (e.target.closest('.switch')) return;
+                        e.stopPropagation();
+                        figurinhasAtivas = !figurinhasAtivas;
+                        checkFigurinhas.checked = figurinhasAtivas;
+                        localStorage.setItem('figurinhas_ativas', figurinhasAtivas ? 'true' : 'false');
+                        atualizarTextoFigurinhas();
+                    });
+
+                    checkFigurinhas.addEventListener('change', (e) => {
+                        e.stopPropagation();
+                        figurinhasAtivas = checkFigurinhas.checked;
+                        localStorage.setItem('figurinhas_ativas', figurinhasAtivas ? 'true' : 'false');
+                        atualizarTextoFigurinhas();
+                    });
+                }
+
+                if (btnToggleControlesTopo && controlesTopo) {
+                    if (controlesTopoEscondidos) {
+                        controlesTopo.classList.add('escondido');
+                        btnToggleControlesTopo.classList.add('revertido');
+                    }
+                    btnToggleControlesTopo.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        controlesTopoEscondidos = !controlesTopoEscondidos;
+                        controlesTopo.classList.toggle('escondido', controlesTopoEscondidos);
+                        btnToggleControlesTopo.classList.toggle('revertido', controlesTopoEscondidos);
+                        localStorage.setItem('controles_topo_escondidos', controlesTopoEscondidos);
+                    });
+                }
+
+                if (btnMenuToggle) {
+                    btnMenuToggle.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (dropdownMenu) dropdownMenu.classList.toggle('ativo');
+                    });
+                }
+
+                window.addEventListener('click', () => {
+                    if (dropdownMenu) dropdownMenu.classList.remove('ativo');
+                });
+
+                function aplicarRotacao() {
+                    const wrapper = document.querySelector('.controles-wrapper');
+                    if (wrapper) {
+                        wrapper.classList.remove('posicao-top', 'posicao-right', 'posicao-bottom', 'posicao-left');
+                        if (rotacaoAtual === 90) wrapper.classList.add('posicao-right');
+                        else if (rotacaoAtual === 180) wrapper.classList.add('posicao-bottom');
+                        else if (rotacaoAtual === 270) wrapper.classList.add('posicao-left');
+                        else wrapper.classList.add('posicao-top');
+                    }
+
+                    const elementosPontos = document.querySelectorAll('.pontos');
+                    elementosPontos.forEach(el => {
+                        el.style.transition = 'transform 0.4s ease-in-out';
+                        el.style.transform = `rotate(${rotacaoAtual}deg)`;
+                    });
+                }
+
+                aplicarRotacao();
+
+                if (btnGirar) {
+                    btnGirar.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        rotacaoAtual = (rotacaoAtual + 90) % 360;
+                        localStorage.setItem('rotacao_atual', rotacaoAtual);
+                        aplicarRotacao();
+                    });
+                }
+
+                // 6. Inverter Lados do Placar
+                let ladosInvertidos = localStorage.getItem('lados_invertidos') === 'true';
+
+                function aplicarInversaoLados() {
+                    if (containerAzul && containerVermelho) {
+                        if (ladosInvertidos) {
+                            containerAzul.style.order = '2';
+                            containerVermelho.style.order = '1';
+                        } else {
+                            containerAzul.style.order = '1';
+                            containerVermelho.style.order = '2';
+                        }
+                    }
+                }
+
+                aplicarInversaoLados();
+
+                const btnInverterLados = document.getElementById('btnInverterLados');
+                if (btnInverterLados) {
+                    btnInverterLados.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        ladosInvertidos = !ladosInvertidos;
+                        localStorage.setItem('lados_invertidos', ladosInvertidos);
+                        aplicarInversaoLados();
+                    });
+                }
+
+                function limparConfetes() {
+                    confetesAtivos.forEach(c => c.el.remove());
+                    confetesAtivos.length = 0;
+                }
+
+                function dispararAvisoCentral(texto) {
+                    const aviso = document.createElement('div');
+                    aviso.className = 'aviso-central';
+                    aviso.textContent = texto;
+                    document.body.appendChild(aviso);
+                    setTimeout(() => aviso.remove(), 2000);
+                }
+
+                function criarConfeteNoLado(containerAlvo) {
+                    const el = document.createElement('div');
+                    el.className = 'confete';
+                    const cores = ['#ffeb3b', '#00e676', '#00b0ff', '#ff5722', '#e040fb', '#ffffff'];
+                    el.style.backgroundColor = cores[Math.floor(Math.random() * cores.length)];
+                    el.style.width = (Math.random() * 8 + 8) + 'px';
+                    el.style.height = (Math.random() * 8 + 8) + 'px';
+                    if (Math.random() > 0.5) el.style.borderRadius = '50%';
+                    containerAlvo.appendChild(el);
+                    const posX = Math.random() * containerAlvo.clientWidth;
+                    confetesAtivos.push({
+                        el, container: containerAlvo, x: posX, y: -10,
+                        vx: (Math.random() - 0.5) * 6, vy: Math.random() * 4 + 2,
+                        rot: Math.random() * 360, rotSpeed: (Math.random() - 0.5) * 10,
+                        gravity: 0.3, vida: 1.0, decay: 0.01
+                    });
+                }
+
+                function dispararChuvaConfetesNoLado(lado) {
+                    limparConfetes();
+                    const containerAlvo = lado === 'azul' ? containerAzul : containerVermelho;
+                    let intervalo = setInterval(() => {
+                        for (let i = 0; i < 6; i++) criarConfeteNoLado(containerAlvo);
+                    }, 50);
+                    setTimeout(() => clearInterval(intervalo), 2000);
+                }
+
+                function dispararFigurinhaPontoNoLado(lado) {
+                    if (!figurinhasAtivas) return;
+                    const antiga = document.querySelector('.figurinha-ponto');
+                    if (antiga) antiga.remove();
+                    const containerAlvo = lado === 'azul' ? containerAzul : containerVermelho;
+                    const img = document.createElement('img');
+                    img.className = 'figurinha-ponto';
+                    img.src = IMAGENS_DA_THAI[Math.floor(Math.random() * IMAGENS_DA_THAI.length)];
+                    containerAlvo.appendChild(img);
+                    img.addEventListener('animationend', () => img.remove());
+                }
+
+                function atualizarFisica() {
+                    for (let i = confetesAtivos.length - 1; i >= 0; i--) {
+                        let c = confetesAtivos[i];
+                        c.vy += c.gravity;
+                        c.x += c.vx;
+                        c.y += c.vy;
+                        c.rot += c.rotSpeed;
+                        if (c.y > c.container.clientHeight - 20) {
+                            c.vy *= -0.4;
+                            c.vx *= 0.8;
+                        }
+                        c.vida -= c.decay;
+                        if (c.vida <= 0) c.el.style.opacity = 0;
+                        c.el.style.transform = `translate(${c.x}px, ${c.y}px) rotate(${c.rot}deg)`;
+                        if (c.vida <= -0.2) {
+                            c.el.remove();
+                            confetesAtivos.splice(i, 1);
+                        }
+                    }
+                    requestAnimationFrame(atualizarFisica);
+                }
+                requestAnimationFrame(atualizarFisica);
+
+                function atualizarPlacar() {
+                    if (elAzul) elAzul.textContent = scoreAzul;
+                    if (elVermelho) elVermelho.textContent = scoreVermelho;
+                }
+
+                function verificarRegras(ladoModificado) {
+                    let diferenca = Math.abs(scoreAzul - scoreVermelho);
+                    let maiorPontuacao = Math.max(scoreAzul, scoreVermelho);
+                    let venceu = false;
+                    let ladoVencedor = '';
+
+                    if (scoreAzul === 15 || scoreVermelho === 15) {
+                        venceu = true;
+                        ladoVencedor = scoreAzul === 15 ? 'azul' : 'vermelho';
+                    } else if (maiorPontuacao >= 12 && diferenca >= 2) {
+                        venceu = true;
+                        ladoVencedor = scoreAzul > scoreVermelho ? 'azul' : 'vermelho';
+                    }
+
+                    if (venceu) {
+                        jogoEncerrado = true;
+                        dispararChuvaConfetesNoLado(ladoVencedor);
+                        let elVencedor = ladoVencedor === 'azul' ? elAzul : elVermelho;
+                        elVencedor.innerHTML = '<span class="trofeu-animado">🏆</span>';
+                        setTimeout(() => atualizarPlacar(), 2000);
+                        return;
+                    }
+
+                    if (scoreAzul === scoreVermelho && [11, 12, 13, 14].includes(scoreAzul) && ladoModificado) {
+                        dispararAvisoCentral('Empatou!');
+                        return;
+                    }
+
+                    let ehMatchPoint = false;
+                    if (scoreAzul === 15 || scoreVermelho === 15) {
+                        ehMatchPoint = false;
+                    } else if (scoreAzul >= 11 && scoreVermelho >= 11 && diferenca === 1) {
+                        ehMatchPoint = true;
+                    } else if ((scoreAzul === 11 && scoreVermelho < 11) || (scoreVermelho === 11 && scoreAzul < 11)) {
+                        if ((scoreAzul === 11 && ladoModificado === 'azul') || (scoreVermelho === 11 && ladoModificado === 'vermelho')) {
+                            ehMatchPoint = true;
+                        }
+                    } else if ((scoreAzul > 11 || scoreVermelho > 11) && diferenca === 1) {
+                        ehMatchPoint = true;
+                    }
+
+                    if (ehMatchPoint) {
+                        dispararAvisoCentral('MATCH POINT!');
+                        return;
+                    }
+
+                    if (!jogoEncerrado) dispararFigurinhaPontoNoLado(ladoModificado);
+                }
+
+                function bindLadoPlacar(container, lado) {
+                    let startX = 0, startY = 0, isInteracting = false;
+
+                    function getPos(e) {
+                        if (e.touches && e.touches.length > 0) {
+                            return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                        }
+                        if (e.changedTouches && e.changedTouches.length > 0) {
+                            return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+                        }
+                        return { x: e.clientX, y: e.clientY };
+                    }
+
+                    function handleStart(e) {
+                        if (e.target.closest('.controles-wrapper, .controles-centro, .controles-baixo, .modal-overlay, button, a, .dropdown-menu')) {
+                            return;
+                        }
+                        isInteracting = true;
+                        const pos = getPos(e);
+                        startX = pos.x;
+                        startY = pos.y;
+                    }
+
+                    function handleEnd(e) {
+                        if (!isInteracting) return;
+                        isInteracting = false;
+
+                        if (e.target.closest('.controles-wrapper, .controles-centro, .controles-baixo, .modal-overlay, button, a, .dropdown-menu')) {
+                            return;
+                        }
+
+                        const pos = getPos(e);
+                        let deltaX = pos.x - startX;
+                        let deltaY = pos.y - startY;
+                        let diff = 0;
+
+                        if (rotacaoAtual === 0) diff = -deltaY;
+                        else if (rotacaoAtual === 90) diff = deltaX;
+                        else if (rotacaoAtual === 180) diff = deltaY;
+                        else if (rotacaoAtual === 270) diff = -deltaX;
+
+                        if (jogoEncerrado) {
+                            scoreAzul = 0;
+                            scoreVermelho = 0;
+                            jogoEncerrado = false;
+                            const antiga = document.querySelector('.figurinha-ponto');
+                            if (antiga) antiga.remove();
+                            limparConfetes();
+                        }
+
+                        if (diff < -50) {
+                            if (lado === 'azul') scoreAzul = Math.max(0, scoreAzul - 1);
+                            else scoreVermelho = Math.max(0, scoreVermelho - 1);
+                            atualizarPlacar();
+                        } else {
+                            if (lado === 'azul') {
+                                if (scoreAzul < 15) scoreAzul++;
+                            } else {
+                                if (scoreVermelho < 15) scoreVermelho++;
+                            }
+                            atualizarPlacar();
+                            verificarRegras(lado);
+                        }
+                    }
+
+                    container.addEventListener('touchstart', handleStart, { passive: true });
+                    container.addEventListener('touchend', handleEnd, { passive: true });
+                    container.addEventListener('mousedown', handleStart);
+                    container.addEventListener('mouseup', handleEnd);
+                }
+
+                if (containerAzul) bindLadoPlacar(containerAzul, 'azul');
+                if (containerVermelho) bindLadoPlacar(containerVermelho, 'vermelho');
+
+                function abrirModalZerar() {
+                    if (modalZerarPlacar) modalZerarPlacar.style.display = 'flex';
+                }
+
+                function fecharModalZerar() {
+                    if (modalZerarPlacar) modalZerarPlacar.style.display = 'none';
+                }
+
+                function executarZerar() {
+                    scoreAzul = 0;
+                    scoreVermelho = 0;
+                    jogoEncerrado = false;
+                    const antiga = document.querySelector('.figurinha-ponto');
+                    if (antiga) antiga.remove();
+                    limparConfetes();
+                    atualizarPlacar();
+                    fecharModalZerar();
+                }
+
+                const resetarPlacar = (e) => {
+                    if (e) e.stopPropagation();
+                    if (scoreAzul > 0 || scoreVermelho > 0) {
+                        abrirModalZerar();
+                    } else {
+                        executarZerar();
+                    }
+                };
+
+                if (btnReset) {
+                    btnReset.addEventListener('click', resetarPlacar);
+                }
+                if (btnResetBaixo) {
+                    btnResetBaixo.addEventListener('click', resetarPlacar);
+                }
+                if (btnCancelarZerar) {
+                    btnCancelarZerar.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        fecharModalZerar();
+                    });
+                }
+                if (btnConfirmarZerar) {
+                    btnConfirmarZerar.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        executarZerar();
+                    });
+                }
+                if (modalZerarPlacar) {
+                    modalZerarPlacar.addEventListener('click', (e) => {
+                        if (e.target === modalZerarPlacar) {
+                            fecharModalZerar();
+                        }
+                    });
+                }
+
+                if (btnFullscreen) {
+                    btnFullscreen.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                        if (isIOS && !window.navigator.standalone) {
+                            alert("🍎 No iPhone, o navegador bloqueia a tela cheia. Para resolver:\n\n1. Clique no botão 'Compartilhar' do Safari.\n2. Role para baixo e escolha 'Adicionar à Tela de Início'.\n3. Abra pelo novo ícone criado!");
+                            return;
+                        }
+                        if (!document.fullscreenElement) {
+                            document.documentElement.requestFullscreen().then(() => {
+                                sessionStorage.setItem('modoFullscreen', 'ativo');
+                            }).catch(() => {
+                                alert("Seu navegador atual bloqueou a tela cheia. Adicione o site à sua Tela de Início!");
+                            });
+                        } else if (document.exitFullscreen) {
+                            document.exitFullscreen();
+                            sessionStorage.removeItem('modoFullscreen');
+                        }
+                    });
+                }
+
+                // ==========================================
+                // 2. LÓGICA DE JOGADORES (JOGADORES.JS)
+                // ==========================================
+                let jogadoresCadastro = [];
+
+                carregarJogadoresCadastro = function () {
+                    const dados = localStorage.getItem('base_jogadores');
+                    jogadoresCadastro = dados ? JSON.parse(dados) : [];
+                    renderizarListaJogadores();
+                };
+
+                function salvarJogadoresCadastro() {
+                    localStorage.setItem('base_jogadores', JSON.stringify(jogadoresCadastro));
+                }
+
+                function renderizarListaJogadores() {
+                    const listaJogadores = document.getElementById('listaJogadores');
+                    if (!listaJogadores) return;
+                    const contadorJogadores = document.getElementById('contadorJogadores');
+                    if (contadorJogadores) contadorJogadores.textContent = jogadoresCadastro.length;
+                    if (jogadoresCadastro.length === 0) {
+                        listaJogadores.innerHTML = '<span style="color: #777; font-size: 0.85rem; text-align: center; padding: 10px;">Nenhum jogador cadastrado ainda.</span>';
+                        return;
+                    }
+                    listaJogadores.innerHTML = '';
+                    jogadoresCadastro.forEach((j, index) => {
+                        const item = document.createElement('div');
+                        item.className = 'jogador-item';
+                        item.innerHTML = `
+                            <div class="jogador-info">
+                                <span class="jogador-nome">${j.nome}</span>
+                                <div class="jogador-detalhes">
+                                    ${j.genero === 'm' ? svgM : svgF}
+                                    <span class="jogador-estrelas">${'⭐'.repeat(j.nivel)}</span>
+                                </div>
+                            </div>
+                            <button class="btn-excluir" type="button" onclick="removerJogador(${index})">Excluir</button>
+                        `;
+                        listaJogadores.appendChild(item);
+                    });
+                }
+
+                const btnAdicionar = document.getElementById('btnAdicionar');
+                if (btnAdicionar) {
+                    btnAdicionar.addEventListener('click', () => {
+                        const inputNome = document.getElementById('inputNome');
+                        const nome = inputNome ? inputNome.value.trim() : '';
+                        const inputSexo = document.querySelector('input[name="sexo"]:checked');
+                        const genero = inputSexo ? inputSexo.value : 'm';
+                        const selectEstrelas = document.getElementById('selectEstrelas');
+                        const nivel = selectEstrelas ? parseInt(selectEstrelas.value) : 4;
+                        if (!nome) {
+                            alert('Por favor, digite o nome do jogador.');
+                            return;
+                        }
+                        jogadoresCadastro.push({ nome, genero, nivel });
+                        salvarJogadoresCadastro();
+                        renderizarListaJogadores();
+                        if (inputNome) {
+                            inputNome.value = '';
+                            inputNome.focus();
+                        }
+                    });
+                }
+
+                window.removerJogador = function (index) {
+                    jogadoresCadastro.splice(index, 1);
+                    salvarJogadoresCadastro();
+                    renderizarListaJogadores();
+                };
+
+                // Initial load
+                carregarJogadoresCadastro();
+
+                // ==========================================
+                // 3. LÓGICA DE SORTEIO (SORTEIO.JS)
+                // ==========================================
+                let baseJogadores = [];
+                let jogadoresSelecionados = new Set();
+                let timesAtuais = [];
+                let filaEspera = [];
+                let modoVisualizacao = 'sorteio';
+                let timeSelecionadoManual = 0;
+
+                carregarJogadoresSorteio = function () {
+                    const dados = localStorage.getItem('base_jogadores');
+                    const grade = document.getElementById('gradeJogadores');
+                    if (!grade) return;
+                    baseJogadores = dados ? JSON.parse(dados) : [];
+                    jogadoresSelecionados = new Set();
+
+                    if (baseJogadores.length > 0) {
+                        grade.innerHTML = '';
+                        baseJogadores.forEach((j, index) => {
+                            const card = document.createElement('div');
+                            card.className = 'card-selecao';
+                            card.id = `card-${index}`;
+                            card.onclick = () => alternarSelecao(index);
+                            card.innerHTML = `
+                                <div class="card-topo">
+                                    <span class="j-nome-icone">${j.genero === 'm' ? svgM14 : svgF14} <span class="card-nome">${j.nome}</span></span>
+                                </div>
+                                <div class="card-estrelas">${'⭐'.repeat(j.nivel)}</div>
+                            `;
+                            grade.appendChild(card);
+                        });
+                    } else {
+                        grade.innerHTML = '<span style="color: #777; font-size: 0.85rem; text-align: center; width: 100%; padding: 10px;">Nenhum jogador cadastrado. Vá em "Jogadores" primeiro.</span>';
+                    }
+                    atualizarContador();
+                    carregarTimesIniciaisSalvos();
+                };
+
+                function carregarTimesIniciaisSalvos() {
+                    const salvos = localStorage.getItem('times_salvos');
+                    if (salvos && salvos.trim() !== "" && salvos !== "[]") {
+                        try {
+                            const parsed = JSON.parse(salvos);
+                            if (Array.isArray(parsed) && parsed.length > 0) {
+                                timesAtuais = parsed;
+                                modoVisualizacao = 'sorteio';
+                                timeSelecionadoManual = 0;
+                                renderizarVisualizacao();
+                            }
+                        } catch (e) { }
+                    }
+                }
+
+                function alternarSelecao(index) {
+                    const card = document.getElementById(`card-${index}`);
+                    if (!card) return;
+                    if (jogadoresSelecionados.has(index)) {
+                        jogadoresSelecionados.delete(index);
+                        card.classList.remove('selecionado');
+                    } else {
+                        jogadoresSelecionados.add(index);
+                        card.classList.add('selecionado');
+                    }
+                    atualizarContador();
+                }
+
+                window.selecionarTodos = function (selecionar) {
+                    baseJogadores.forEach((_, index) => {
+                        const card = document.getElementById(`card-${index}`);
+                        if (!card) return;
+                        if (selecionar) {
+                            jogadoresSelecionados.add(index);
+                            card.classList.add('selecionado');
+                        } else {
+                            jogadoresSelecionados.delete(index);
+                            card.classList.remove('selecionado');
+                        }
+                    });
+                    atualizarContador();
+                };
+
+                function atualizarContador() {
+                    const contador = document.getElementById('contadorSelecionados');
+                    if (contador) {
+                        contador.innerText = `${jogadoresSelecionados.size} / ${baseJogadores.length}`;
+                    }
+                }
+
+                function embaralhar(array) {
+                    for (let i = array.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [array[i], array[j]] = [array[j], array[i]];
+                    }
+                    return array;
+                }
+
+                document.querySelectorAll('input[name="modo"]').forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        const btn = document.getElementById('btnAcao');
+                        if (!btn) return;
+                        if (e.target.value === 'manual') {
+                            btn.innerHTML = 'Iniciar Montagem Manual';
+                            btn.style.backgroundColor = '#ffc107';
+                            btn.style.color = '#111';
+                        } else if (e.target.value === 'misto') {
+                            btn.innerHTML = '🎲 Sortear Times (Equilibrado/Justo)';
+                            btn.style.backgroundColor = '#28a745';
+                            btn.style.color = 'white';
+                        } else {
+                            btn.innerHTML = '🎲 Sortear Times';
+                            btn.style.backgroundColor = '#28a745';
+                            btn.style.color = 'white';
+                        }
+                    });
+                });
+
+                window.iniciarGeracao = function () {
+                    if (jogadoresSelecionados.size === 0) {
+                        alert("Selecione pelo menos um jogador!");
+                        return;
+                    }
+                    const checkedTam = document.querySelector('input[name="tamanho"]:checked');
+                    const tamanhoTime = checkedTam ? parseInt(checkedTam.value) : 2;
+                    const checkedModo = document.querySelector('input[name="modo"]:checked');
+                    const modo = checkedModo ? checkedModo.value : 'normal';
+                    let presentes = Array.from(jogadoresSelecionados).map(i => ({ ...baseJogadores[i], idOriginal: i }));
+                    const qtdTimesCompletos = Math.floor(presentes.length / tamanhoTime);
+                    if (qtdTimesCompletos === 0 && modo !== 'manual') {
+                        alert(`Você selecionou ${presentes.length} pessoas. Insuficiente para formar 1 time de ${tamanhoTime}.`);
+                        return;
+                    }
+                    let qtdTimesIniciais = qtdTimesCompletos > 0 ? qtdTimesCompletos : 1;
+                    if (modo === 'manual') prepararModoManual(presentes, qtdTimesIniciais);
+                    else gerarSorteioAleatorioEquilibrado(presentes, tamanhoTime, qtdTimesCompletos, modo);
+                };
+
+                function gerarSorteioAleatorioEquilibrado(presentes, tamanhoTime, qtdTimesCompletos, modo) {
+                    modoVisualizacao = 'sorteio';
+                    timeSelecionadoManual = 0;
+                    timesAtuais = Array.from({ length: qtdTimesCompletos }, () => []);
+                    filaEspera = [];
+
+                    const prepararLista = (lista) => {
+                        let grupos = {};
+                        lista.forEach(j => {
+                            if (!grupos[j.nivel]) grupos[j.nivel] = [];
+                            grupos[j.nivel].push(j);
+                        });
+                        let listaFinal = [];
+                        Object.keys(grupos).map(Number).sort((a, b) => b - a).forEach(nivel => {
+                            listaFinal.push(...embaralhar([...grupos[nivel]]));
+                        });
+                        return listaFinal;
+                    };
+
+                    let totalVagas = qtdTimesCompletos * tamanhoTime;
+
+                    if (modo === 'normal') {
+                        let listaOrdenada = prepararLista(presentes);
+                        let direcao = 1, indexTime = 0;
+                        for (let i = 0; i < totalVagas; i++) {
+                            timesAtuais[indexTime].push(listaOrdenada[i]);
+                            indexTime += direcao;
+                            if (indexTime >= qtdTimesCompletos || indexTime < 0) {
+                                direcao *= -1;
+                                indexTime += direcao;
+                            }
+                        }
+                        for (let i = totalVagas; i < listaOrdenada.length; i++) filaEspera.push(listaOrdenada[i]);
+                        timesAtuais.forEach(time => embaralhar(time));
+                    } else if (modo === 'misto') {
+                        let listaGeral = prepararLista(presentes);
+                        let jogadoresAtivos = listaGeral.slice(0, totalVagas);
+                        filaEspera = listaGeral.slice(totalVagas);
+                        let mulheres = jogadoresAtivos.filter(j => j.genero === 'f');
+                        let homens = jogadoresAtivos.filter(j => j.genero === 'm');
+                        let baseW = Math.floor(mulheres.length / qtdTimesCompletos);
+                        let extraW = mulheres.length % qtdTimesCompletos;
+                        let timesTemp = Array.from({ length: qtdTimesCompletos }, (_, i) => ({
+                            id: i, jogadores: [], estrelas: 0,
+                            vagasM: baseW + (i < extraW ? 1 : 0),
+                            vagasTotais: tamanhoTime
+                        }));
+                        let mIndex = 0;
+                        timesTemp.forEach(t => {
+                            for (let i = 0; i < t.vagasM; i++) {
+                                if (mIndex < mulheres.length) {
+                                    let m = mulheres[mIndex++];
+                                    t.jogadores.push(m);
+                                    t.estrelas += m.nivel;
+                                }
+                            }
+                        });
+                        homens.forEach(h => {
+                            let timesComVaga = timesTemp.filter(t => t.jogadores.length < t.vagasTotais);
+                            timesComVaga.sort((a, b) => a.estrelas - b.estrelas);
+                            if (timesComVaga.length > 0) {
+                                timesComVaga[0].jogadores.push(h);
+                                timesComVaga[0].estrelas += h.nivel;
+                            }
+                        });
+                        timesTemp.forEach(t => { timesAtuais[t.id] = embaralhar(t.jogadores); });
+                    }
+                    verificarExistenciaTimesSalvosESortear();
+                }
+
+                window.adicionarTimeManual = function () {
+                    timesAtuais.push([]);
+                    timeSelecionadoManual = timesAtuais.length - 1;
+                    renderizarVisualizacao();
+                };
+
+                window.removerTimeManual = function (index, event) {
+                    if (event) event.stopPropagation();
+                    if (timesAtuais[index] && timesAtuais[index].length > 0) {
+                        filaEspera.push(...timesAtuais[index]);
+                        filaEspera.sort((a, b) => b.nivel - a.nivel);
+                    }
+                    timesAtuais.splice(index, 1);
+                    if (timeSelecionadoManual === index) timeSelecionadoManual = Math.max(0, timesAtuais.length - 1);
+                    else if (timeSelecionadoManual > index) timeSelecionadoManual--;
+                    renderizarVisualizacao();
+                };
+
+                function prepararModoManual(presentes, qtdTimesIniciais) {
+                    modoVisualizacao = 'manual';
+                    timeSelecionadoManual = 0;
+                    timesAtuais = Array.from({ length: qtdTimesIniciais }, () => []);
+                    filaEspera = embaralhar([...presentes]).sort((a, b) => b.nivel - a.nivel);
+                    verificarExistenciaTimesSalvosESortear();
+                }
+
+                function verificarExistenciaTimesSalvosESortear() {
+                    const salvos = localStorage.getItem('times_salvos');
+                    const modalContainer = document.getElementById('modalSorteio');
+                    if (!modalContainer) return;
+                    if (salvos && salvos.trim() !== "" && salvos !== "[]") {
+                        modalContainer.innerHTML = `
+                            <div class="modal-overlay">
+                                <div class="modal-card">
+                                    <div class="modal-icone-status">❌</div>
+                                    <div class="modal-titulo">Times Salvos Encontrados</div>
+                                    <div class="modal-texto">Já existem times salvos cadastrados no sistema. Deseja sobrescrevê-los com este novo sorteio?</div>
+                                    <div class="modal-botoes">
+                                        <button class="modal-btn modal-btn-cancelar" type="button" onclick="fecharModalSorteio()">Manter Antigos</button>
+                                        <button class="modal-btn modal-btn-confirmar" type="button" onclick="fecharModalSorteio(); renderizarVisualizacao();">Sobrescrever</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        renderizarVisualizacao();
+                    }
+                }
+
+                window.fecharModalSorteio = function () {
+                    const modal = document.getElementById('modalSorteio');
+                    if (modal) modal.innerHTML = '';
+                };
+
+                window.salvarTimesDefinitivo = function () {
+                    if (timesAtuais.length === 0 || timesAtuais.every(t => t.length === 0)) {
+                        alert("Os times estão vazios. Monte ou sorteie os times antes de salvar!");
+                        return;
+                    }
+                    localStorage.setItem('times_salvos', JSON.stringify(timesAtuais));
+                    const modalContainer = document.getElementById('modalSorteio');
+                    if (modalContainer) {
+                        modalContainer.innerHTML = `
+                            <div class="modal-overlay">
+                                <div class="modal-card">
+                                    <div class="modal-icone-status">✅</div>
+                                    <div class="modal-titulo">Sucesso!</div>
+                                    <div class="modal-texto">Os times foram salvos com sucesso e já podem ser puxados pelas páginas de partidas e ranking!</div>
+                                    <div class="modal-botoes">
+                                        <button class="modal-btn modal-btn-confirmar" type="button" onclick="fecharModalSorteio()">OK</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                };
+
+                window.confirmarExcluirTodos = function () {
+                    const modalContainer = document.getElementById('modalSorteio');
+                    if (modalContainer) {
+                        modalContainer.innerHTML = `
+                            <div class="modal-overlay">
+                                <div class="modal-card">
+                                    <div class="modal-icone-status">⚠️</div>
+                                    <div class="modal-titulo">Excluir Todos os Times</div>
+                                    <div class="modal-texto">Tem certeza que deseja apagar todos os times atuais e salvos?</div>
+                                    <div class="modal-botoes">
+                                        <button class="modal-btn modal-btn-cancelar" type="button" onclick="fecharModalSorteio()">Cancelar</button>
+                                        <button class="modal-btn modal-btn-confirmar" type="button" style="background-color: #dc3545;" onclick="excluirTodosDefinitivo()">Excluir</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                };
+
+                window.excluirTodosDefinitivo = function () {
+                    localStorage.removeItem('times_salvos');
+                    timesAtuais = [];
+                    filaEspera = [];
+                    fecharModalSorteio();
+                    const secaoRes = document.getElementById('secaoResultados');
+                    if (secaoRes) secaoRes.style.display = 'none';
+                };
+
+                window.selecionarTimeManual = function (index) {
+                    timeSelecionadoManual = index;
+                    renderizarVisualizacao();
+                };
+
+                window.adicionarAoTimeAtivo = function (indexFila) {
+                    if (timesAtuais.length === 0) {
+                        alert("Crie um time primeiro clicando em 'Adicionar Novo Time'!");
+                        return;
+                    }
+                    const jogador = filaEspera.splice(indexFila, 1)[0];
+                    timesAtuais[timeSelecionadoManual].push(jogador);
+                    renderizarVisualizacao();
+                };
+
+                window.removerDoTime = function (indexTime, indexJogador) {
+                    const jogador = timesAtuais[indexTime].splice(indexJogador, 1)[0];
+                    filaEspera.push(jogador);
+                    filaEspera.sort((a, b) => b.nivel - a.nivel);
+                    renderizarVisualizacao();
+                };
+
+                function renderizarVisualizacao() {
+                    const container = document.getElementById('containerTimes');
+                    if (!container) return;
+                    const banco = document.getElementById('bancoManual');
+                    const instrucao = document.getElementById('instrucaoManual');
+                    const secao = document.getElementById('secaoResultados');
+                    const titulo = document.getElementById('tituloResultados');
+                    const acoesExtras = document.getElementById('acoesManuaisExtra');
+
+                    container.innerHTML = '';
+                    const mostrarBanco = filaEspera.length > 0 || modoVisualizacao === 'manual';
+
+                    if (mostrarBanco) {
+                        if (instrucao) instrucao.style.display = 'block';
+                        if (banco) {
+                            banco.style.display = 'flex';
+                            banco.innerHTML = '<div style="width: 100%; font-size: 0.8rem; color:#bbb;">Banco de Reservas / Disponíveis:</div>';
+                            if (filaEspera.length === 0) banco.innerHTML += '<span style="color:#666; font-size:0.85rem;">Nenhum jogador no banco.</span>';
+                            filaEspera.forEach((j, i) => {
+                                banco.innerHTML += `
+                                    <div class="chip-jogador" onclick="adicionarAoTimeAtivo(${i})">
+                                        ${j.genero === 'm' ? svgM14 : svgF14} ${j.nome} <span style="color:#ffc107">${'⭐'.repeat(j.nivel)}</span>
+                                    </div>
+                                `;
+                            });
+                        }
+                    } else {
+                        if (instrucao) instrucao.style.display = 'none';
+                        if (banco) banco.style.display = 'none';
+                    }
+
+                    if (titulo) titulo.innerText = modoVisualizacao === 'manual' ? 'Montagem Manual' : 'Times Gerados';
+                    if (acoesExtras) acoesExtras.style.display = 'block';
+
+                    timesAtuais.forEach((time, indice) => {
+                        let estrelasTotais = time.reduce((soma, j) => soma + j.nivel, 0);
+                        let classesCard = 'time-card interativo' + (indice === timeSelecionadoManual ? ' ativo' : '');
+                        let htmlTime = `
+                            <div class="${classesCard}" onclick="selecionarTimeManual(${indice})">
+                                <div class="time-header">
+                                    <span style="display: flex; align-items: center;">Time ${indice + 1} (${time.length}) <span onclick="removerTimeManual(${indice}, event)" style="padding-left: 10px; cursor: pointer;" title="Excluir Time">🗑️</span></span>
+                                    <span class="time-forca">⭐ Força: ${estrelasTotais}</span>
+                                </div>
+                                <div class="time-lista">
+                        `;
+                        if (time.length === 0) {
+                            htmlTime += '<span style="color: #666; font-size: 0.85rem; text-align: center;">Time vazio... (toque para selecionar e adicione jogadores do banco)</span>';
+                        }
+                        time.forEach((j, idxJogador) => {
+                            htmlTime += `
+                                <div class="jogador-item-lista clicavel" onclick="removerDoTime(${indice}, ${idxJogador}); event.stopPropagation();">
+                                    <span class="j-nome-icone">${j.genero === 'm' ? svgM14 : svgF14} ${j.nome}</span>
+                                    <span style="color: #ffc107; font-size: 0.8rem;">${'⭐'.repeat(j.nivel)}</span>
+                                </div>
+                            `;
+                        });
+                        htmlTime += '</div></div>';
+                        container.innerHTML += htmlTime;
+                    });
+                    if (secao) secao.style.display = 'block';
+                }
+
+                carregarJogadoresSorteio();
+
+                // ==========================================
+                // 4. LÓGICA DO RANKING (RANKING.JS)
+                // ==========================================
+                let timesSalvosRanking = [];
+                let trofeusTimes = {};
+
+                function formatarTrofeus(qtd) {
+                    if (qtd <= 0) return '—';
+                    let linhas = [];
+                    for (let i = 0; i < qtd; i += 5) {
+                        linhas.push('🏆'.repeat(Math.min(5, qtd - i)));
+                    }
+                    return linhas.join('<br>');
+                }
+
+                carregarDadosRanking = function () {
+                    const secaoPodio = document.getElementById('secaoPodio');
+                    if (!secaoPodio) return;
+
+                    const dadosTimes = localStorage.getItem('times_salvos');
+                    const dadosHistorico = localStorage.getItem('ranking_historico');
+                    const dadosTrofeusManuais = localStorage.getItem('ranking_trofeus');
+                    trofeusTimes = {};
+                    timesSalvosRanking = [];
+
+                    if (dadosTimes && dadosTimes.trim() !== "" && dadosTimes !== "[]") {
+                        try { timesSalvosRanking = JSON.parse(dadosTimes); } catch (e) { timesSalvosRanking = []; }
+                    }
+
+                    if (dadosHistorico && timesSalvosRanking.length > 0) {
+                        try {
+                            const historico = JSON.parse(dadosHistorico);
+                            timesSalvosRanking.forEach((timeJogadores, index) => {
+                                const nomes = timeJogadores.map(j => j.nome).join(' & ');
+                                const nomeFormatado = `Time ${index + 1} (${nomes})`;
+                                if (historico[nomeFormatado] !== undefined) trofeusTimes[index] = historico[nomeFormatado];
+                                else if (historico[`Time ${index + 1}`] !== undefined) trofeusTimes[index] = historico[`Time ${index + 1}`];
+                                else {
+                                    for (let chave in historico) {
+                                        if (chave.includes(`Time ${index + 1}`)) {
+                                            trofeusTimes[index] = historico[chave];
+                                            break;
+                                        }
+                                    }
+                                }
+                            });
+                        } catch (e) { }
+                    } else if (dadosTrofeusManuais) {
+                        try { trofeusTimes = JSON.parse(dadosTrofeusManuais); } catch (e) { trofeusTimes = {}; }
+                    }
+
+                    if (timesSalvosRanking.length === 0) {
+                        document.getElementById('secaoPodio').style.display = 'none';
+                        document.getElementById('secaoRankingCompleto').style.display = 'none';
+                        document.getElementById('secaoSemTimes').style.display = 'block';
+                    } else {
+                        document.getElementById('secaoPodio').style.display = 'block';
+                        document.getElementById('secaoRankingCompleto').style.display = 'block';
+                        document.getElementById('secaoSemTimes').style.display = 'none';
+                        renderizarInterfaceRanking();
+                    }
+                };
+
+                function obterListaClassificada() {
+                    return timesSalvosRanking.map((time, index) => ({
+                        indice: index,
+                        nomeTime: `Time ${index + 1}`,
+                        membros: `(${time.map(j => j.nome).join(', ')})`,
+                        trofeus: trofeusTimes[index] || 0
+                    })).sort((a, b) => b.trofeus - a.trofeus);
+                }
+
+                function renderizarInterfaceRanking() {
+                    const ranking = obterListaClassificada();
+                    const containerPodio = document.getElementById('containerPodio');
+                    if (!containerPodio) return;
+
+                    let p1 = ranking[0] || { nomeTime: '-', membros: '(-)', trofeus: 0 };
+                    let p2 = ranking[1] || { nomeTime: '-', membros: '(-)', trofeus: 0 };
+                    let p3 = ranking[2] || { nomeTime: '-', membros: '(-)', trofeus: 0 };
+
+                    containerPodio.innerHTML = `
+                        <div class="podio-coluna">
+                            <div class="podio-info-topo">
+                                <span class="podio-avatar" title="${p2.nomeTime}">${p2.nomeTime}</span>
+                                <span class="podio-membros" title="${p2.membros}">${p2.membros}</span>
+                            </div>
+                            <div class="podio-bloco podio-2">
+                                <span class="podio-posicao-num">2º</span>
+                                <div class="podio-trofeus">${formatarTrofeus(p2.trofeus)}</div>
+                            </div>
+                        </div>
+                        <div class="podio-coluna">
+                            <div class="podio-info-topo">
+                                <span class="podio-avatar" title="${p1.nomeTime}">${p1.nomeTime}</span>
+                                <span class="podio-membros" title="${p1.membros}">${p1.membros}</span>
+                            </div>
+                            <div class="podio-bloco podio-1">
+                                <span class="podio-posicao-num">1º</span>
+                                <div class="podio-trofeus">${formatarTrofeus(p1.trofeus)}</div>
+                            </div>
+                        </div>
+                        <div class="podio-coluna">
+                            <div class="podio-info-topo">
+                                <span class="podio-avatar" title="${p3.nomeTime}">${p3.nomeTime}</span>
+                                <span class="podio-membros" title="${p3.membros}">${p3.membros}</span>
+                            </div>
+                            <div class="podio-bloco podio-3">
+                                <span class="podio-posicao-num">3º</span>
+                                <div class="podio-trofeus">${formatarTrofeus(p3.trofeus)}</div>
+                            </div>
+                        </div>
+                    `;
+
+                    const listaCompleta = document.getElementById('listaRankingCompleta');
+                    if (!listaCompleta) return;
+                    listaCompleta.innerHTML = '';
+                    ranking.forEach((t, i) => {
+                        let classeCard = 'ranking-card';
+                        if (i === 0) classeCard += ' lider';
+                        else if (i === 1) classeCard += ' vice';
+                        else if (i === 2) classeCard += ' terceiro';
+                        listaCompleta.innerHTML += `
+                            <div class="${classeCard}">
+                                <div class="ranking-info">
+                                    <span class="ranking-pos">${i + 1}º</span>
+                                    <div>
+                                        <div class="ranking-nome-time">${t.nomeTime}</div>
+                                        <div style="font-size: 0.8rem; color: #aaa; max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${t.membros}</div>
+                                    </div>
+                                </div>
+                                <div class="ranking-qtd-trofeus">${formatarTrofeus(t.trofeus)}</div>
+                            </div>
+                        `;
+                    });
+                }
+
+                carregarDadosRanking();
+
+                // ==========================================
+                // 5. LÓGICA DE PARTIDAS (PARTIDAS.JS)
+                // ==========================================
+                let timesDisponiveis = [];
+                let partidas = [];
+                let contadorPartidasTimes = {};
+
+                atualizarPaginaPartidas = function () {
+                    carregarTimesSalvos();
+                    carregarPartidasSalvas();
+                };
+
+                function carregarTimesSalvos() {
+                    const dadosSalvos = localStorage.getItem('times_salvos');
+                    timesDisponiveis = [];
+                    if (dadosSalvos) {
+                        try {
+                            const parsed = JSON.parse(dadosSalvos);
+                            if (Array.isArray(parsed) && parsed.length > 0) {
+                                parsed.forEach((timeJogadores, index) => {
+                                    if (Array.isArray(timeJogadores) && timeJogadores.length > 0) {
+                                        timesDisponiveis.push(`Time ${index + 1} (${timeJogadores.map(j => j.nome).join(' & ')})`);
+                                    }
+                                });
+                            }
+                        } catch (e) { }
+                    }
+                    recalcularContadoresMemoria();
+                    atualizarPainelTimesStatus();
+                }
+
+                function recalcularContadoresMemoria() {
+                    contadorPartidasTimes = {};
+                    timesDisponiveis.forEach(t => contadorPartidasTimes[t] = 0);
+                    partidas.forEach(p => {
+                        if (contadorPartidasTimes[p.time1] !== undefined) contadorPartidasTimes[p.time1]++;
+                        if (contadorPartidasTimes[p.time2] !== undefined) contadorPartidasTimes[p.time2]++;
+                    });
+                }
+
+                function atualizarPainelTimesStatus() {
+                    const infoStatus = document.getElementById('infoTimesStatus');
+                    if (!infoStatus) return;
+                    if (timesDisponiveis.length > 0) {
+                        let htmlLista = `👥 <strong>Times carregados (${timesDisponiveis.length}):</strong><div class="lista-times-container">`;
+                        timesDisponiveis.forEach(t => {
+                            htmlLista += `<div class="item-time-lista"><span>• ${t}</span> <span class="contador-jogos-badge">${contadorPartidasTimes[t] || 0} jogos</span></div>`;
+                        });
+                        htmlLista += '</div>';
+                        infoStatus.innerHTML = htmlLista;
+                    } else {
+                        infoStatus.innerHTML = `⚠️ <strong>Nenhum time salvo encontrado.</strong> Vá na tela de <button type="button" onclick="navegarParaPagina('sorteio')" class="link-interno">Sorteio</button>, monte e salve seus times primeiro!`;
+                    }
+                }
+
+                function carregarPartidasSalvas() {
+                    const salvas = localStorage.getItem('partidas_geradas');
+                    if (salvas) {
+                        try {
+                            const parsed = JSON.parse(salvas);
+                            if (Array.isArray(parsed)) {
+                                partidas = parsed;
+                                recalcularContadoresMemoria();
+                                atualizarPainelTimesStatus();
+                                renderizarTabela();
+                            }
+                        } catch (e) { }
+                    } else {
+                        partidas = [];
+                        renderizarTabela();
+                    }
+                }
+
+                function salvarPartidasMemoria() {
+                    localStorage.setItem('partidas_geradas', JSON.stringify(partidas));
+                }
+
+                function atualizarHistoricoRanking() {
+                    let historicoVitorias = {};
+                    partidas.forEach(p => {
+                        if (p.vencedor) historicoVitorias[p.vencedor] = (historicoVitorias[p.vencedor] || 0) + 1;
+                    });
+                    localStorage.setItem('ranking_historico', JSON.stringify(historicoVitorias));
+                }
+
+                const btnGerarLista = document.getElementById('btnGerarLista');
+                if (btnGerarLista) {
+                    btnGerarLista.addEventListener('click', () => {
+                        if (timesDisponiveis.length < 2) {
+                            alert("Você precisa ter pelo menos 2 times salvos na tela de Sorteio para gerar as partidas!");
+                            return;
+                        }
+                        const modalContainer = document.getElementById('modalPartidas');
+                        if (modalContainer) {
+                            modalContainer.innerHTML = `
+                                <div class="modal-overlay">
+                                    <div class="modal-card">
+                                        <div class="modal-icone-status">⚠️</div>
+                                        <div class="modal-titulo">Atenção</div>
+                                        <div class="modal-texto">Gerar novas partidas vai zerar o histórico do Ranking, deseja gerar uma nova partida?</div>
+                                        <div class="modal-botoes">
+                                            <button class="modal-btn modal-btn-cancelar" type="button" onclick="fecharModalPartidas()">Cancelar</button>
+                                            <button class="modal-btn modal-btn-confirmar" type="button" style="background-color: #dc3545;" onclick="executarGeracaoPartidas()">Gerar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    });
+                }
+
+                window.fecharModalPartidas = function () {
+                    const modal = document.getElementById('modalPartidas');
+                    if (modal) modal.innerHTML = '';
+                };
+
+                window.executarGeracaoPartidas = function () {
+                    fecharModalPartidas();
+                    localStorage.removeItem('ranking_historico');
+                    const selectHoras = document.getElementById('selectHoras');
+                    const horas = selectHoras ? parseInt(selectHoras.value) : 2;
+                    const numTimes = timesDisponiveis.length;
+                    const partidasBaseAlvo = horas * 12;
+                    let jogosPorTime = Math.round((partidasBaseAlvo * 2) / numTimes);
+                    if (jogosPorTime < 1) jogosPorTime = 1;
+                    const totalPartidas = Math.round((jogosPorTime * numTimes) / 2);
+
+                    contadorPartidasTimes = {};
+                    timesDisponiveis.forEach(t => contadorPartidasTimes[t] = 0);
+                    partidas = [];
+                    let idContador = 1;
+
+                    for (let i = 0; i < totalPartidas; i++) {
+                        let timesOrdenados = [...timesDisponiveis].sort((a, b) => {
+                            if (contadorPartidasTimes[a] !== contadorPartidasTimes[b]) return contadorPartidasTimes[a] - contadorPartidasTimes[b];
+                            return Math.random() - 0.5;
+                        });
+                        let t1 = timesOrdenados[0];
+                        let t2 = timesOrdenados[1];
+                        if (numTimes > 2 && i > 0) {
+                            let ultimaPartida = partidas[i - 1];
+                            if ((ultimaPartida.time1 === t1 && ultimaPartida.time2 === t2) || (ultimaPartida.time1 === t2 && ultimaPartida.time2 === t1)) {
+                                if (timesOrdenados[2]) t2 = timesOrdenados[2];
+                            }
+                        }
+                        contadorPartidasTimes[t1]++;
+                        contadorPartidasTimes[t2]++;
+                        partidas.push({ id: idContador++, time1: t1, time2: t2, vencedor: null, status: i === 0 ? 'ativa' : 'bloqueada' });
+                    }
+                    salvarPartidasMemoria();
+                    atualizarHistoricoRanking();
+                    atualizarPainelTimesStatus();
+                    renderizarTabela();
+                };
+
+                window.adicionarPartidaManual = function () {
+                    if (timesDisponiveis.length < 2) {
+                        alert("Você precisa ter times disponíveis para adicionar partidas!");
+                        return;
+                    }
+                    const novoId = partidas.length > 0 ? partidas[partidas.length - 1].id + 1 : 1;
+                    let timesOrdenados = [...timesDisponiveis].sort((a, b) => (contadorPartidasTimes[a] || 0) - (contadorPartidasTimes[b] || 0));
+                    const t1 = timesOrdenados[0];
+                    const t2 = timesOrdenados[1] || timesOrdenados[0];
+                    contadorPartidasTimes[t1] = (contadorPartidasTimes[t1] || 0) + 1;
+                    contadorPartidasTimes[t2] = (contadorPartidasTimes[t2] || 0) + 1;
+                    const deveSerAtiva = partidas.length === 0 || !partidas.some(p => p.status === 'ativa');
+                    partidas.push({ id: novoId, time1: t1, time2: t2, vencedor: null, status: deveSerAtiva ? 'ativa' : 'bloqueada' });
+                    salvarPartidasMemoria();
+                    atualizarHistoricoRanking();
+                    atualizarPainelTimesStatus();
+                    renderizarTabela();
+                };
+
+                function renderizarTabela() {
+                    const corpo = document.getElementById('listaPartidasCorpo');
+                    if (!corpo) return;
+                    corpo.innerHTML = '';
+                    if (partidas.length === 0) {
+                        corpo.innerHTML = '<div class="aviso-vazio">Nenhuma partida gerada no momento.</div>';
+                        return;
+                    }
+                    partidas.forEach((p) => {
+                        const linha = document.createElement('div');
+                        linha.className = `partida-linha ${p.status}`;
+                        linha.id = `linha-partida-${p.id}`;
+                        let conteudoVencedor = '';
+                        if (p.vencedor) {
+                            conteudoVencedor = `<span class="badge-vencedor">🏆 ${p.vencedor}</span>`;
+                        } else if (p.status === 'ativa') {
+                            conteudoVencedor = `
+                                <div class="vencedor-controles">
+                                    <select class="select-vencedor" id="select-${p.id}">
+                                        <option value="${p.time1}">${p.time1}</option>
+                                        <option value="${p.time2}">${p.time2}</option>
+                                    </select>
+                                    <button class="btn-ok" type="button" onclick="confirmarVencedor(${p.id})">OK</button>
+                                </div>
+                            `;
+                        } else {
+                            conteudoVencedor = `
+                                <div class="vencedor-controles">
+                                    <select class="select-vencedor" disabled><option>Aguardando...</option></select>
+                                    <button class="btn-ok" type="button" disabled>OK</button>
+                                </div>
+                            `;
+                        }
+                        linha.innerHTML = `
+                            <div class="col-partida">
+                                <div class="partida-info-texto">
+                                    <span class="partida-numero">Partida ${p.id}</span>
+                                    <span>${p.time1} <strong>vs</strong> ${p.time2}</span>
+                                </div>
+                            </div>
+                            <div class="col-vencedor">${conteudoVencedor}</div>
+                        `;
+                        corpo.appendChild(linha);
+                    });
+                }
+
+                window.confirmarVencedor = function (id) {
+                    const select = document.getElementById(`select-${id}`);
+                    if (!select) return;
+                    const vencedorEscolhido = select.value;
+                    let partidaAtual = partidas.find(p => p.id === id);
+                    if (partidaAtual) {
+                        partidaAtual.vencedor = vencedorEscolhido;
+                        partidaAtual.status = 'concluida';
+                    }
+                    let proximaPartida = partidas.find(p => p.id === id + 1);
+                    if (proximaPartida) proximaPartida.status = 'ativa';
+                    salvarPartidasMemoria();
+                    atualizarHistoricoRanking();
+                    renderizarTabela();
+                    setTimeout(() => {
+                        const proximaLinha = document.getElementById(`linha-partida-${id + 1}`);
+                        if (proximaLinha) proximaLinha.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100);
+                };
+
+                atualizarPaginaPartidas();
+            }
+
+            if (document.readyState === 'loading') {
+                window.addEventListener('DOMContentLoaded', initApp);
+            } else {
+                initApp();
+            }
+        })();
+    </script>
+</body>
+
+</html>
