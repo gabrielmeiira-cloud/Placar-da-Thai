@@ -1311,3 +1311,25 @@ input:checked + .slider {
 input:checked + .slider:before {
     transform: translateX(20px);
 }
+
+/* ==========================================================================
+   BADGE DE VERSÃO NO CANTO INFERIOR DIREITO
+   ========================================================================== */
+.app-version-badge {
+    position: fixed;
+    bottom: 12px;
+    right: 14px;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    z-index: 999;
+    pointer-events: none;
+    letter-spacing: 0.5px;
+}
