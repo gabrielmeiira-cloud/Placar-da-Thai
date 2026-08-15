@@ -25,7 +25,7 @@
          ========================================================================== -->
     <div class="secao-placar-wrapper">
         <section id="secao-placar">
-            <div class="versao-placar">Placar da Thai V7.7</div>
+            <div class="versao-placar">Placar da Thai V7.8</div>
 
             <div class="controles-topo-centro">
                 <button class="btn-central" id="btnToggleControlesTopo" type="button" title="Configurações e Gestão">
@@ -173,13 +173,17 @@
                             <span style="font-size: 0.9rem; color: var(--texto-secundario);">Total: <strong id="contadorJogadores">0</strong></span>
                         </div>
                         <div class="lista-itens" id="listaJogadores"></div>
-
-                        <div style="display: flex; margin-top: 14px;">
-                            <button type="button" class="btn-aba" style="width: 100%; padding: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; background: rgba(78, 94, 120, 0.45); border: 1.5px solid rgba(255, 255, 255, 0.45);" onclick="OverlayModule.irPara('topico-sorteio')">
-                                Ir para 👥 Times ↓
-                            </button>
-                        </div>
                     </div>
+                </div>
+
+                <!-- ATALHO DIRECIONAL FORA DO CARD -->
+                <div class="container-atalho-direcional">
+                    <button type="button" class="link-atalho-secao" onclick="OverlayModule.irPara('topico-sorteio')">
+                        <span>Ir para 👥 Times</span>
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
                 </div>
             </section>
 
@@ -256,13 +260,17 @@
                         <div id="bancoManual" class="banco-chips" style="display: none; margin-top: 8px;"></div>
 
                         <div class="container-times-grid" id="containerTimes" style="margin-top: 14px; margin-bottom: 14px;"></div>
-
-                        <div style="display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap;">
-                            <button type="button" class="btn-aba" style="width: 100%; padding: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; background: rgba(78, 94, 120, 0.45); border: 1.5px solid rgba(255, 255, 255, 0.45);" onclick="OverlayModule.irPara('topico-partidas')">
-                                Ir para 📋 Partidas ↓
-                            </button>
-                        </div>
                     </div>
+                </div>
+
+                <!-- ATALHO DIRECIONAL FORA DO CARD -->
+                <div class="container-atalho-direcional">
+                    <button type="button" class="link-atalho-secao" onclick="OverlayModule.irPara('topico-partidas')">
+                        <span>Ir para 📋 Partidas</span>
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
                 </div>
             </section>
 
@@ -324,6 +332,16 @@
                         </div>
                         <div class="lista-partidas" id="listaPartidasCorpo"></div>
                     </div>
+                </div>
+
+                <!-- ATALHO DIRECIONAL FORA DO CARD -->
+                <div class="container-atalho-direcional">
+                    <button type="button" class="link-atalho-secao" onclick="OverlayModule.irPara('topico-ranking')">
+                        <span>Ir para 🏆 Ranking</span>
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
                 </div>
             </section>
 

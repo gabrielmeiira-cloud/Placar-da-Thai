@@ -263,34 +263,48 @@
             if (this.estaAberto()) this.fechar();
             else this.abrir();
         },
+        tabAtivaId: null,
         irPara(targetId) {
             const el = document.getElementById(targetId);
             if (el && this.conteudo) {
-                const topoRelativo = el.offsetTop - this.conteudo.offsetTop - 10;
+                const topoRelativo = el.offsetTop - this.conteudo.offsetTop - 15;
                 this.conteudo.scrollTo({ top: Math.max(0, topoRelativo), behavior: 'smooth' });
             }
             this.destacarBotaoGuia(targetId);
             if (!this.estaAberto()) this.abrir();
         },
         destacarBotaoGuia(targetId) {
+            if (this.tabAtivaId === targetId) return;
+            this.tabAtivaId = targetId;
+
             this.botoesAbas.forEach(b => {
                 if (b.getAttribute('data-target') === targetId) {
                     b.classList.add('ativo');
-                    b.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                    b.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
                 } else {
                     b.classList.remove('ativo');
                 }
             });
         },
         atualizarGuiaScrollspy() {
-            if (!this.conteudo) return;
-            const scrollPos = this.conteudo.scrollTop + 80;
-            let idAtual = 'topico-jogadores';
+            if (!this.conteudo || !this.secoes || this.secoes.length === 0) return;
+
+            // Se o usuário rolou até o fim da página, destaca a última seção (Ranking)
+            const noFim = (this.conteudo.scrollTop + this.conteudo.clientHeight >= this.conteudo.scrollHeight - 40);
+            if (noFim) {
+                const ultimaSecao = this.secoes[this.secoes.length - 1];
+                if (ultimaSecao) {
+                    this.destacarBotaoGuia(ultimaSecao.id);
+                    return;
+                }
+            }
+
+            const scrollPos = this.conteudo.scrollTop + 140;
+            let idAtual = this.secoes[0].id;
 
             this.secoes.forEach(secao => {
                 const topo = secao.offsetTop - this.conteudo.offsetTop;
-                const altura = secao.offsetHeight;
-                if (scrollPos >= topo && scrollPos < topo + altura) {
+                if (scrollPos >= topo) {
                     idAtual = secao.id;
                 }
             });
