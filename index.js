@@ -865,8 +865,11 @@
                 let htmlTime = `
                     <div class="${classesCard}" onclick="SorteioModule.selecionarTimeManual(${indice})">
                         <div class="time-header">
-                            <span style="display: flex; align-items: center; font-weight: 600;">Time ${indice + 1} (${time.length}) <span onclick="SorteioModule.removerTimeManual(${indice}, event)" style="padding-left: 8px; cursor: pointer;" title="Excluir Time">🗑️</span></span>
-                            <span class="time-forca">⭐ Força: ${estrelasTotais}</span>
+                            <span class="time-titulo-nome" style="font-weight: 600;">Time ${indice + 1}</span>
+                            <div class="time-header-acoes" style="display: flex; align-items: center; gap: 8px;">
+                                <span class="time-forca">⭐ Força: ${estrelasTotais}</span>
+                                <button class="btn-fechar-time" onclick="SorteioModule.removerTimeManual(${indice}, event)" type="button" title="Excluir Time">✕</button>
+                            </div>
                         </div>
                         <div class="time-lista">
                 `;
