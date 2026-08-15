@@ -1152,7 +1152,7 @@
             const p = this.partidas.find(item => item.id === id);
             if (!p) return;
             State.carregarPartidaNoPlacar(p.time1, p.time2, p.id);
-            OverlayModule.fechar();
+            this.renderizar();
         },
         pausarPartida(id) {
             State.data.partidaAtual = null;
