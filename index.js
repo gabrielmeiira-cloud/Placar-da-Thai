@@ -655,6 +655,10 @@
                     }
                 } else {
                     if (painelAuto) painelAuto.style.display = 'flex';
+                    const secao = document.getElementById('secaoResultados');
+                    if (secao && this.modoVisualizacao === 'manual') {
+                        secao.style.display = 'none';
+                    }
                     if (btn) {
                         if (tipoSorteio === 'misto') {
                             btn.innerHTML = '👫 Sortear Times (Equilibrado por Sexo)';
@@ -710,8 +714,8 @@
             if (!jOriginal) return;
             const modoPrincipal = document.querySelector('input[name="modoPrincipal"]:checked')?.value || 'manual';
 
-            if (modoPrincipal === 'manual' || this.modoVisualizacao === 'manual' || this.timesAtuais.length > 0) {
-                if (modoPrincipal === 'manual' && this.modoVisualizacao !== 'manual') {
+            if (modoPrincipal === 'manual') {
+                if (this.modoVisualizacao !== 'manual') {
                     this.modoVisualizacao = 'manual';
                     if (this.timesAtuais.length === 0) this.timesAtuais = [[], []];
                 }
