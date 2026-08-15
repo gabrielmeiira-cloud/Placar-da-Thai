@@ -1,0 +1,16 @@
+{
+  "name": "Placar da Thai",
+  "short_name": "PlacarThai",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#007bff",
+  "theme_color": "#007bff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "Thai01.webp",
+      "sizes": "192x192 512x512",
+      "type": "image/webp"
+    }
+  ]
+}

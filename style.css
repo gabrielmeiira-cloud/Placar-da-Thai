@@ -383,7 +383,7 @@ body.tema-escuro .time-header {
 }
 
 /* ==========================================================================
-   SEÇÃO 1: PLACAR AO VIVO (100dvh)
+   SEÇÃO 1: PLACAR AO VIVO (100dvh - SEMPRE HORIZONTAL LADO A LADO)
    ========================================================================== */
 
 .secao-placar-wrapper {
@@ -399,38 +399,10 @@ body.tema-escuro .time-header {
     height: 100dvh;
     min-height: 100dvh;
     display: flex;
-    flex-direction: row;
+    flex-direction: row !important; /* Sempre horizontal: Lado Azul na esquerda, Lado Vermelho na direita */
     position: relative;
     overflow: hidden;
     touch-action: none;
-}
-
-@media (orientation: portrait) {
-    #secao-placar {
-        flex-direction: column;
-    }
-
-    #secao-placar .pontos {
-        font-size: 50vh;
-    }
-
-    .lado-azul,
-    .lado-vermelho {
-        height: 50%;
-        width: 100%;
-    }
-
-    .lado-azul .lado-tag-time {
-        top: 14px;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-
-    .lado-vermelho .lado-tag-time {
-        top: 14px;
-        left: 50%;
-        transform: translateX(-50%);
-    }
 }
 
 .lado-azul,
@@ -450,6 +422,7 @@ body.tema-escuro .time-header {
     font-family: inherit;
     box-sizing: border-box;
     height: 100%;
+    width: 50%;
 }
 
 .lado-azul {
@@ -496,7 +469,7 @@ body.tema-escuro .time-header {
 }
 
 .pontos {
-    font-size: 100vh;
+    font-size: clamp(90px, 44vw, 75vh);
     line-height: 1;
     font-weight: 600;
     font-family: 'Fredoka', sans-serif;

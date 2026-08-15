@@ -1153,41 +1153,6 @@
         }
         aplicarTemaUI();
 
-        // Controle da Rotação (Livre vs Bloqueada)
-        const btnToggleRotacao = document.getElementById('btnToggleRotacao');
-        const checkRotacao = document.getElementById('checkRotacao');
-        const labelRotacao = document.getElementById('labelRotacao');
-
-        function aplicarRotacaoUI() {
-            const livre = !!State.data.configs.rotacaoLivre;
-            if (livre) {
-                document.body.classList.add('rotacao-livre');
-                if (checkRotacao) checkRotacao.checked = true;
-                if (labelRotacao) labelRotacao.textContent = '🔄 Rotação: Ligada';
-            } else {
-                document.body.classList.remove('rotacao-livre');
-                if (checkRotacao) checkRotacao.checked = false;
-                if (labelRotacao) labelRotacao.textContent = '🔄 Rotação: Desligada';
-            }
-        }
-
-        if (btnToggleRotacao) {
-            btnToggleRotacao.addEventListener('click', (e) => {
-                if (e.target.closest('.switch')) return;
-                const novo = !State.data.configs.rotacaoLivre;
-                State.salvarConfigs({ rotacaoLivre: novo });
-                aplicarRotacaoUI();
-            });
-        }
-
-        if (checkRotacao) {
-            checkRotacao.addEventListener('change', () => {
-                State.salvarConfigs({ rotacaoLivre: checkRotacao.checked });
-                aplicarRotacaoUI();
-            });
-        }
-        aplicarRotacaoUI();
-
         if (overlayIntro) {
             if (State.data.configs.figurinhas !== false) {
                 overlayIntro.style.display = 'flex';
