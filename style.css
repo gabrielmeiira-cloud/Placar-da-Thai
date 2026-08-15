@@ -440,22 +440,22 @@ body.tema-escuro .time-header {
 /* NOME DOS TIMES - COMPACTO E ELEGANTE NO TOPO */
 .lado-tag-time {
     position: absolute;
-    top: 50px;
-    background: rgba(255, 255, 255, 0.18);
+    top: 58px;
+    background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    padding: 4px 14px;
-    border-radius: 16px;
+    padding: 5px 16px;
+    border-radius: 20px;
     font-size: 0.88rem;
     font-weight: 600;
-    max-width: 80%;
+    max-width: 82%;
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     z-index: 10;
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.38);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
     color: #ffffff;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
     pointer-events: none;
@@ -463,7 +463,7 @@ body.tema-escuro .time-header {
 }
 
 .pontos {
-    font-size: 100vh;
+    font-size: clamp(90px, 58vh, 34vw);
     line-height: 1;
     font-weight: 600;
     font-family: 'Fredoka', sans-serif;
@@ -471,19 +471,30 @@ body.tema-escuro .time-header {
     z-index: 2;
     transition: transform 0.3s ease;
     pointer-events: none;
+    margin-top: 36px;
 }
 
 @media (orientation: portrait) {
     .pontos {
-        font-size: 50vh;
+        font-size: clamp(65px, 28vh, 52vw);
     }
-    .lado-tag-time {
-        top: 52px;
+    .lado-azul .lado-tag-time {
+        top: 56px;
         font-size: 0.82rem;
-        padding: 3px 12px;
+        padding: 4px 14px;
+    }
+    .lado-azul .pontos {
+        margin-top: 42px;
+        margin-bottom: 0;
     }
     .lado-vermelho .lado-tag-time {
-        top: 12px;
+        top: 14px;
+        font-size: 0.82rem;
+        padding: 4px 14px;
+    }
+    .lado-vermelho .pontos {
+        margin-top: 24px;
+        margin-bottom: 24px;
     }
 }
 

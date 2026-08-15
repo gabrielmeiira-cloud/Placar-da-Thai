@@ -879,6 +879,9 @@
                 this.partidas.push({ id: idContador++, time1: t1, time2: t2, vencedor: null, status: i === 0 ? 'ativa' : 'bloqueada' });
             }
             State.salvarPartidas(this.partidas);
+            if (this.partidas.length > 0) {
+                this.iniciarNoPlacar(this.partidas[0].id);
+            }
         },
         adicionarPartidaManual() {
             if (this.timesDisponiveis.length < 2) { alert("Você precisa ter times disponíveis para adicionar partidas!"); return; }
