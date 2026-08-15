@@ -257,9 +257,22 @@ body.painel-aberto .lado-vermelho {
     scroll-margin-top: 15px;
 }
 
+.bloqueio-touch-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    z-index: 9998;
+    background: rgba(0, 0, 0, 0.001);
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+    pointer-events: auto;
+}
+
 .menu-container {
     position: relative;
-    z-index: 1500;
+    z-index: 9999;
     flex-shrink: 0;
 }
 
@@ -309,7 +322,7 @@ body.painel-aberto .lado-vermelho {
     min-width: 255px;
     border: 1px solid rgba(255, 255, 255, 0.35);
     padding: 8px;
-    z-index: 9999;
+    z-index: 10000;
     pointer-events: auto;
     box-sizing: border-box;
 }

@@ -450,26 +450,29 @@
                 if (e.changedTouches && e.changedTouches.length > 0) return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
                 return { x: e.clientX, y: e.clientY };
             };
+            const estaBloqueado = () => {
+                if (OverlayModule.estaAberto() || document.body.classList.contains('painel-aberto')) return true;
+                const dropdown = document.getElementById('dropdownMenu');
+                if (dropdown && dropdown.classList.contains('ativo')) return true;
+                const bloqueio = document.getElementById('bloqueioTouchMenu');
+                if (bloqueio && bloqueio.style.display !== 'none') return true;
+                const modal = document.querySelector('.modal-overlay:not([style*="display: none"])');
+                if (modal) return true;
+                return false;
+            };
+
             const handleStart = (e) => {
-                if (OverlayModule.estaAberto() || document.body.classList.contains('painel-aberto')) return;
-                if (document.querySelector('.dropdown-menu.ativo')) return;
-                const modalAberto = document.querySelector('.modal-overlay:not([style*="display: none"])');
-                if (modalAberto) return;
+                if (estaBloqueado()) return;
 
                 if (e.type === 'mousedown' && Date.now() - lastTouchTime < 600) return;
                 if (e.type.startsWith('touch')) lastTouchTime = Date.now();
-                if (e.target.closest('.controles-centro, .controles-baixo, .controles-wrapper, .modal-overlay, .painel-gestao-overlay, .dropdown-menu, button, a, .indicador-rolagem-baixo')) return;
+                if (e.target.closest('.controles-centro, .controles-baixo, .controles-wrapper, .modal-overlay, .painel-gestao-overlay, .dropdown-menu, .bloqueio-touch-menu, button, a, .indicador-rolagem-baixo')) return;
                 interagindo = true;
                 const pos = getPos(e);
                 startX = pos.x; startY = pos.y;
             };
             const handleEnd = (e) => {
-                if (OverlayModule.estaAberto() || document.body.classList.contains('painel-aberto') || document.querySelector('.dropdown-menu.ativo')) {
-                    interagindo = false;
-                    return;
-                }
-                const modalAberto = document.querySelector('.modal-overlay:not([style*="display: none"])');
-                if (modalAberto) {
+                if (estaBloqueado()) {
                     interagindo = false;
                     return;
                 }
@@ -477,7 +480,7 @@
                 if (e.type === 'mouseup' && Date.now() - lastTouchTime < 600) return;
                 if (!interagindo) return;
                 interagindo = false;
-                if (e.target.closest('.controles-centro, .controles-baixo, .controles-wrapper, .modal-overlay, .painel-gestao-overlay, .dropdown-menu, button, a, .indicador-rolagem-baixo')) return;
+                if (e.target.closest('.controles-centro, .controles-baixo, .controles-wrapper, .modal-overlay, .painel-gestao-overlay, .dropdown-menu, .bloqueio-touch-menu, button, a, .indicador-rolagem-baixo')) return;
                 
                 const agora = Date.now();
                 if (agora - lastActionTime < 180) return;
@@ -1275,21 +1278,58 @@
 
         const overlayIntro = document.getElementById('overlayFigurinhaInicial');
 
-        // Toggle do Menu Dropdown (☰)
-        if (btnMenuToggle && dropdownMenu) {
-            btnMenuToggle.addEventListener('click', (e) => {
+        const bloqueioTouchMenu = document.getElementById('bloqueioTouchMenu');
+
+        const fecharDropdown = () => {
+            if (dropdownMenu) dropdownMenu.classList.remove('ativo');
+            if (bloqueioTouchMenu) bloqueioTouchMenu.style.display = 'none';
+        };
+
+        const abrirDropdown = () => {
+            if (dropdownMenu) dropdownMenu.classList.add('ativo');
+            if (bloqueioTouchMenu) bloqueioTouchMenu.style.display = 'block';
+        };
+
+        const toggleDropdown = (e) => {
+            if (e) {
                 e.stopPropagation();
                 e.preventDefault();
-                dropdownMenu.classList.toggle('ativo');
-            });
+            }
+            if (dropdownMenu && dropdownMenu.classList.contains('ativo')) {
+                fecharDropdown();
+            } else {
+                abrirDropdown();
+            }
+        };
+
+        // Toggle do Menu Dropdown (☰)
+        if (btnMenuToggle && dropdownMenu) {
+            btnMenuToggle.addEventListener('click', toggleDropdown);
+            btnMenuToggle.addEventListener('pointerup', (e) => { e.stopPropagation(); });
+            btnMenuToggle.addEventListener('touchend', (e) => { e.stopPropagation(); });
+
+            if (bloqueioTouchMenu) {
+                ['touchstart', 'touchend', 'pointerdown', 'pointerup', 'mousedown', 'click'].forEach(evt => {
+                    bloqueioTouchMenu.addEventListener(evt, (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        fecharDropdown();
+                    });
+                });
+            }
 
             dropdownMenu.addEventListener('click', (e) => {
                 e.stopPropagation();
             });
+            ['touchstart', 'touchend', 'touchmove', 'pointerdown', 'pointerup', 'mousedown'].forEach(evt => {
+                dropdownMenu.addEventListener(evt, (e) => {
+                    e.stopPropagation();
+                });
+            });
 
             window.addEventListener('click', (e) => {
                 if (!e.target.closest('#btnMenuToggle') && !e.target.closest('#dropdownMenu')) {
-                    dropdownMenu.classList.remove('ativo');
+                    fecharDropdown();
                 }
             });
         }
