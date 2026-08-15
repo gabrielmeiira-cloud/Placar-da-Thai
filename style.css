@@ -284,14 +284,10 @@ body {
 .seta-animada {
     width: 6px;
     height: 6px;
-    border-top: 2px solid rgba(255, 255, 255, 0.8);
-    border-left: 2px solid rgba(255, 255, 255, 0.8);
-    transform: rotate(45deg);
-    transition: transform 0.3s;
-}
-
-#btnToggleControlesTopo.revertido .seta-animada {
+    border-top: 2px solid rgba(255, 255, 255, 0.85);
+    border-left: 2px solid rgba(255, 255, 255, 0.85);
     transform: rotate(225deg);
+    transition: transform 0.3s;
 }
 
 /* ===================== TEMA ESCURO (ESTILO ORIGINAL) ===================== */

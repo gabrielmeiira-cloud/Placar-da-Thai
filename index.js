@@ -1048,17 +1048,13 @@
 
         const overlayIntro = document.getElementById('overlayFigurinhaInicial');
 
-        if (btnToggleControlesTopo && placarHeader) {
-            if (State.data.configs.controlesEscondidos) {
-                placarHeader.classList.add('escondido');
-                btnToggleControlesTopo.classList.add('revertido');
-            }
+        if (btnToggleControlesTopo) {
             btnToggleControlesTopo.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const escondido = !placarHeader.classList.contains('escondido');
-                placarHeader.classList.toggle('escondido', escondido);
-                btnToggleControlesTopo.classList.toggle('revertido', escondido);
-                State.salvarConfigs({ controlesEscondidos: escondido });
+                const secaoJogadores = document.getElementById('secao-jogadores');
+                if (secaoJogadores) {
+                    secaoJogadores.scrollIntoView({ behavior: 'smooth' });
+                }
             });
         }
 
@@ -1067,12 +1063,7 @@
             btnMenuToggle.addEventListener('click', (e) => {
                 e.stopPropagation();
                 e.preventDefault();
-                const abrindo = !dropdownMenu.classList.contains('ativo');
-                dropdownMenu.classList.toggle('ativo', abrindo);
-                if (abrindo) {
-                    const secaoGestao = document.getElementById('secao-jogadores');
-                    if (secaoGestao) secaoGestao.scrollIntoView({ behavior: 'smooth' });
-                }
+                dropdownMenu.classList.toggle('ativo');
             });
 
             dropdownMenu.addEventListener('click', (e) => {
