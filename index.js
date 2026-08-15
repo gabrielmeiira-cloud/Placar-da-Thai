@@ -197,10 +197,14 @@
             });
 
             const btnToggleControlesTopo = document.getElementById('btnToggleControlesTopo');
+            const placarHeader = document.getElementById('placarHeader');
             if (btnToggleControlesTopo) {
                 const noPlacar = idAtual === 'secao-placar' || window.scrollY < 100;
                 btnToggleControlesTopo.classList.toggle('revertido', !noPlacar);
                 btnToggleControlesTopo.setAttribute('title', noPlacar ? 'Descer para as páginas' : 'Subir para o placar');
+                if (placarHeader) {
+                    placarHeader.classList.toggle('escondido', noPlacar);
+                }
             }
         }
 
