@@ -657,11 +657,11 @@
                     if (painelAuto) painelAuto.style.display = 'flex';
                     if (btn) {
                         if (tipoSorteio === 'misto') {
-                            btn.innerHTML = '👫 Sortear Times (Misto)';
+                            btn.innerHTML = '👫 Sortear Times (Equilibrado por Sexo)';
                         } else if (tipoSorteio === 'aleatorio') {
                             btn.innerHTML = '🎲 Sortear Times (Aleatório)';
                         } else {
-                            btn.innerHTML = '🎲 Sortear Times (Equilibrado)';
+                            btn.innerHTML = '🎲 Sortear Times (Equilibrado por Nível)';
                         }
                     }
                 }
@@ -902,7 +902,8 @@
             const secao = document.getElementById('secaoResultados');
             const titulo = document.getElementById('tituloResultados');
             const acoesExtras = document.getElementById('acoesManuaisExtra');
-            if (this.timesAtuais.length === 0) { secao.style.display = 'none'; return; }
+            if (secao) secao.style.display = 'block';
+
             container.innerHTML = '';
             const mostrarBanco = this.filaEspera.length > 0 || this.modoVisualizacao === 'manual';
             if (mostrarBanco && banco && instrucao) {
@@ -919,6 +920,11 @@
             } else if (banco && instrucao) { instrucao.style.display = 'none'; banco.style.display = 'none'; }
             if (titulo) titulo.innerText = this.modoVisualizacao === 'manual' ? 'Montagem Manual' : 'Times Gerados';
             if (acoesExtras) acoesExtras.style.display = 'flex';
+
+            if (this.timesAtuais.length === 0) {
+                container.innerHTML = '<div class="aviso-vazio" style="padding: 16px; width: 100%;">⚠️ Nenhum time criado ou sorteado ainda. Clique em "+ Novo Time" acima para criar um time ou realize um sorteio!</div>';
+                return;
+            }
             this.timesAtuais.forEach((time, indice) => {
                 let estrelasTotais = time.reduce((soma, j) => soma + j.nivel, 0);
                 let classesCard = 'time-card' + (indice === this.timeSelecionadoManual ? ' ativo' : '');
