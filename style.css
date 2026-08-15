@@ -1548,9 +1548,9 @@ body.tema-escuro .modal-btn-cancelar {
 
 @keyframes animTrofeu {
     0% { transform: scale(0.2); opacity: 0; }
-    30% { transform: scale(1.05); opacity: 1; }
+    30% { transform: scale(1.03); opacity: 1; }
     50% { transform: scale(1.0); opacity: 1; }
-    70% { transform: scale(1.03); opacity: 1; }
+    70% { transform: scale(1.02); opacity: 1; }
     100% { transform: scale(0.2); opacity: 0; }
 }
 
@@ -1558,7 +1558,7 @@ body.tema-escuro .modal-btn-cancelar {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: min(52vw, 52vh);
+    font-size: min(65vw, 65vh);
     animation: animTrofeu 2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     line-height: 1;
     filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.5));

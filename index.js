@@ -216,6 +216,14 @@
                 }, { passive: true });
             }
 
+            if (this.painel) {
+                ['touchstart', 'touchend', 'touchmove', 'pointerdown', 'pointerup', 'mousedown', 'mouseup'].forEach(evt => {
+                    this.painel.addEventListener(evt, (e) => {
+                        e.stopPropagation();
+                    }, { passive: true });
+                });
+            }
+
             window.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && this.estaAberto()) {
                     this.fechar();
@@ -445,18 +453,27 @@
                 return { x: e.clientX, y: e.clientY };
             };
             const handleStart = (e) => {
+                if (OverlayModule.estaAberto()) return;
+                if (document.querySelector('.dropdown-menu.ativo')) return;
+                if (document.querySelector('.modal-overlay[style*="display: flex"]')) return;
+
                 if (e.type === 'mousedown' && Date.now() - lastTouchTime < 600) return;
                 if (e.type.startsWith('touch')) lastTouchTime = Date.now();
-                if (e.target.closest('.controles-centro, .controles-baixo, .controles-wrapper, .modal-overlay, button, a, .indicador-rolagem-baixo')) return;
+                if (e.target.closest('.controles-centro, .controles-baixo, .controles-wrapper, .modal-overlay, .painel-gestao-overlay, .dropdown-menu, button, a, .indicador-rolagem-baixo')) return;
                 interagindo = true;
                 const pos = getPos(e);
                 startX = pos.x; startY = pos.y;
             };
             const handleEnd = (e) => {
+                if (OverlayModule.estaAberto() || document.querySelector('.dropdown-menu.ativo') || document.querySelector('.modal-overlay[style*="display: flex"]')) {
+                    interagindo = false;
+                    return;
+                }
+
                 if (e.type === 'mouseup' && Date.now() - lastTouchTime < 600) return;
                 if (!interagindo) return;
                 interagindo = false;
-                if (e.target.closest('.controles-centro, .controles-baixo, .controles-wrapper, .modal-overlay, button, a, .indicador-rolagem-baixo')) return;
+                if (e.target.closest('.controles-centro, .controles-baixo, .controles-wrapper, .modal-overlay, .painel-gestao-overlay, .dropdown-menu, button, a, .indicador-rolagem-baixo')) return;
                 
                 const agora = Date.now();
                 if (agora - lastActionTime < 180) return;
@@ -1222,7 +1239,7 @@
                                 <div class="ranking-detalhes-time">
                                     <div class="ranking-nome-time">${t.nomeTime}</div>
                                     <div class="ranking-membros-txt">(${t.membros || 'Avulso'})</div>
-                                    <div class="ranking-stats-sub">${t.jogos} jogos | ${t.vitorias}V - ${t.derrotas}D | Saldo: ${t.saldoPontos > 0 ? '+' : ''}${t.saldoPontos}</div>
+                                    <div class="ranking-stats-sub">${t.jogos} jogos | ${t.vitorias} vitórias - ${t.derrotas} derrotas | Saldo: ${t.saldoPontos > 0 ? '+' : ''}${t.saldoPontos}</div>
                                 </div>
                             </div>
                             <div class="ranking-qtd-trofeus">${this.formatarTrofeus(t.vitorias)}</div>
