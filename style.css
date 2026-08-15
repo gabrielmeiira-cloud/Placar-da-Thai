@@ -1013,10 +1013,11 @@ body.tema-escuro .time-header {
 }
 
 .time-card {
+    position: relative;
     background: rgba(255, 255, 255, 0.08);
     border: 2px solid rgba(255, 255, 255, 0.25);
-    border-radius: 12px;
-    overflow: hidden;
+    border-radius: 14px;
+    overflow: visible;
     display: flex;
     flex-direction: column;
     cursor: pointer;
@@ -1030,12 +1031,13 @@ body.tema-escuro .time-header {
 
 .time-header {
     background: rgba(255, 255, 255, 0.12);
-    padding: 10px 12px;
+    padding: 10px 14px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 0.95rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 12px 12px 0 0;
 }
 
 .time-forca {
@@ -1044,29 +1046,33 @@ body.tema-escuro .time-header {
 }
 
 .btn-fechar-time {
-    background: rgba(220, 53, 69, 0.25);
-    border: 1px solid rgba(255, 77, 94, 0.5);
-    color: #ff6b7a;
+    position: absolute;
+    top: -10px;
+    right: -8px;
+    background: #dc3545;
+    border: 2px solid #ffffff;
+    color: #ffffff;
     border-radius: 50%;
-    width: 22px;
-    height: 22px;
+    width: 26px;
+    height: 26px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.8rem;
-    font-weight: bold;
+    font-size: 0.85rem;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s ease;
-    margin-left: 6px;
+    transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
     padding: 0;
     line-height: 1;
+    z-index: 15;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
 }
 
-.btn-fechar-time:hover {
-    background: rgba(220, 53, 69, 0.9);
-    color: #ffffff;
+.btn-fechar-time:hover,
+.btn-fechar-time:active {
+    background: #bd2130;
     transform: scale(1.15);
-    box-shadow: 0 0 10px rgba(220, 53, 69, 0.6);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.6);
 }
 
 .time-lista {
@@ -1646,7 +1652,7 @@ input:checked + .slider:before {
     transform: translateX(20px);
 }
 
-/* Responsividade de Abas e Cabeçalho para Portrait */
+/* ===================== MOBILE FIRST: RESPONSIVIDADE E TOQUE ===================== */
 @media (max-width: 680px) {
     .painel-overlay-header {
         padding: 8px 10px;
@@ -1664,5 +1670,40 @@ input:checked + .slider:before {
     .btn-fechar-painel {
         padding: 6px 12px;
         font-size: 0.9rem;
+    }
+    .painel-overlay-conteudo {
+        padding: 12px 10px;
+    }
+    .card-secao-principal {
+        padding: 14px 10px;
+        gap: 12px;
+        margin-bottom: 16px;
+        border-radius: 12px;
+    }
+    .sub-bloco-secao {
+        padding: 12px 10px;
+        border-radius: 10px;
+        gap: 10px;
+    }
+    .card-painel-titulo {
+        font-size: 1rem;
+    }
+    .container-times-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    .input-padrao {
+        font-size: 1rem;
+        padding: 12px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .secao-titulo {
+        font-size: 1.2rem;
+    }
+    .btn-sucesso, .btn-aviso, .btn-perigo, .btn-acao-sorteio {
+        min-height: 44px;
+        font-size: 0.95rem;
     }
 }
