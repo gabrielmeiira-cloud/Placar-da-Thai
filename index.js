@@ -172,55 +172,94 @@
     };
     State.init();
 
-    // 2. NAVEGAÇÃO & SCROLLSPY
-    function initScrollspy() {
-        const secoes = document.querySelectorAll('section[id]');
-        const navButtons = document.querySelectorAll('.botoes-atalho-container a.btn-atalho');
+    // 2. PAINEL DE GESTÃO EM VIDRO (OVERLAY DRAWER & ABAS)
+    const OverlayModule = {
+        painel: null,
+        gatilho: null,
+        btnFechar: null,
+        botoesAbas: [],
+        abasItens: [],
+        abaAtiva: 'jogadores',
+        init() {
+            this.painel = document.getElementById('painelGestaoOverlay');
+            this.gatilho = document.getElementById('btnToggleControlesTopo');
+            this.btnFechar = document.getElementById('btnFecharPainel');
+            this.botoesAbas = document.querySelectorAll('.painel-abas-nav .btn-aba[data-aba]');
+            this.abasItens = document.querySelectorAll('.aba-painel-item');
 
-        function atualizarScrollspy() {
-            let idAtual = 'secao-placar';
-            const scrollPos = window.scrollY + 200;
-
-            secoes.forEach(secao => {
-                const topo = secao.offsetTop;
-                const altura = secao.offsetHeight;
-                if (scrollPos >= topo && scrollPos < topo + altura) idAtual = secao.getAttribute('id');
-            });
-
-            navButtons.forEach(btn => {
-                if (btn.getAttribute('data-target') === idAtual) {
-                    btn.classList.add('ativo');
-                    btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-                } else {
-                    btn.classList.remove('ativo');
-                }
-            });
-
-            const btnToggleControlesTopo = document.getElementById('btnToggleControlesTopo');
-            const placarHeader = document.getElementById('placarHeader');
-            if (btnToggleControlesTopo) {
-                const noPlacar = idAtual === 'secao-placar' || window.scrollY < 100;
-                btnToggleControlesTopo.classList.toggle('revertido', !noPlacar);
-                btnToggleControlesTopo.setAttribute('title', noPlacar ? 'Descer para as páginas' : 'Subir para o placar');
-                if (placarHeader) {
-                    placarHeader.classList.toggle('escondido', noPlacar);
-                }
+            if (this.gatilho) {
+                this.gatilho.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.toggle();
+                });
             }
-        }
 
-        window.addEventListener('scroll', atualizarScrollspy, { passive: true });
-        atualizarScrollspy();
+            if (this.btnFechar) {
+                this.btnFechar.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.fechar();
+                });
+            }
 
-        // Trata todos os links internos de navegação (#secao-*)
-        document.querySelectorAll('a[href^="#secao-"]').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const targetId = link.getAttribute('href').replace('#', '') || link.getAttribute('data-target');
-                const el = document.getElementById(targetId);
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
+            this.botoesAbas.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const aba = btn.getAttribute('data-aba');
+                    if (aba) this.irParaAba(aba);
+                });
             });
-        });
-    }
+
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && this.estaAberto()) {
+                    this.fechar();
+                }
+            });
+        },
+        estaAberto() {
+            return this.painel && this.painel.classList.contains('aberto');
+        },
+        abrir(aba = null) {
+            if (aba) this.irParaAba(aba);
+            if (this.painel) {
+                this.painel.classList.add('aberto');
+            }
+            if (this.gatilho) {
+                this.gatilho.classList.add('revertido');
+                this.gatilho.setAttribute('title', 'Fechar e Voltar ao Placar');
+            }
+        },
+        fechar() {
+            if (this.painel) {
+                this.painel.classList.remove('aberto');
+            }
+            if (this.gatilho) {
+                this.gatilho.classList.remove('revertido');
+                this.gatilho.setAttribute('title', 'Abrir Opções & Gestão');
+            }
+        },
+        toggle() {
+            if (this.estaAberto()) this.fechar();
+            else this.abrir();
+        },
+        irParaAba(nomeAba) {
+            this.abaAtiva = nomeAba;
+            this.botoesAbas.forEach(b => {
+                if (b.getAttribute('data-aba') === nomeAba) b.classList.add('ativo');
+                else b.classList.remove('ativo');
+            });
+            this.abasItens.forEach(item => {
+                if (item.id === `aba-${nomeAba}`) {
+                    item.classList.add('ativa');
+                } else {
+                    item.classList.remove('ativa');
+                }
+            });
+            const conteudo = document.querySelector('.painel-overlay-conteudo');
+            if (conteudo) conteudo.scrollTo({ top: 0, behavior: 'smooth' });
+            if (!this.estaAberto()) this.abrir();
+        }
+    };
+    window.OverlayModule = OverlayModule;
 
     // 3. PLACAR AO VIVO
     const Placar = {
@@ -915,8 +954,7 @@
             const p = this.partidas.find(item => item.id === id);
             if (!p) return;
             State.carregarPartidaNoPlacar(p.time1, p.time2, p.id);
-            const secao = document.getElementById('secao-placar');
-            if (secao) secao.scrollIntoView({ behavior: 'smooth' });
+            OverlayModule.fechar();
         },
         pausarPartida(id) {
             State.data.partidaAtual = null;
@@ -1059,26 +1097,6 @@
 
         const overlayIntro = document.getElementById('overlayFigurinhaInicial');
 
-        if (btnToggleControlesTopo) {
-            btnToggleControlesTopo.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const noPlacar = window.scrollY < 100 || !btnToggleControlesTopo.classList.contains('revertido');
-                if (noPlacar) {
-                    const secaoJogadores = document.getElementById('secao-jogadores');
-                    if (secaoJogadores) {
-                        secaoJogadores.scrollIntoView({ behavior: 'smooth' });
-                    }
-                } else {
-                    const secaoPlacar = document.getElementById('secao-placar') || document.querySelector('.secao-placar-wrapper');
-                    if (secaoPlacar) {
-                        secaoPlacar.scrollIntoView({ behavior: 'smooth' });
-                    } else {
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }
-                }
-            });
-        }
-
         // Toggle do Menu Dropdown (☰)
         if (btnMenuToggle && dropdownMenu) {
             btnMenuToggle.addEventListener('click', (e) => {
@@ -1169,11 +1187,11 @@
     // 9. INICIALIZAÇÃO
     function inicializarApp() {
         Placar.init();
+        OverlayModule.init();
         JogadoresModule.init();
         SorteioModule.init();
         PartidasModule.init();
         RankingModule.init();
-        initScrollspy();
         initMenuConfig();
     }
 
