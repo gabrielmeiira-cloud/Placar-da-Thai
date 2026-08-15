@@ -638,10 +638,13 @@
         init() {
             this.timesAtuais = State.data.times || [];
             
-            const alternarVisibilidadeModo = (modo) => {
+            const alternarVisibilidadeModo = () => {
+                const modoPrincipal = document.querySelector('input[name="modoPrincipal"]:checked')?.value || 'manual';
+                const tipoSorteio = document.querySelector('input[name="tipoSorteio"]:checked')?.value || 'normal';
                 const painelAuto = document.getElementById('opcoesSorteioAuto');
                 const btn = document.getElementById('btnAcaoSorteio');
-                if (modo === 'manual') {
+
+                if (modoPrincipal === 'manual') {
                     if (painelAuto) painelAuto.style.display = 'none';
                     let presentes = Array.from(this.jogadoresSelecionados).map(i => ({ ...State.data.jogadores[i] }));
                     if (this.timesAtuais.length === 0) {
@@ -653,9 +656,9 @@
                 } else {
                     if (painelAuto) painelAuto.style.display = 'flex';
                     if (btn) {
-                        if (modo === 'misto') {
+                        if (tipoSorteio === 'misto') {
                             btn.innerHTML = '👫 Sortear Times (Misto)';
-                        } else if (modo === 'aleatorio') {
+                        } else if (tipoSorteio === 'aleatorio') {
                             btn.innerHTML = '🎲 Sortear Times (Aleatório)';
                         } else {
                             btn.innerHTML = '🎲 Sortear Times (Equilibrado)';
@@ -664,10 +667,12 @@
                 }
             };
 
-            document.querySelectorAll('input[name="modo"]').forEach(radio => {
-                radio.addEventListener('change', (e) => {
-                    alternarVisibilidadeModo(e.target.value);
-                });
+            document.querySelectorAll('input[name="modoPrincipal"]').forEach(radio => {
+                radio.addEventListener('change', alternarVisibilidadeModo);
+            });
+
+            document.querySelectorAll('input[name="tipoSorteio"]').forEach(radio => {
+                radio.addEventListener('change', alternarVisibilidadeModo);
             });
 
             State.subscribe((tipo) => {
@@ -675,8 +680,7 @@
                 if (tipo === 'times') { this.timesAtuais = State.data.times; this.renderizarVisualizacao(); }
             });
             this.carregarGrade();
-            const modoInicial = document.querySelector('input[name="modo"]:checked')?.value || 'manual';
-            alternarVisibilidadeModo(modoInicial);
+            alternarVisibilidadeModo();
             if (this.timesAtuais.length > 0) this.renderizarVisualizacao();
         },
         carregarGrade() {
@@ -704,11 +708,10 @@
         sincronizarSelecaoComBanco(index, selecionou) {
             const jOriginal = State.data.jogadores[index];
             if (!jOriginal) return;
-            const modoEl = document.querySelector('input[name="modo"]:checked');
-            const modo = modoEl ? modoEl.value : 'normal';
+            const modoPrincipal = document.querySelector('input[name="modoPrincipal"]:checked')?.value || 'manual';
 
-            if (modo === 'manual' || this.modoVisualizacao === 'manual' || this.timesAtuais.length > 0) {
-                if (modo === 'manual' && this.modoVisualizacao !== 'manual') {
+            if (modoPrincipal === 'manual' || this.modoVisualizacao === 'manual' || this.timesAtuais.length > 0) {
+                if (modoPrincipal === 'manual' && this.modoVisualizacao !== 'manual') {
                     this.modoVisualizacao = 'manual';
                     if (this.timesAtuais.length === 0) this.timesAtuais = [[], []];
                 }
@@ -768,20 +771,21 @@
         },
         iniciarGeracao() {
             const jogadores = State.data.jogadores;
-            if (this.jogadoresSelecionados.size === 0) { alert("Selecione pelo menos um jogador presente!"); return; }
+            if (this.jogadoresSelecionados.size === 0) { alert("Selecione pelo menos um jogador presente em 'Quem vai Jogar?'!"); return; }
             const tamanhoEl = document.querySelector('input[name="tamanho"]:checked');
             const tamanho = tamanhoEl ? parseInt(tamanhoEl.value) : 2;
-            const modoEl = document.querySelector('input[name="modo"]:checked');
-            const modo = modoEl ? modoEl.value : 'normal';
+            const modoPrincipal = document.querySelector('input[name="modoPrincipal"]:checked')?.value || 'manual';
+            const tipoSorteio = document.querySelector('input[name="tipoSorteio"]:checked')?.value || 'normal';
+
             let presentes = Array.from(this.jogadoresSelecionados).map(i => ({ ...jogadores[i] }));
             const qtdTimesCompletos = Math.floor(presentes.length / tamanho);
-            if (qtdTimesCompletos === 0 && modo !== 'manual') {
+            if (qtdTimesCompletos === 0 && modoPrincipal !== 'manual') {
                 alert(`Você selecionou ${presentes.length} pessoa(s). Insuficiente para formar 1 time de ${tamanho}.`);
                 return;
             }
-            let qtdTimesIniciais = qtdTimesCompletos > 0 ? qtdTimesCompletos : 1;
-            if (modo === 'manual') this.prepararModoManual(presentes, qtdTimesIniciais);
-            else this.gerarSorteioAutomatico(presentes, tamanho, qtdTimesCompletos, modo);
+            let qtdTimesIniciais = qtdTimesCompletos > 0 ? qtdTimesCompletos : 2;
+            if (modoPrincipal === 'manual') this.prepararModoManual(presentes, qtdTimesIniciais);
+            else this.gerarSorteioAutomatico(presentes, tamanho, qtdTimesCompletos, tipoSorteio);
         },
         gerarSorteioAutomatico(presentes, tamanho, qtdTimesCompletos, modo) {
             this.modoVisualizacao = 'sorteio';
