@@ -25,7 +25,7 @@
          ========================================================================== -->
     <div class="secao-placar-wrapper">
         <section id="secao-placar">
-            <div class="versao-placar">Placar da Thai V6.8</div>
+            <div class="versao-placar">Placar da Thai V6.9</div>
 
             <div class="controles-topo-centro">
                 <button class="btn-central" id="btnToggleControlesTopo" type="button" title="Configurações e Gestão">
@@ -106,9 +106,9 @@
                 <button class="btn-aba" data-target="topico-ranking" type="button">🏆 Ranking</button>
             </nav>
 
-            <!-- BOTÃO FECHAR RÁPIDO DO PAINEL -->
-            <button class="btn-fechar-painel" id="btnFecharPainel" type="button" title="Voltar ao Placar">
-                <span>✕</span> Fechar
+            <!-- BOTÃO FECHAR RÁPIDO DO PAINEL (CÍRCULO VERMELHO COM X) -->
+            <button class="btn-fechar-circulo-topo" id="btnFecharPainel" type="button" title="Voltar ao Placar">
+                ✕
             </button>
         </header>
 
@@ -168,6 +168,12 @@
                             <span style="font-size: 0.9rem; color: var(--texto-secundario);">Total: <strong id="contadorJogadores">0</strong></span>
                         </div>
                         <div class="lista-itens" id="listaJogadores"></div>
+
+                        <div style="display: flex; margin-top: 14px;">
+                            <button type="button" class="btn-aba" style="width: 100%; padding: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; background: rgba(78, 94, 120, 0.45); border: 1.5px solid rgba(255, 255, 255, 0.45);" onclick="OverlayModule.irPara('topico-sorteio')">
+                                Ir para 👥 Times ↓
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -248,7 +254,7 @@
 
                         <div style="display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap;">
                             <button type="button" class="btn-aba" style="width: 100%; padding: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; background: rgba(78, 94, 120, 0.45); border: 1.5px solid rgba(255, 255, 255, 0.45);" onclick="OverlayModule.irPara('topico-partidas')">
-                                📋 Ir para Partidas ▼
+                                Ir para 📋 Partidas ↓
                             </button>
                         </div>
                     </div>

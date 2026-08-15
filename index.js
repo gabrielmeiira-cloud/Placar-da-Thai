@@ -1382,8 +1382,8 @@
 
         if (btnToggleFullscreen) {
             btnToggleFullscreen.addEventListener('click', (e) => {
-                if (e.target !== checkFullscreen) {
-                    alternarFullscreen();
+                if (e.target !== checkFullscreen && !e.target.closest('.switch')) {
+                    if (checkFullscreen) checkFullscreen.click();
                 }
             });
         }
@@ -1401,15 +1401,13 @@
         function atualizarFigurinhasUI() {
             const ativa = State.data.configs.figurinhas !== false;
             if (checkFig) checkFig.checked = ativa;
-            if (labelFig) labelFig.textContent = ativa ? '🖼️ Figurinhas: Ativas' : '🖼️ Figurinhas: Desativadas';
+            if (labelFig) labelFig.textContent = ativa ? '🖼️ Figurinhas: Ativadas' : '🖼️ Figurinhas: Desativadas';
         }
 
         if (btnToggleFig) {
             btnToggleFig.addEventListener('click', (e) => {
-                if (e.target !== checkFig) {
-                    const novo = !State.data.configs.figurinhas;
-                    State.salvarConfigs({ figurinhas: novo });
-                    atualizarFigurinhasUI();
+                if (e.target !== checkFig && !e.target.closest('.switch')) {
+                    if (checkFig) checkFig.click();
                 }
             });
         }
@@ -1437,20 +1435,9 @@
 
         if (btnToggleTema) {
             btnToggleTema.addEventListener('click', (e) => {
-                if (e.target !== checkTema) {
-                    const atual = State.data.configs.tema || 'claro';
-                    const novo = atual === 'escuro' ? 'claro' : 'escuro';
-                    State.salvarConfigs({ tema: novo });
-                    aplicarTemaUI();
+                if (e.target !== checkTema && !e.target.closest('.switch')) {
+                    if (checkTema) checkTema.click();
                 }
-            });
-        }
-
-        if (checkTema) {
-            checkTema.addEventListener('change', () => {
-                const novo = checkTema.checked ? 'claro' : 'escuro';
-                State.salvarConfigs({ tema: novo });
-                aplicarTemaUI();
             });
         }
 
