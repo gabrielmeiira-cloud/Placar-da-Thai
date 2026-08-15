@@ -1246,7 +1246,7 @@
                                 <div class="ranking-detalhes-time">
                                     <div class="ranking-nome-time">${t.nomeTime}</div>
                                     <div class="ranking-membros-txt">(${t.membros || 'Avulso'})</div>
-                                    <div class="ranking-stats-sub">${t.jogos} jogos | ${t.vitorias} vitórias - ${t.derrotas} derrotas | Saldo: ${t.saldoPontos > 0 ? '+' : ''}${t.saldoPontos}</div>
+                                    <div class="ranking-stats-sub">${t.jogos} jogos | ${t.vitorias} vitórias / ${t.derrotas} derrotas | Saldo: ${t.saldoPontos > 0 ? '+' : ''}${t.saldoPontos}</div>
                                 </div>
                             </div>
                             <div class="ranking-qtd-trofeus">${this.formatarTrofeus(t.vitorias)}</div>
