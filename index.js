@@ -195,6 +195,13 @@
                     btn.classList.remove('ativo');
                 }
             });
+
+            const btnToggleControlesTopo = document.getElementById('btnToggleControlesTopo');
+            if (btnToggleControlesTopo) {
+                const noPlacar = idAtual === 'secao-placar' || window.scrollY < 100;
+                btnToggleControlesTopo.classList.toggle('revertido', !noPlacar);
+                btnToggleControlesTopo.setAttribute('title', noPlacar ? 'Descer para as páginas' : 'Subir para o placar');
+            }
         }
 
         window.addEventListener('scroll', atualizarScrollspy, { passive: true });
@@ -1051,9 +1058,19 @@
         if (btnToggleControlesTopo) {
             btnToggleControlesTopo.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const secaoJogadores = document.getElementById('secao-jogadores');
-                if (secaoJogadores) {
-                    secaoJogadores.scrollIntoView({ behavior: 'smooth' });
+                const noPlacar = window.scrollY < 100 || !btnToggleControlesTopo.classList.contains('revertido');
+                if (noPlacar) {
+                    const secaoJogadores = document.getElementById('secao-jogadores');
+                    if (secaoJogadores) {
+                        secaoJogadores.scrollIntoView({ behavior: 'smooth' });
+                    }
+                } else {
+                    const secaoPlacar = document.getElementById('secao-placar') || document.querySelector('.secao-placar-wrapper');
+                    if (secaoPlacar) {
+                        secaoPlacar.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
                 }
             });
         }

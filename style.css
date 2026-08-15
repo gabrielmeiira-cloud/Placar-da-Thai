@@ -286,8 +286,12 @@ body {
     height: 6px;
     border-top: 2px solid rgba(255, 255, 255, 0.85);
     border-left: 2px solid rgba(255, 255, 255, 0.85);
-    transform: rotate(225deg);
-    transition: transform 0.3s;
+    transform: rotate(225deg); /* Aponta para baixo quando no placar */
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#btnToggleControlesTopo.revertido .seta-animada {
+    transform: rotate(45deg); /* Aponta para cima quando nas paginas de gestao */
 }
 
 /* ===================== TEMA ESCURO (ESTILO ORIGINAL) ===================== */
