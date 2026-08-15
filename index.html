@@ -25,7 +25,7 @@
          ========================================================================== -->
     <div class="secao-placar-wrapper">
         <section id="secao-placar">
-            <div class="versao-placar">Placar da Thai V6.2</div>
+            <div class="versao-placar">Placar da Thai V6.3</div>
 
             <div class="controles-topo-centro">
                 <button class="btn-central" id="btnToggleControlesTopo" type="button" title="Configurações e Gestão">
@@ -130,11 +130,15 @@
                             <div class="form-grupo-campo">
                                 <span class="form-subtitulo-label">Sexo</span>
                                 <div class="radio-group" style="display: flex; gap: 8px;">
-                                    <label class="radio-chip" style="flex: 1; justify-content: center;">
-                                        <input type="radio" name="sexo" value="m" checked> 🚹 Masculino
+                                    <label class="radio-chip" style="flex: 1; justify-content: center; gap: 6px;">
+                                        <input type="radio" name="sexo" value="m" checked>
+                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="icone-m"><circle cx="10" cy="14" r="6"></circle><line x1="14.24" y1="9.76" x2="20" y2="4"></line><polyline points="15 4 20 4 20 9"></polyline></svg>
+                                        Masculino
                                     </label>
-                                    <label class="radio-chip" style="flex: 1; justify-content: center;">
-                                        <input type="radio" name="sexo" value="f"> 🚺 Feminino
+                                    <label class="radio-chip" style="flex: 1; justify-content: center; gap: 6px;">
+                                        <input type="radio" name="sexo" value="f">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="icone-f"><circle cx="12" cy="9" r="6"></circle><line x1="12" y1="15" x2="12" y2="22"></line><line x1="9" y1="19" x2="15" y2="19"></line></svg>
+                                        Feminino
                                     </label>
                                 </div>
                             </div>
@@ -240,8 +244,8 @@
                         <div class="container-times-grid" id="containerTimes" style="margin-top: 14px; margin-bottom: 14px;"></div>
 
                         <div style="display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap;">
-                            <button type="button" class="btn-sucesso" style="flex: 1; padding: 12px; cursor: pointer;" onclick="OverlayModule.irPara('topico-partidas')">
-                                📋 Ir para Partidas ▶
+                            <button type="button" class="btn-aba" style="width: 100%; padding: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; background: rgba(78, 94, 120, 0.45); border: 1.5px solid rgba(255, 255, 255, 0.45);" onclick="OverlayModule.irPara('topico-partidas')">
+                                📋 Ir para Partidas ▼
                             </button>
                         </div>
                     </div>

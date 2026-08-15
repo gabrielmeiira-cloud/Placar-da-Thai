@@ -74,6 +74,11 @@
         salvarPartidas(partidas) {
             this.data.partidas = partidas;
             localStorage.setItem(this.KEYS.PARTIDAS, JSON.stringify(partidas));
+            if (!partidas || partidas.length === 0) {
+                this.data.partidaAtual = null;
+                localStorage.removeItem(this.KEYS.PARTIDA_ATUAL);
+                this.notify('partida_ativa', null);
+            }
             this.notify('partidas', partidas);
         },
         salvarConfigs(parciais) {
