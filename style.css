@@ -142,7 +142,14 @@ body {
 .painel-gestao-overlay.aberto {
     transform: translateY(0);
     opacity: 1;
-    pointer-events: auto;
+    pointer-events: auto !important;
+}
+
+body.painel-aberto .secao-placar-wrapper,
+body.painel-aberto #secao-placar,
+body.painel-aberto .lado-azul,
+body.painel-aberto .lado-vermelho {
+    pointer-events: none !important;
 }
 
 .painel-overlay-header {

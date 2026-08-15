@@ -216,14 +216,6 @@
                 }, { passive: true });
             }
 
-            if (this.painel) {
-                ['touchstart', 'touchend', 'touchmove', 'pointerdown', 'pointerup', 'mousedown', 'mouseup'].forEach(evt => {
-                    this.painel.addEventListener(evt, (e) => {
-                        e.stopPropagation();
-                    }, { passive: true });
-                });
-            }
-
             window.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && this.estaAberto()) {
                     this.fechar();
@@ -237,6 +229,7 @@
             if (this.painel) {
                 this.painel.classList.add('aberto');
             }
+            document.body.classList.add('painel-aberto');
             if (this.gatilho) {
                 this.gatilho.setAttribute('title', 'Fechar Configurações');
             }
@@ -248,6 +241,7 @@
             if (this.painel) {
                 this.painel.classList.remove('aberto');
             }
+            document.body.classList.remove('painel-aberto');
             if (this.gatilho) {
                 this.gatilho.setAttribute('title', 'Configurações e Gestão');
             }
@@ -453,9 +447,10 @@
                 return { x: e.clientX, y: e.clientY };
             };
             const handleStart = (e) => {
-                if (OverlayModule.estaAberto()) return;
+                if (OverlayModule.estaAberto() || document.body.classList.contains('painel-aberto')) return;
                 if (document.querySelector('.dropdown-menu.ativo')) return;
-                if (document.querySelector('.modal-overlay[style*="display: flex"]')) return;
+                const modalAberto = document.querySelector('.modal-overlay:not([style*="display: none"])');
+                if (modalAberto) return;
 
                 if (e.type === 'mousedown' && Date.now() - lastTouchTime < 600) return;
                 if (e.type.startsWith('touch')) lastTouchTime = Date.now();
@@ -465,7 +460,12 @@
                 startX = pos.x; startY = pos.y;
             };
             const handleEnd = (e) => {
-                if (OverlayModule.estaAberto() || document.querySelector('.dropdown-menu.ativo') || document.querySelector('.modal-overlay[style*="display: flex"]')) {
+                if (OverlayModule.estaAberto() || document.body.classList.contains('painel-aberto') || document.querySelector('.dropdown-menu.ativo')) {
+                    interagindo = false;
+                    return;
+                }
+                const modalAberto = document.querySelector('.modal-overlay:not([style*="display: none"])');
+                if (modalAberto) {
                     interagindo = false;
                     return;
                 }
