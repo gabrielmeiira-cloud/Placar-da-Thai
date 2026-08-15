@@ -563,8 +563,8 @@ body.tema-escuro .time-header {
     }
 
     #secao-placar .pontos {
-        font-size: min(140vw, 42dvh);
-        line-height: 0.9;
+        font-size: min(94vw, 47dvh);
+        line-height: 0.88;
     }
 }
 
