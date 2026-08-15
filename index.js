@@ -172,20 +172,21 @@
     };
     State.init();
 
-    // 2. PAINEL DE GESTÃO EM VIDRO (OVERLAY DRAWER & ABAS)
+    // 2. PAINEL DE GESTÃO EM VIDRO (OVERLAY DRAWER & GUIA DE TÓPICOS SCROLLSPY)
     const OverlayModule = {
         painel: null,
         gatilho: null,
         btnFechar: null,
+        conteudo: null,
         botoesAbas: [],
-        abasItens: [],
-        abaAtiva: 'jogadores',
+        secoes: [],
         init() {
             this.painel = document.getElementById('painelGestaoOverlay');
             this.gatilho = document.getElementById('btnToggleControlesTopo');
             this.btnFechar = document.getElementById('btnFecharPainel');
-            this.botoesAbas = document.querySelectorAll('.painel-abas-nav .btn-aba[data-aba]');
-            this.abasItens = document.querySelectorAll('.aba-painel-item');
+            this.conteudo = document.getElementById('painelOverlayConteudo');
+            this.botoesAbas = document.querySelectorAll('.painel-abas-nav .btn-aba[data-target]');
+            this.secoes = document.querySelectorAll('.secao-painel-item');
 
             if (this.gatilho) {
                 this.gatilho.addEventListener('click', (e) => {
@@ -204,10 +205,16 @@
             this.botoesAbas.forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const aba = btn.getAttribute('data-aba');
-                    if (aba) this.irParaAba(aba);
+                    const targetId = btn.getAttribute('data-target');
+                    if (targetId) this.irPara(targetId);
                 });
             });
+
+            if (this.conteudo) {
+                this.conteudo.addEventListener('scroll', () => {
+                    this.atualizarGuiaScrollspy();
+                }, { passive: true });
+            }
 
             window.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && this.estaAberto()) {
@@ -218,14 +225,16 @@
         estaAberto() {
             return this.painel && this.painel.classList.contains('aberto');
         },
-        abrir(aba = null) {
-            if (aba) this.irParaAba(aba);
+        abrir(targetId = null) {
             if (this.painel) {
                 this.painel.classList.add('aberto');
             }
             if (this.gatilho) {
                 this.gatilho.classList.add('revertido');
                 this.gatilho.setAttribute('title', 'Fechar e Voltar ao Placar');
+            }
+            if (targetId) {
+                setTimeout(() => this.irPara(targetId), 50);
             }
         },
         fechar() {
@@ -241,22 +250,39 @@
             if (this.estaAberto()) this.fechar();
             else this.abrir();
         },
-        irParaAba(nomeAba) {
-            this.abaAtiva = nomeAba;
+        irPara(targetId) {
+            const el = document.getElementById(targetId);
+            if (el && this.conteudo) {
+                const topoRelativo = el.offsetTop - this.conteudo.offsetTop - 10;
+                this.conteudo.scrollTo({ top: Math.max(0, topoRelativo), behavior: 'smooth' });
+            }
+            this.destacarBotaoGuia(targetId);
+            if (!this.estaAberto()) this.abrir();
+        },
+        destacarBotaoGuia(targetId) {
             this.botoesAbas.forEach(b => {
-                if (b.getAttribute('data-aba') === nomeAba) b.classList.add('ativo');
-                else b.classList.remove('ativo');
-            });
-            this.abasItens.forEach(item => {
-                if (item.id === `aba-${nomeAba}`) {
-                    item.classList.add('ativa');
+                if (b.getAttribute('data-target') === targetId) {
+                    b.classList.add('ativo');
+                    b.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
                 } else {
-                    item.classList.remove('ativa');
+                    b.classList.remove('ativo');
                 }
             });
-            const conteudo = document.querySelector('.painel-overlay-conteudo');
-            if (conteudo) conteudo.scrollTo({ top: 0, behavior: 'smooth' });
-            if (!this.estaAberto()) this.abrir();
+        },
+        atualizarGuiaScrollspy() {
+            if (!this.conteudo) return;
+            const scrollPos = this.conteudo.scrollTop + 80;
+            let idAtual = 'topico-jogadores';
+
+            this.secoes.forEach(secao => {
+                const topo = secao.offsetTop - this.conteudo.offsetTop;
+                const altura = secao.offsetHeight;
+                if (scrollPos >= topo && scrollPos < topo + altura) {
+                    idAtual = secao.id;
+                }
+            });
+
+            this.destacarBotaoGuia(idAtual);
         }
     };
     window.OverlayModule = OverlayModule;

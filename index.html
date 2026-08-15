@@ -33,7 +33,7 @@
          ========================================================================== -->
     <div class="secao-placar-wrapper">
         <section id="secao-placar">
-            <div class="versao-placar">Placar da Thai V3.0</div>
+            <div class="versao-placar">Placar da Thai V3.1</div>
 
             <div class="controles-centro">
                 <button class="btn-central" id="btnInverterLados" type="button" title="Inverter placar">⇄</button>
@@ -58,10 +58,10 @@
     </div>
 
     <!-- ==========================================================================
-         PAINEL DE GESTÃO EM VIDRO (GLASS OVERLAY DRAWER) DESLIZANTE SOBRE O PLACAR
+         PAINEL DE GESTÃO EM VIDRO (GLASS OVERLAY DRAWER) COM ROLAGEM ÚNICA CONTÍNUA
          ========================================================================== -->
     <div class="painel-gestao-overlay" id="painelGestaoOverlay">
-        <!-- CABEÇALHO DO PAINEL COM ABAS E MENU -->
+        <!-- CABEÇALHO DO PAINEL COM GUIA DE TÓPICOS E MENU -->
         <header class="painel-overlay-header">
             <!-- MENU HAMBÚRGUER À ESQUERDA -->
             <div class="menu-container">
@@ -84,12 +84,12 @@
                 </div>
             </div>
 
-            <!-- ABAS DE NAVEGAÇÃO INTERNA EM VIDRO -->
-            <nav class="painel-abas-nav">
-                <button class="btn-aba ativo" data-aba="jogadores" type="button">👤 Jogadores</button>
-                <button class="btn-aba" data-aba="sorteio" type="button">🎲 Sorteio</button>
-                <button class="btn-aba" data-aba="partidas" type="button">📋 Partidas</button>
-                <button class="btn-aba" data-aba="ranking" type="button">🏆 Ranking</button>
+            <!-- GUIA DE TÓPICOS / SCROLLSPY EM VIDRO -->
+            <nav class="painel-abas-nav" id="painelAbasNav">
+                <button class="btn-aba ativo" data-target="topico-jogadores" type="button">👤 Jogadores</button>
+                <button class="btn-aba" data-target="topico-sorteio" type="button">🎲 Sorteio</button>
+                <button class="btn-aba" data-target="topico-partidas" type="button">📋 Partidas</button>
+                <button class="btn-aba" data-target="topico-ranking" type="button">🏆 Ranking</button>
                 <button class="btn-aba" id="btnFullscreen" type="button">🖥️ Tela Cheia</button>
             </nav>
 
@@ -99,11 +99,11 @@
             </button>
         </header>
 
-        <!-- ÁREA DE CONTEÚDO ROLÁVEL DAS ABAS -->
-        <div class="painel-overlay-conteudo">
+        <!-- ÁREA ÚNICA DE CONTEÚDO ROLÁVEL COM TODOS OS TÓPICOS -->
+        <div class="painel-overlay-conteudo" id="painelOverlayConteudo">
             
-            <!-- ABA 1: JOGADORES -->
-            <div class="aba-painel-item ativa" id="aba-jogadores">
+            <!-- TÓPICO 1: JOGADORES -->
+            <section class="secao-painel-item" id="topico-jogadores">
                 <div class="secao-cabecalho">
                     <h2 class="secao-titulo">👤 Cadastro de Jogadores</h2>
                     <button class="btn-atalho" type="button" onclick="OverlayModule.fechar()">⬆ Voltar ao Placar</button>
@@ -139,10 +139,10 @@
                     </div>
                     <div class="lista-itens" id="listaJogadores"></div>
                 </div>
-            </div>
+            </section>
 
-            <!-- ABA 2: SORTEIO -->
-            <div class="aba-painel-item" id="aba-sorteio">
+            <!-- TÓPICO 2: SORTEIO -->
+            <section class="secao-painel-item" id="topico-sorteio">
                 <div class="secao-cabecalho">
                     <h2 class="secao-titulo">🎲 Sorteio & Equilíbrio de Times</h2>
                     <button class="btn-atalho" type="button" onclick="OverlayModule.fechar()">⬆ Voltar ao Placar</button>
@@ -201,15 +201,15 @@
                     <div class="container-times-grid" id="containerTimes"></div>
 
                     <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
-                        <button type="button" class="btn-sucesso" style="flex: 1; padding: 12px; cursor: pointer;" onclick="OverlayModule.irParaAba('partidas')">
+                        <button type="button" class="btn-sucesso" style="flex: 1; padding: 12px; cursor: pointer;" onclick="OverlayModule.irPara('topico-partidas')">
                             📋 Ir para Fila de Partidas ▶
                         </button>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <!-- ABA 3: PARTIDAS -->
-            <div class="aba-painel-item" id="aba-partidas">
+            <!-- TÓPICO 3: PARTIDAS -->
+            <section class="secao-painel-item" id="topico-partidas">
                 <div class="secao-cabecalho">
                     <h2 class="secao-titulo">📋 Fila de Partidas</h2>
                     <button class="btn-atalho" type="button" onclick="OverlayModule.fechar()">⬆ Voltar ao Placar</button>
@@ -236,10 +236,10 @@
                     <div class="card-painel-titulo">Confrontos da Rodada</div>
                     <div class="lista-partidas" id="listaPartidasCorpo"></div>
                 </div>
-            </div>
+            </section>
 
-            <!-- ABA 4: RANKING -->
-            <div class="aba-painel-item" id="aba-ranking">
+            <!-- TÓPICO 4: RANKING -->
+            <section class="secao-painel-item" id="topico-ranking">
                 <div class="secao-cabecalho">
                     <h2 class="secao-titulo">🏆 Pódio & Ranking Geral</h2>
                     <button class="btn-atalho" type="button" onclick="OverlayModule.fechar()">⬆ Voltar ao Placar</button>
@@ -260,7 +260,7 @@
                     <div class="card-painel-titulo">Classificação Geral dos Times</div>
                     <div class="lista-itens" id="listaRankingCompleta"></div>
                 </div>
-            </div>
+            </section>
 
         </div>
     </div>
