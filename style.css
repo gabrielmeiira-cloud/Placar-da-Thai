@@ -383,7 +383,7 @@ body.tema-escuro .time-header {
 }
 
 /* ==========================================================================
-   SEÇÃO 1: PLACAR AO VIVO (100dvh - WIDESCREEN HORIZONTAL INDEPENDENTE DA ROTAÇÃO)
+   SEÇÃO 1: PLACAR AO VIVO (100dvh)
    ========================================================================== */
 
 .secao-placar-wrapper {
@@ -407,51 +407,26 @@ body.tema-escuro .time-header {
 
 @media (orientation: portrait) {
     #secao-placar {
-        width: 100dvh;
-        height: 100vw;
-        min-height: 100vw;
-        max-height: 100vw;
-        position: absolute;
-        top: 0;
-        left: 0;
-        transform-origin: 0 0;
-        transform: rotate(90deg) translateY(-100%);
-    }
-
-    #secao-placar .pontos {
-        font-size: 80vw;
-    }
-
-    /* MODO ROTAÇÃO LIVRE ATIVADA NO MENU */
-    body.rotacao-livre #secao-placar {
-        width: 100vw;
-        height: 100dvh;
-        min-height: 100dvh;
-        max-height: 100dvh;
-        position: relative;
-        top: auto;
-        left: auto;
-        transform: none;
         flex-direction: column;
     }
 
-    body.rotacao-livre #secao-placar .pontos {
+    #secao-placar .pontos {
         font-size: 50vh;
     }
 
-    body.rotacao-livre .lado-azul,
-    body.rotacao-livre .lado-vermelho {
+    .lado-azul,
+    .lado-vermelho {
         height: 50%;
         width: 100%;
     }
 
-    body.rotacao-livre .lado-azul .lado-tag-time {
+    .lado-azul .lado-tag-time {
         top: 14px;
         left: 50%;
         transform: translateX(-50%);
     }
 
-    body.rotacao-livre .lado-vermelho .lado-tag-time {
+    .lado-vermelho .lado-tag-time {
         top: 14px;
         left: 50%;
         transform: translateX(-50%);
