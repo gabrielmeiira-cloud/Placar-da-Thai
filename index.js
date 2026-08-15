@@ -230,6 +230,8 @@
                 this.painel.classList.add('aberto');
             }
             document.body.classList.add('painel-aberto');
+            const dropdown = document.getElementById('dropdownMenu');
+            if (dropdown) dropdown.classList.remove('ativo');
             if (this.gatilho) {
                 this.gatilho.setAttribute('title', 'Fechar Configurações');
             }
@@ -242,6 +244,8 @@
                 this.painel.classList.remove('aberto');
             }
             document.body.classList.remove('painel-aberto');
+            const dropdown = document.getElementById('dropdownMenu');
+            if (dropdown) dropdown.classList.remove('ativo');
             if (this.gatilho) {
                 this.gatilho.setAttribute('title', 'Configurações e Gestão');
             }
