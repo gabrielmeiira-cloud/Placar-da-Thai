@@ -531,9 +531,8 @@
                 const deslizeDiminuir = isPortrait ? (deltaX < -40 || deltaY > 40) : (deltaY > 40);
 
                 if (this.jogoEncerrado) {
-                    this.scoreAzul = 0; this.scoreVermelho = 0; this.jogoEncerrado = false;
-                    const antiga = document.querySelector('.figurinha-ponto'); if (antiga) antiga.remove();
-                    this.limparConfetes();
+                    // Placar travado na vitória. Não permite adicionar nem remover pontos pelo toque.
+                    return;
                 }
                 if (deslizeDiminuir) {
                     if (lado === 'azul') this.scoreAzul = Math.max(0, this.scoreAzul - 1);
