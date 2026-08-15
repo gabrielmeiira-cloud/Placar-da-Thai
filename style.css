@@ -165,7 +165,6 @@ body.modal-aberto .pontos {
     pointer-events: none !important;
     touch-action: none !important;
     user-select: none !important;
-    visibility: hidden !important;
 }
 
 .painel-overlay-header {
@@ -229,6 +228,31 @@ body.modal-aberto .pontos {
     border-color: rgba(255, 255, 255, 0.95);
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18), 0 0 12px rgba(255, 255, 255, 0.4);
     font-weight: 600;
+}
+
+.btn-aba[data-target="topico-jogadores"].ativo {
+    background: rgba(0, 123, 255, 0.4);
+    border-color: #007bff;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2), 0 0 16px rgba(0, 123, 255, 0.6);
+}
+
+.btn-aba[data-target="topico-sorteio"].ativo {
+    background: rgba(220, 53, 69, 0.4);
+    border-color: #dc3545;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2), 0 0 16px rgba(220, 53, 69, 0.6);
+}
+
+.btn-aba[data-target="topico-partidas"].ativo {
+    background: rgba(255, 255, 255, 0.45);
+    border-color: #ffffff;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2), 0 0 16px rgba(255, 255, 255, 0.6);
+    color: #ffffff;
+}
+
+.btn-aba[data-target="topico-ranking"].ativo {
+    background: rgba(255, 193, 7, 0.4);
+    border-color: #ffc107;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2), 0 0 16px rgba(255, 193, 7, 0.6);
 }
 
 /* BOTÃO VOLTAR FLUTUANTE NA DIREITA EMBAIXO DO HEADER COM ÍCONE DO PLACAR (EFEITO GLASS) */
@@ -1000,23 +1024,23 @@ body.tema-escuro .time-header {
 
 /* MARCADORES COLORIDOS DE TOPO EM CADA TÓPICO */
 #topico-jogadores .card-secao-principal {
-    border-top: 4.5px solid #00d2ff;
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25), 0 0 22px rgba(0, 210, 255, 0.22);
+    border-top: 4.5px solid #007bff;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25), 0 0 24px rgba(0, 123, 255, 0.35);
 }
 
 #topico-sorteio .card-secao-principal {
-    border-top: 4.5px solid #c084fc;
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25), 0 0 22px rgba(192, 132, 252, 0.22);
+    border-top: 4.5px solid #dc3545;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25), 0 0 24px rgba(220, 53, 69, 0.35);
 }
 
 #topico-partidas .card-secao-principal {
-    border-top: 4.5px solid #00e676;
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25), 0 0 22px rgba(0, 230, 118, 0.22);
+    border-top: 4.5px solid #ffffff;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25), 0 0 24px rgba(255, 255, 255, 0.35);
 }
 
 #topico-ranking .card-secao-principal {
     border-top: 4.5px solid #ffc107;
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25), 0 0 26px rgba(255, 193, 7, 0.28);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25), 0 0 26px rgba(255, 193, 7, 0.35);
 }
 
 .secao-cabecalho-card {
