@@ -161,10 +161,11 @@ body.modal-aberto .pontos {
 }
 
 .painel-overlay-header {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 16px;
+    padding: 10px 16px 14px;
     background: rgba(75, 90, 115, 0.45);
     border-bottom: 1px solid rgba(255, 255, 255, 0.45);
     gap: 12px;
@@ -172,6 +173,7 @@ body.modal-aberto .pontos {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     width: 100%;
     box-sizing: border-box;
+    z-index: 100;
 }
 
 .painel-abas-nav {
@@ -219,48 +221,53 @@ body.modal-aberto .pontos {
     font-weight: 600;
 }
 
-.btn-fechar-transparente {
-    background: rgba(255, 255, 255, 0.14);
-    border: 1.5px solid rgba(255, 255, 255, 0.45);
+/* BOTÃO FECHAR FLUTUANTE CENTRALIZADO SOBREPOSTO AO HEADER */
+.btn-fechar-flutuante-centro {
+    position: absolute;
+    bottom: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(38, 50, 70, 0.88);
+    border: 1.5px solid rgba(255, 255, 255, 0.6);
     color: #ffffff;
-    padding: 7px 16px;
+    padding: 5px 22px;
     border-radius: 20px;
     font-family: 'Fredoka', sans-serif;
-    font-size: 0.95rem;
-    font-weight: 500;
+    font-size: 0.92rem;
+    font-weight: 600;
     cursor: pointer;
     white-space: nowrap;
-    transition: background-color 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     display: flex;
     align-items: center;
     gap: 6px;
-    flex-shrink: 0;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+    z-index: 110;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
-.btn-fechar-transparente span {
+.btn-fechar-flutuante-centro span {
     font-weight: 700;
-    font-size: 1.05rem;
+    font-size: 1rem;
 }
 
-.btn-fechar-transparente:hover {
-    background: rgba(255, 255, 255, 0.28);
-    border-color: rgba(255, 255, 255, 0.75);
-    transform: scale(1.05);
-    box-shadow: 0 4px 18px rgba(255, 255, 255, 0.2);
+.btn-fechar-flutuante-centro:hover {
+    background: rgba(220, 53, 69, 0.85);
+    border-color: rgba(255, 255, 255, 0.9);
+    transform: translateX(-50%) translateY(2px) scale(1.06);
+    box-shadow: 0 8px 24px rgba(220, 53, 69, 0.5);
 }
 
-.btn-fechar-transparente:active {
-    transform: scale(0.95);
-    background: rgba(255, 255, 255, 0.38);
+.btn-fechar-flutuante-centro:active {
+    transform: translateX(-50%) scale(0.95);
 }
 
 .painel-overlay-conteudo {
     flex: 1;
     overflow-y: auto;
-    padding: 24px 16px 60px;
+    padding: 34px 16px 60px;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
     display: flex;
