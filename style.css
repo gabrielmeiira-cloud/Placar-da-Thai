@@ -666,6 +666,17 @@ body.tema-escuro .time-header {
     pointer-events: none;
 }
 
+.controles-topo-centro {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    z-index: 25;
+    pointer-events: none;
+}
+
 .controles-centro {
     position: absolute;
     top: 50%;
@@ -708,6 +719,15 @@ body.tema-escuro .time-header {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
     transition: transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.btn-central svg {
+    display: block;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-central:hover svg {
+    transform: rotate(60deg) scale(1.1);
 }
 
 .btn-central:hover {
