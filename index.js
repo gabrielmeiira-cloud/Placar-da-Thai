@@ -637,30 +637,46 @@
         svgF14: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="icone-f"><circle cx="12" cy="9" r="6"></circle><line x1="12" y1="15" x2="12" y2="22"></line><line x1="9" y1="19" x2="15" y2="19"></line></svg>`,
         init() {
             this.timesAtuais = State.data.times || [];
+            
+            const alternarVisibilidadeModo = (modo) => {
+                const painelAuto = document.getElementById('opcoesSorteioAuto');
+                const btn = document.getElementById('btnAcaoSorteio');
+                if (modo === 'manual') {
+                    if (painelAuto) painelAuto.style.display = 'none';
+                    let presentes = Array.from(this.jogadoresSelecionados).map(i => ({ ...State.data.jogadores[i] }));
+                    if (this.timesAtuais.length === 0) {
+                        this.prepararModoManual(presentes, 2);
+                    } else {
+                        this.modoVisualizacao = 'manual';
+                        this.renderizarVisualizacao();
+                    }
+                } else {
+                    if (painelAuto) painelAuto.style.display = 'flex';
+                    if (btn) {
+                        if (modo === 'misto') {
+                            btn.innerHTML = '👫 Sortear Times (Misto)';
+                        } else if (modo === 'aleatorio') {
+                            btn.innerHTML = '🎲 Sortear Times (Aleatório)';
+                        } else {
+                            btn.innerHTML = '🎲 Sortear Times (Equilibrado)';
+                        }
+                    }
+                }
+            };
+
             document.querySelectorAll('input[name="modo"]').forEach(radio => {
                 radio.addEventListener('change', (e) => {
-                    const btn = document.getElementById('btnAcaoSorteio');
-                    if (!btn) return;
-                    if (e.target.value === 'manual') {
-                        btn.innerHTML = '✋ Iniciar Montagem Manual'; btn.className = 'btn-acao-sorteio btn-aviso';
-                        let presentes = Array.from(this.jogadoresSelecionados).map(i => ({ ...State.data.jogadores[i] }));
-                        if (presentes.length > 0 && this.timesAtuais.length === 0) {
-                            this.prepararModoManual(presentes, 2);
-                        }
-                    } else if (e.target.value === 'misto') {
-                        btn.innerHTML = '👫 Sortear Times (Misto)'; btn.className = 'btn-acao-sorteio btn-sucesso';
-                    } else if (e.target.value === 'aleatorio') {
-                        btn.innerHTML = '🎲 Sortear Times (Aleatório)'; btn.className = 'btn-acao-sorteio btn-sucesso';
-                    } else {
-                        btn.innerHTML = '🎲 Sortear Times (Equilibrado)'; btn.className = 'btn-acao-sorteio btn-sucesso';
-                    }
+                    alternarVisibilidadeModo(e.target.value);
                 });
             });
+
             State.subscribe((tipo) => {
                 if (tipo === 'jogadores') this.carregarGrade();
                 if (tipo === 'times') { this.timesAtuais = State.data.times; this.renderizarVisualizacao(); }
             });
             this.carregarGrade();
+            const modoInicial = document.querySelector('input[name="modo"]:checked')?.value || 'manual';
+            alternarVisibilidadeModo(modoInicial);
             if (this.timesAtuais.length > 0) this.renderizarVisualizacao();
         },
         carregarGrade() {
