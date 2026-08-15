@@ -346,18 +346,27 @@
             const abrirModalReset = (e) => {
                 if (e) e.stopPropagation();
                 if (this.scoreAzul > 0 || this.scoreVermelho > 0) {
-                    if (this.modalZerar) this.modalZerar.style.display = 'flex';
+                    if (this.modalZerar) {
+                        this.modalZerar.style.display = 'flex';
+                        document.body.classList.add('modal-aberto');
+                    }
                 } else { this.executarZerar(); }
             };
             if (this.btnReset) this.btnReset.addEventListener('click', abrirModalReset);
             if (this.btnResetBaixo) this.btnResetBaixo.addEventListener('click', abrirModalReset);
             if (this.btnCancelarZerar) {
-                this.btnCancelarZerar.addEventListener('click', (e) => { e.stopPropagation(); if (this.modalZerar) this.modalZerar.style.display = 'none'; });
+                this.btnCancelarZerar.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (this.modalZerar) this.modalZerar.style.display = 'none';
+                    document.body.classList.remove('modal-aberto');
+                });
             }
             if (this.btnConfirmarZerar) {
                 this.btnConfirmarZerar.addEventListener('click', (e) => {
-                    e.stopPropagation(); this.executarZerar();
+                    e.stopPropagation();
+                    this.executarZerar();
                     if (this.modalZerar) this.modalZerar.style.display = 'none';
+                    document.body.classList.remove('modal-aberto');
                 });
             }
             if (this.btnSalvarFimJogo) {
@@ -365,6 +374,7 @@
                     e.stopPropagation();
                     const temPartidaAtiva = State.data.partidaAtual && State.data.partidaAtual.idPartida;
                     if (this.modalFimJogo) this.modalFimJogo.style.display = 'none';
+                    document.body.classList.remove('modal-aberto');
 
                     if (temPartidaAtiva) {
                         const prox = State.finalizarPartida(this.scoreAzul, this.scoreVermelho, this.ultimoLadoVencedor);
@@ -374,6 +384,7 @@
                         } else {
                             if (this.modalRodadaConcluida) {
                                 this.modalRodadaConcluida.style.display = 'flex';
+                                document.body.classList.add('modal-aberto');
                             } else {
                                 this.dispararAviso('Rodada Concluída! 🏆');
                             }
@@ -387,6 +398,7 @@
                 this.btnIrParaRankingModal.addEventListener('click', (e) => {
                     e.stopPropagation();
                     if (this.modalRodadaConcluida) this.modalRodadaConcluida.style.display = 'none';
+                    document.body.classList.remove('modal-aberto');
                     OverlayModule.irPara('topico-ranking');
                 });
             }
@@ -394,12 +406,14 @@
                 this.btnContinuarPlacarModal.addEventListener('click', (e) => {
                     e.stopPropagation();
                     if (this.modalRodadaConcluida) this.modalRodadaConcluida.style.display = 'none';
+                    document.body.classList.remove('modal-aberto');
                 });
             }
             if (this.btnVoltarPonto) {
                 this.btnVoltarPonto.addEventListener('click', (e) => {
                     e.stopPropagation();
                     if (this.modalFimJogo) this.modalFimJogo.style.display = 'none';
+                    document.body.classList.remove('modal-aberto');
                     this.jogoEncerrado = false;
                     if (this.ultimoLadoVencedor === 'azul') {
                         this.scoreAzul = Math.max(0, this.scoreAzul - 1);
@@ -575,7 +589,10 @@
                 }
             }
 
-            if (this.modalFimJogo) this.modalFimJogo.style.display = 'flex';
+            if (this.modalFimJogo) {
+                this.modalFimJogo.style.display = 'flex';
+                document.body.classList.add('modal-aberto');
+            }
         },
         executarZerar() {
             this.scoreAzul = 0; this.scoreVermelho = 0; this.jogoEncerrado = false;

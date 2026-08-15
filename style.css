@@ -148,8 +148,20 @@ body {
 body.painel-aberto .secao-placar-wrapper,
 body.painel-aberto #secao-placar,
 body.painel-aberto .lado-azul,
-body.painel-aberto .lado-vermelho {
+body.painel-aberto .lado-vermelho,
+body.painel-aberto .pontos,
+body.modal-aberto .secao-placar-wrapper,
+body.modal-aberto #secao-placar,
+body.modal-aberto .lado-azul,
+body.modal-aberto .lado-vermelho,
+body.modal-aberto .pontos {
     pointer-events: none !important;
+    touch-action: none !important;
+    user-select: none !important;
+}
+
+body.painel-aberto #secao-placar {
+    visibility: hidden !important;
 }
 
 .painel-overlay-header {
