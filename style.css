@@ -288,31 +288,32 @@ body.modal-aberto .pontos {
 .painel-overlay-conteudo {
     flex: 1;
     overflow-y: auto;
-    padding: 42px 16px 60px;
+    padding: 38px 16px 50px;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
     display: flex;
     flex-direction: column;
-    gap: 36px;
+    gap: 16px;
 }
 
 .secao-painel-item {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 10px;
     max-width: 850px;
     width: 100%;
     margin: 0 auto;
     scroll-margin-top: 20px;
 }
 
-/* LINHA FINA SEPARADORA DE SEÇÕES */
+/* LINHA FINA SEPARADORA DE SEÇÕES COM BRILHO SUAVE */
 .divisor-secao {
     width: 100%;
-    max-width: 650px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
-    margin: 8px auto 0;
+    max-width: 550px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+    margin: 4px auto 0;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
 }
 
 .bloqueio-touch-menu {
@@ -928,12 +929,57 @@ body.tema-escuro .time-header {
 }
 
 .secao-titulo {
-    font-size: 1.4rem;
-    font-weight: 600;
+    font-size: 1.45rem;
+    font-weight: 700;
     display: flex;
     align-items: center;
     gap: 10px;
-    color: var(--texto-principal);
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+    letter-spacing: 0.3px;
+}
+
+/* BADGES DE TÓPICO SUPER VISÍVEIS DE LONGE */
+.badge-topico {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    display: inline-block;
+    margin-bottom: 6px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.badge-topico-1 {
+    background: rgba(0, 210, 255, 0.25);
+    border: 1.5px solid #00d2ff;
+    color: #00d2ff;
+    box-shadow: 0 0 14px rgba(0, 210, 255, 0.45);
+}
+
+.badge-topico-2 {
+    background: rgba(168, 85, 247, 0.25);
+    border: 1.5px solid #c084fc;
+    color: #e9d5ff;
+    box-shadow: 0 0 14px rgba(168, 85, 247, 0.45);
+}
+
+.badge-topico-3 {
+    background: rgba(0, 230, 118, 0.25);
+    border: 1.5px solid #00e676;
+    color: #bbf7d0;
+    box-shadow: 0 0 14px rgba(0, 230, 118, 0.45);
+}
+
+.badge-topico-4 {
+    background: rgba(255, 193, 7, 0.25);
+    border: 1.5px solid #ffc107;
+    color: #fef08a;
+    box-shadow: 0 0 16px rgba(255, 193, 7, 0.55);
 }
 
 .card-painel {
@@ -950,17 +996,39 @@ body.tema-escuro .time-header {
 }
 
 .card-secao-principal {
-    padding: 22px 20px;
-    gap: 18px;
-    margin-bottom: 24px;
+    padding: 18px 18px;
+    gap: 14px;
+    margin-bottom: 0;
     border-radius: 16px;
     box-shadow: 0 12px 35px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* MARCADORES COLORIDOS DE TOPO EM CADA TÓPICO */
+#topico-jogadores .card-secao-principal {
+    border-top: 4.5px solid #00d2ff;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25), 0 0 22px rgba(0, 210, 255, 0.22);
+}
+
+#topico-sorteio .card-secao-principal {
+    border-top: 4.5px solid #c084fc;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25), 0 0 22px rgba(192, 132, 252, 0.22);
+}
+
+#topico-partidas .card-secao-principal {
+    border-top: 4.5px solid #00e676;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25), 0 0 22px rgba(0, 230, 118, 0.22);
+}
+
+#topico-ranking .card-secao-principal {
+    border-top: 4.5px solid #ffc107;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25), 0 0 26px rgba(255, 193, 7, 0.28);
 }
 
 .secao-cabecalho-card {
     border-bottom: 1.5px solid rgba(255, 255, 255, 0.22);
-    padding-bottom: 10px;
-    margin-bottom: 2px;
+    padding-bottom: 8px;
+    margin-bottom: 0;
 }
 
 .sub-bloco-secao {
