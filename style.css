@@ -383,7 +383,7 @@ body.tema-escuro .time-header {
 }
 
 /* ==========================================================================
-   SEÇÃO 1: PLACAR AO VIVO (100dvh - SEMPRE HORIZONTAL LADO A LADO)
+   SEÇÃO 1: PLACAR AO VIVO (100dvh - WIDESCREEN HORIZONTAL INDEPENDENTE DA ROTAÇÃO)
    ========================================================================== */
 
 .secao-placar-wrapper {
@@ -399,10 +399,28 @@ body.tema-escuro .time-header {
     height: 100dvh;
     min-height: 100dvh;
     display: flex;
-    flex-direction: row !important; /* Sempre horizontal: Lado Azul na esquerda, Lado Vermelho na direita */
+    flex-direction: row;
     position: relative;
     overflow: hidden;
     touch-action: none;
+}
+
+@media (orientation: portrait) {
+    #secao-placar {
+        width: 100dvh;
+        height: 100vw;
+        min-height: 100vw;
+        max-height: 100vw;
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform-origin: 0 0;
+        transform: rotate(90deg) translateY(-100%);
+    }
+
+    #secao-placar .pontos {
+        font-size: 80vw;
+    }
 }
 
 .lado-azul,
@@ -422,7 +440,6 @@ body.tema-escuro .time-header {
     font-family: inherit;
     box-sizing: border-box;
     height: 100%;
-    width: 50%;
 }
 
 .lado-azul {
@@ -469,7 +486,7 @@ body.tema-escuro .time-header {
 }
 
 .pontos {
-    font-size: clamp(90px, 44vw, 75vh);
+    font-size: 100vh;
     line-height: 1;
     font-weight: 600;
     font-family: 'Fredoka', sans-serif;

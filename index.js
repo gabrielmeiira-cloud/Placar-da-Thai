@@ -22,8 +22,7 @@
                 tema: 'claro',
                 figurinhas: true,
                 ladosInvertidos: false,
-                controlesEscondidos: false,
-                rotacaoLivre: false
+                controlesEscondidos: false
             }
         },
         listeners: [],
@@ -378,7 +377,9 @@
 
                 const pos = getPos(e);
                 let deltaY = pos.y - startY;
-                const deslizeDiminuir = deltaY > 40;
+                let deltaX = pos.x - startX;
+                const isPortrait = window.innerHeight > window.innerWidth;
+                const deslizeDiminuir = isPortrait ? (deltaX < -40 || deltaY > 40) : (deltaY > 40);
 
                 if (this.jogoEncerrado) {
                     this.scoreAzul = 0; this.scoreVermelho = 0; this.jogoEncerrado = false;
