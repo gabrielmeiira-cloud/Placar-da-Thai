@@ -278,6 +278,23 @@ body.modal-aberto .pontos {
     pointer-events: auto;
 }
 
+.barreira-touch-placar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    z-index: 2450;
+    background: rgba(0, 0, 0, 0.001);
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+    pointer-events: auto;
+}
+
+body.painel-aberto .barreira-touch-placar {
+    display: block !important;
+}
+
 .menu-container {
     position: relative;
     z-index: 9999;

@@ -235,6 +235,8 @@
                 this.painel.classList.add('aberto');
             }
             document.body.classList.add('painel-aberto');
+            const barreira = document.getElementById('barreiraTouchPlacar');
+            if (barreira) barreira.style.display = 'block';
             const dropdown = document.getElementById('dropdownMenu');
             if (dropdown) dropdown.classList.remove('ativo');
             if (this.gatilho) {
@@ -249,6 +251,8 @@
                 this.painel.classList.remove('aberto');
             }
             document.body.classList.remove('painel-aberto');
+            const barreira = document.getElementById('barreiraTouchPlacar');
+            if (barreira) barreira.style.display = 'none';
             const dropdown = document.getElementById('dropdownMenu');
             if (dropdown) dropdown.classList.remove('ativo');
             if (this.gatilho) {
@@ -470,7 +474,10 @@
                 return { x: e.clientX, y: e.clientY };
             };
             const estaBloqueado = () => {
-                if (OverlayModule.estaAberto() || document.body.classList.contains('painel-aberto')) return true;
+                if (document.body.classList.contains('painel-aberto') || document.body.classList.contains('modal-aberto')) return true;
+                const barreira = document.getElementById('barreiraTouchPlacar');
+                if (barreira && barreira.style.display !== 'none') return true;
+                if (OverlayModule.estaAberto()) return true;
                 const dropdown = document.getElementById('dropdownMenu');
                 if (dropdown && dropdown.classList.contains('ativo')) return true;
                 const bloqueio = document.getElementById('bloqueioTouchMenu');
