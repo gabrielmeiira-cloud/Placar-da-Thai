@@ -642,9 +642,11 @@
                     const btn = document.getElementById('btnAcaoSorteio');
                     if (!btn) return;
                     if (e.target.value === 'manual') {
-                        btn.innerHTML = 'Iniciar Montagem Manual'; btn.className = 'btn-acao-sorteio btn-aviso';
+                        btn.innerHTML = '✋ Iniciar Montagem Manual'; btn.className = 'btn-acao-sorteio btn-aviso';
                     } else if (e.target.value === 'misto') {
-                        btn.innerHTML = '🎲 Sortear Times (Misto & Equilibrado)'; btn.className = 'btn-acao-sorteio btn-sucesso';
+                        btn.innerHTML = '👫 Sortear Times (Misto)'; btn.className = 'btn-acao-sorteio btn-sucesso';
+                    } else if (e.target.value === 'aleatorio') {
+                        btn.innerHTML = '🎲 Sortear Times (Aleatório)'; btn.className = 'btn-acao-sorteio btn-sucesso';
                     } else {
                         btn.innerHTML = '🎲 Sortear Times (Equilibrado)'; btn.className = 'btn-acao-sorteio btn-sucesso';
                     }
@@ -773,6 +775,14 @@
                     if (timesComVaga.length > 0) { timesComVaga[0].jogadores.push(h); timesComVaga[0].estrelas += h.nivel; }
                 });
                 timesTemp.forEach(t => { this.timesAtuais[t.id] = this.embaralhar(t.jogadores); });
+            } else if (modo === 'aleatorio') {
+                let listaEmbaralhada = this.embaralhar(presentes);
+                let jogadoresAtivos = listaEmbaralhada.slice(0, totalVagas);
+                this.filaEspera = listaEmbaralhada.slice(totalVagas);
+                for (let i = 0; i < totalVagas; i++) {
+                    this.timesAtuais[i % qtdTimesCompletos].push(jogadoresAtivos[i]);
+                }
+                this.timesAtuais.forEach((time, idx) => { this.timesAtuais[idx] = this.embaralhar(time); });
             }
             State.salvarTimes(this.timesAtuais);
             this.renderizarVisualizacao();
