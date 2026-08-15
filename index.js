@@ -1108,7 +1108,8 @@
             }
             State.salvarPartidas(this.partidas);
             if (this.partidas.length > 0) {
-                this.iniciarNoPlacar(this.partidas[0].id);
+                const p = this.partidas[0];
+                State.carregarPartidaNoPlacar(p.time1, p.time2, p.id);
             }
         },
         adicionarPartidaManual() {
