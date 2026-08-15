@@ -25,7 +25,7 @@
          ========================================================================== -->
     <div class="secao-placar-wrapper">
         <section id="secao-placar">
-            <div class="versao-placar">Placar da Thai V4.0</div>
+            <div class="versao-placar">Placar da Thai V4.1</div>
 
             <div class="controles-topo-centro">
                 <button class="btn-central" id="btnToggleControlesTopo" type="button" title="Configurações e Gestão">
@@ -262,13 +262,17 @@
                             <option value="4">4 horas (~48 jogos)</option>
                         </select>
                         <button class="btn-sucesso" id="btnGerarLista" type="button">📅 Gerar Partidas</button>
-                        <button class="btn-atalho" id="btnAddPartidaManual" type="button">+ Jogo Avulso</button>
-                        <button class="btn-perigo" id="btnLimparPartidas" type="button">🗑️ Limpar</button>
                     </div>
                 </div>
 
                 <div class="card-painel">
-                    <div class="card-painel-titulo">Confrontos da Rodada</div>
+                    <div class="card-painel-titulo">
+                        <span>Confrontos da Rodada</span>
+                        <div style="display: flex; gap: 6px;">
+                            <button class="btn-atalho" id="btnAddPartidaManual" type="button">+ Jogo Avulso</button>
+                            <button class="btn-perigo" id="btnLimparPartidas" type="button" style="padding: 4px 10px; font-size: 0.82rem;">🗑️ Limpar</button>
+                        </div>
+                    </div>
                     <div class="lista-partidas" id="listaPartidasCorpo"></div>
                 </div>
             </section>

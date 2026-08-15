@@ -929,7 +929,7 @@
                 });
                 html += '</div>'; info.innerHTML = html;
             } else {
-                info.innerHTML = '⚠️ <strong>Nenhum time sorteado encontrado.</strong> Vá na seção <a href="#secao-sorteio" class="link-interno">🎲 Sorteio</a> para sortear seus times primeiro!';
+                info.innerHTML = '⚠️ <strong>Nenhum time sorteado encontrado.</strong> Vá na seção <a href="#topico-sorteio" class="link-interno" onclick="OverlayModule.irPara(\'topico-sorteio\')">👥 Times</a> para sortear ou montar seus times primeiro!';
             }
         },
         abrirModalGerar() {
@@ -1001,7 +1001,7 @@
             if (!corpo) return;
             corpo.innerHTML = '';
             if (this.partidas.length === 0) {
-                corpo.innerHTML = '<div class="aviso-vazio">Nenhuma partida gerada. Clique em "📅 Gerar Fila" acima para iniciar a rodada!</div>';
+                corpo.innerHTML = '<div class="aviso-vazio">Nenhuma partida gerada. Clique em "📅 Gerar Partidas" acima para iniciar a rodada!</div>';
                 return;
             }
             const pa = State.data.partidaAtual;
