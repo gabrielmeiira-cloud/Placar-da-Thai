@@ -221,46 +221,45 @@ body.modal-aberto .pontos {
     font-weight: 600;
 }
 
-/* BOTÃO FECHAR FLUTUANTE NA DIREITA SOBREPOSTO AO HEADER */
-.btn-fechar-flutuante-direita {
+/* BOTÃO VOLTAR FLUTUANTE NA DIREITA EMBAIXO DO HEADER */
+.btn-voltar-flutuante-direita {
     position: absolute;
-    bottom: -18px;
-    right: 16px;
+    bottom: -20px;
+    right: 14px;
     background: linear-gradient(135deg, #ff4d4f, #d32f2f);
     border: 2px solid #ffffff;
     color: #ffffff;
-    padding: 8px 22px;
-    border-radius: 24px;
+    padding: 8px 16px;
+    border-radius: 18px;
     font-family: 'Fredoka', sans-serif;
-    font-size: 0.98rem;
+    font-size: 0.94rem;
     font-weight: 700;
     cursor: pointer;
     white-space: nowrap;
-    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 6px;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.5);
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.55);
     z-index: 110;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-}
-
-.btn-fechar-flutuante-direita span {
-    font-weight: 900;
-    font-size: 1.15rem;
     line-height: 1;
 }
 
-.btn-fechar-flutuante-direita:hover {
-    background: linear-gradient(135deg, #ff7875, #f5222d);
-    transform: translateY(2px) scale(1.06);
-    box-shadow: 0 8px 26px rgba(220, 53, 69, 0.7);
+.btn-voltar-flutuante-direita svg {
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
-.btn-fechar-flutuante-direita:active {
-    transform: scale(0.94);
+.btn-voltar-flutuante-direita:hover {
+    background: linear-gradient(135deg, #ff7875, #f5222d);
+    transform: translateY(2px) scale(1.06);
+    box-shadow: 0 8px 26px rgba(220, 53, 69, 0.75);
+}
+
+.btn-voltar-flutuante-direita:active {
+    transform: scale(0.93);
 }
 
 .painel-overlay-conteudo {
