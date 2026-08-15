@@ -643,6 +643,10 @@
                     if (!btn) return;
                     if (e.target.value === 'manual') {
                         btn.innerHTML = '✋ Iniciar Montagem Manual'; btn.className = 'btn-acao-sorteio btn-aviso';
+                        let presentes = Array.from(this.jogadoresSelecionados).map(i => ({ ...State.data.jogadores[i] }));
+                        if (presentes.length > 0 && this.timesAtuais.length === 0) {
+                            this.prepararModoManual(presentes, 2);
+                        }
                     } else if (e.target.value === 'misto') {
                         btn.innerHTML = '👫 Sortear Times (Misto)'; btn.className = 'btn-acao-sorteio btn-sucesso';
                     } else if (e.target.value === 'aleatorio') {
@@ -681,20 +685,56 @@
             }
             this.atualizarContador();
         },
+        sincronizarSelecaoComBanco(index, selecionou) {
+            const jOriginal = State.data.jogadores[index];
+            if (!jOriginal) return;
+            const modoEl = document.querySelector('input[name="modo"]:checked');
+            const modo = modoEl ? modoEl.value : 'normal';
+
+            if (modo === 'manual' || this.modoVisualizacao === 'manual' || this.timesAtuais.length > 0) {
+                if (modo === 'manual' && this.modoVisualizacao !== 'manual') {
+                    this.modoVisualizacao = 'manual';
+                    if (this.timesAtuais.length === 0) this.timesAtuais = [[], []];
+                }
+
+                if (selecionou) {
+                    let jaExiste = this.filaEspera.some(j => j.nome === jOriginal.nome) ||
+                        this.timesAtuais.some(t => Array.isArray(t) && t.some(j => j.nome === jOriginal.nome));
+                    if (!jaExiste) {
+                        this.filaEspera.push({ ...jOriginal });
+                        this.filaEspera.sort((a, b) => b.nivel - a.nivel);
+                    }
+                } else {
+                    this.filaEspera = this.filaEspera.filter(j => j.nome !== jOriginal.nome);
+                    this.timesAtuais.forEach((time, tIdx) => {
+                        if (Array.isArray(time)) {
+                            this.timesAtuais[tIdx] = time.filter(j => j.nome !== jOriginal.nome);
+                        }
+                    });
+                    State.salvarTimes(this.timesAtuais);
+                }
+                this.renderizarVisualizacao();
+            }
+        },
         alternarSelecao(index) {
             const card = document.getElementById(`card-j-${index}`);
+            let selecionou = false;
             if (this.jogadoresSelecionados.has(index)) {
                 this.jogadoresSelecionados.delete(index); if (card) card.classList.remove('selecionado');
+                selecionou = false;
             } else {
                 this.jogadoresSelecionados.add(index); if (card) card.classList.add('selecionado');
+                selecionou = true;
             }
             this.atualizarContador();
+            this.sincronizarSelecaoComBanco(index, selecionou);
         },
         selecionarTodos(marcar) {
             State.data.jogadores.forEach((_, index) => {
                 const card = document.getElementById(`card-j-${index}`);
                 if (marcar) { this.jogadoresSelecionados.add(index); if (card) card.classList.add('selecionado'); }
                 else { this.jogadoresSelecionados.delete(index); if (card) card.classList.remove('selecionado'); }
+                this.sincronizarSelecaoComBanco(index, marcar);
             });
             this.atualizarContador();
         },
