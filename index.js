@@ -366,13 +366,16 @@
 
                 const pos = getPos(e);
                 let deltaY = pos.y - startY;
+                let deltaX = pos.x - startX;
+                const isPortrait = window.innerHeight > window.innerWidth;
+                const deslizeDiminuir = isPortrait ? (deltaX < -40 || deltaY > 40) : (deltaY > 40);
 
                 if (this.jogoEncerrado) {
                     this.scoreAzul = 0; this.scoreVermelho = 0; this.jogoEncerrado = false;
                     const antiga = document.querySelector('.figurinha-ponto'); if (antiga) antiga.remove();
                     this.limparConfetes();
                 }
-                if (deltaY > 50) {
+                if (deslizeDiminuir) {
                     if (lado === 'azul') this.scoreAzul = Math.max(0, this.scoreAzul - 1);
                     else this.scoreVermelho = Math.max(0, this.scoreVermelho - 1);
                     this.atualizarPlacar();
