@@ -25,7 +25,7 @@
          ========================================================================== -->
     <div class="secao-placar-wrapper">
         <section id="secao-placar">
-            <div class="versao-placar">Placar da Thai V3.6</div>
+            <div class="versao-placar">Placar da Thai V3.7</div>
 
             <div class="controles-topo-centro">
                 <button class="btn-central" id="btnToggleControlesTopo" type="button" title="Configurações e Gestão">
@@ -68,13 +68,6 @@
             <div class="menu-container">
                 <button class="btn-menu" id="btnMenuToggle" type="button" title="Configurações">☰</button>
                 <div class="dropdown-menu" id="dropdownMenu">
-                    <div class="dropdown-item" id="btnToggleFullscreen" style="cursor: pointer;">
-                        <span id="labelFullscreen">🖥️ Tela Cheia: Desativada</span>
-                        <label class="switch" onclick="event.stopPropagation();">
-                            <input type="checkbox" id="checkFullscreen">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
                     <div class="dropdown-item" id="btnToggleFigurinhas" style="cursor: pointer;">
                         <span id="labelFigurinhas">🖼️ Figurinhas: Ativadas</span>
                         <label class="switch" onclick="event.stopPropagation();">
@@ -89,13 +82,20 @@
                             <span class="slider"></span>
                         </label>
                     </div>
+                    <div class="dropdown-item" id="btnToggleFullscreen" style="cursor: pointer;">
+                        <span id="labelFullscreen">🖥️ Tela Cheia: Desativada</span>
+                        <label class="switch" onclick="event.stopPropagation();">
+                            <input type="checkbox" id="checkFullscreen">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
                 </div>
             </div>
 
             <!-- GUIA DE TÓPICOS / SCROLLSPY EM VIDRO -->
             <nav class="painel-abas-nav" id="painelAbasNav">
                 <button class="btn-aba ativo" data-target="topico-jogadores" type="button">👤 Jogadores</button>
-                <button class="btn-aba" data-target="topico-sorteio" type="button">🎲 Sorteio</button>
+                <button class="btn-aba" data-target="topico-sorteio" type="button">👥 Times</button>
                 <button class="btn-aba" data-target="topico-partidas" type="button">📋 Partidas</button>
                 <button class="btn-aba" data-target="topico-ranking" type="button">🏆 Ranking</button>
             </nav>
@@ -147,10 +147,10 @@
                 </div>
             </section>
 
-            <!-- TÓPICO 2: SORTEIO -->
+            <!-- TÓPICO 2: TIMES -->
             <section class="secao-painel-item" id="topico-sorteio">
                 <div class="secao-cabecalho">
-                    <h2 class="secao-titulo">🎲 Sorteio & Equilíbrio de Times</h2>
+                    <h2 class="secao-titulo">👥 Formação & Sorteio de Times</h2>
                 </div>
 
                 <div class="card-painel">
