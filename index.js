@@ -352,17 +352,23 @@
             if (this.btnSalvarFimJogo) {
                 this.btnSalvarFimJogo.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const prox = State.finalizarPartida(this.scoreAzul, this.scoreVermelho, this.ultimoLadoVencedor);
+                    const temPartidaAtiva = State.data.partidaAtual && State.data.partidaAtual.idPartida;
                     if (this.modalFimJogo) this.modalFimJogo.style.display = 'none';
-                    this.executarZerar();
-                    if (prox) {
-                        this.dispararAviso(`Próximo Jogo: ${prox.time1} vs ${prox.time2}`);
-                    } else {
-                        if (this.modalRodadaConcluida) {
-                            this.modalRodadaConcluida.style.display = 'flex';
+
+                    if (temPartidaAtiva) {
+                        const prox = State.finalizarPartida(this.scoreAzul, this.scoreVermelho, this.ultimoLadoVencedor);
+                        this.executarZerar();
+                        if (prox) {
+                            this.dispararAviso(`Próximo Jogo: ${prox.time1} vs ${prox.time2}`);
                         } else {
-                            this.dispararAviso('Rodada Concluída! 🏆');
+                            if (this.modalRodadaConcluida) {
+                                this.modalRodadaConcluida.style.display = 'flex';
+                            } else {
+                                this.dispararAviso('Rodada Concluída! 🏆');
+                            }
                         }
+                    } else {
+                        this.executarZerar();
                     }
                 });
             }
@@ -503,15 +509,10 @@
                 let elVencedor = ladoVencedor === 'azul' ? this.elAzul : this.elVermelho;
                 elVencedor.innerHTML = '<span class="trofeu-animado">🏆</span>';
 
-                const temPartidaAtiva = State.data.partidaAtual && State.data.partidaAtual.idPartida;
-                const temPartidasCadastradas = State.data.partidas && State.data.partidas.some(p => p.status === 'pendente' || p.status === 'ativa');
-
-                if (temPartidaAtiva || temPartidasCadastradas) {
-                    setTimeout(() => {
-                        this.atualizarPlacar();
-                        this.abrirModalVencedor(ladoVencedor);
-                    }, 1800);
-                }
+                setTimeout(() => {
+                    this.atualizarPlacar();
+                    this.abrirModalVencedor(ladoVencedor);
+                }, 1800);
                 return;
             }
             if (this.scoreAzul === this.scoreVermelho && [11, 12, 13, 14].includes(this.scoreAzul) && ladoModificado) {
@@ -528,8 +529,23 @@
         },
         abrirModalVencedor(lado) {
             const pa = State.data.partidaAtual;
-            const nome = lado === 'azul' ? (pa ? pa.nomeAzul : 'Time Azul') : (pa ? pa.nomeVermelho : 'Time Vermelho');
-            if (this.textoVencedorModal) this.textoVencedorModal.innerHTML = `<strong>${nome}</strong> venceu por <strong>${this.scoreAzul} x ${this.scoreVermelho}</strong>!`;
+            const temPartidaAtiva = pa && pa.idPartida;
+            const nome = lado === 'azul' ? (pa && pa.nomeAzul ? pa.nomeAzul : 'Time Azul') : (pa && pa.nomeVermelho ? pa.nomeVermelho : 'Time Vermelho');
+            
+            if (this.textoVencedorModal) {
+                this.textoVencedorModal.innerHTML = `<strong>${nome}</strong> venceu por <strong>${this.scoreAzul} x ${this.scoreVermelho}</strong>!`;
+            }
+
+            if (this.btnSalvarFimJogo) {
+                if (temPartidaAtiva) {
+                    this.btnSalvarFimJogo.innerHTML = '💾 Salvar e Ir para Próxima Partida »»';
+                    this.btnSalvarFimJogo.style.backgroundColor = 'var(--cor-verde, #28a745)';
+                } else {
+                    this.btnSalvarFimJogo.innerHTML = '↺ Zerar Placar';
+                    this.btnSalvarFimJogo.style.backgroundColor = '#dc3545';
+                }
+            }
+
             if (this.modalFimJogo) this.modalFimJogo.style.display = 'flex';
         },
         executarZerar() {
