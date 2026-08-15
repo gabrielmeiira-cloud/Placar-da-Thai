@@ -351,6 +351,8 @@ body.tema-escuro #btnToggleControlesTopo:hover {
     border: none;
     outline: none;
     font-family: inherit;
+    padding: 75px 25px 65px;
+    box-sizing: border-box;
 }
 
 .lado-azul {
@@ -373,12 +375,12 @@ body.tema-escuro #btnToggleControlesTopo:hover {
 .lado-tag-time {
     position: absolute;
     top: 55px;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.18);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    padding: 8px 20px;
-    border-radius: 24px;
-    font-size: 1.05rem;
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-size: 1rem;
     font-weight: 600;
     max-width: 82%;
     text-align: center;
@@ -387,11 +389,11 @@ body.tema-escuro #btnToggleControlesTopo:hover {
     text-overflow: ellipsis;
     z-index: 10;
     border: 1px solid rgba(255, 255, 255, 0.35);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
     color: #ffffff;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
     pointer-events: none;
-    transition: transform 0.4s ease-in-out;
+    transition: transform 0.3s ease;
 }
 
 body.tema-escuro .lado-tag-time {
@@ -401,22 +403,35 @@ body.tema-escuro .lado-tag-time {
 }
 
 .pontos {
-    font-size: 100vh;
-    line-height: 1;
+    font-size: min(34vw, 62vh);
+    line-height: 0.9;
     font-weight: 600;
     font-family: 'Fredoka', sans-serif;
     text-shadow: 6px 6px 0px rgba(0, 0, 0, 0.3);
     z-index: 2;
     transition: transform 0.3s ease;
     pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-height: 100%;
 }
 
 @media (orientation: portrait) {
+    .lado-azul,
+    .lado-vermelho {
+        padding: 48px 15px 42px;
+    }
     .pontos {
-        font-size: 50vh;
+        font-size: min(46vw, 23vh);
     }
     .lado-tag-time {
-        top: 60px;
+        top: 55px;
+        font-size: 0.9rem;
+        padding: 5px 14px;
+    }
+    .lado-vermelho .lado-tag-time {
+        top: 14px;
     }
 }
 
@@ -483,20 +498,27 @@ body.tema-escuro .lado-tag-time {
     position: absolute;
     bottom: 15px;
     left: 15px;
-    background-color: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    padding: 6px 12px;
+    background-color: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    padding: 6px 14px;
     border-radius: 20px;
     color: white;
     font-size: 0.85rem;
+    font-weight: 500;
     display: flex;
     align-items: center;
     gap: 6px;
     text-decoration: none;
     z-index: 20;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.indicador-rolagem-baixo:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
 }
 
 /* ==========================================================================
