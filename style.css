@@ -437,10 +437,10 @@ body.tema-escuro .time-header {
     background-color: #a71d2a;
 }
 
-/* NOME DOS TIMES - CENTRALIZADO NO MEIO DO NÚMERO NO TOPO DA TELA */
+/* NOME DOS TIMES - CENTRALIZADO NO MEIO DO NÚMERO BEM PRÓXIMO AO TOPO */
 .lado-tag-time {
     position: absolute;
-    top: 56px;
+    top: 14px;
     left: 50%;
     transform: translateX(-50%);
     background: rgba(255, 255, 255, 0.2);
@@ -480,7 +480,7 @@ body.tema-escuro .time-header {
         font-size: 50vh;
     }
     .lado-azul .lado-tag-time {
-        top: 56px;
+        top: 14px;
         left: 50%;
         transform: translateX(-50%);
         font-size: 0.82rem;
@@ -488,7 +488,7 @@ body.tema-escuro .time-header {
         max-width: 85vw;
     }
     .lado-vermelho .lado-tag-time {
-        top: 20px;
+        top: 6px;
         left: 50%;
         transform: translateX(-50%);
         font-size: 0.82rem;
