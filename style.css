@@ -421,6 +421,41 @@ body.tema-escuro .time-header {
     #secao-placar .pontos {
         font-size: 80vw;
     }
+
+    /* MODO ROTAÇÃO LIVRE ATIVADA NO MENU */
+    body.rotacao-livre #secao-placar {
+        width: 100vw;
+        height: 100dvh;
+        min-height: 100dvh;
+        max-height: 100dvh;
+        position: relative;
+        top: auto;
+        left: auto;
+        transform: none;
+        flex-direction: column;
+    }
+
+    body.rotacao-livre #secao-placar .pontos {
+        font-size: 50vh;
+    }
+
+    body.rotacao-livre .lado-azul,
+    body.rotacao-livre .lado-vermelho {
+        height: 50%;
+        width: 100%;
+    }
+
+    body.rotacao-livre .lado-azul .lado-tag-time {
+        top: 14px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    body.rotacao-livre .lado-vermelho .lado-tag-time {
+        top: 14px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
 }
 
 .lado-azul,
