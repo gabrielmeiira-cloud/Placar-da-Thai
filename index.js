@@ -200,6 +200,22 @@
         window.addEventListener('scroll', atualizarScrollspy, { passive: true });
         atualizarScrollspy();
 
+        function forcarOrientacao(modo) {
+            try {
+                if (screen.orientation && typeof screen.orientation.lock === 'function') {
+                    screen.orientation.lock(modo).catch(() => {});
+                }
+            } catch (e) {}
+        }
+
+        function liberarOrientacao() {
+            try {
+                if (screen.orientation && typeof screen.orientation.unlock === 'function') {
+                    screen.orientation.unlock();
+                }
+            } catch (e) {}
+        }
+
         // Trata todos os links internos de navegação (#secao-*)
         document.querySelectorAll('a[href^="#secao-"]').forEach(link => {
             link.addEventListener('click', (e) => {
@@ -207,6 +223,12 @@
                 const targetId = link.getAttribute('href').replace('#', '') || link.getAttribute('data-target');
                 const el = document.getElementById(targetId);
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
+
+                if (targetId === 'secao-placar') {
+                    liberarOrientacao();
+                } else {
+                    forcarOrientacao('portrait');
+                }
             });
         });
     }
