@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Placar da Thai - Jogadores</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%2250%22 height=%22100%22 fill=%22%23007bff%22/><rect x=%2250%22 width=%2250%22 height=%22100%22 fill=%22%23dc3545%22/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="modo-app">
+
+<!-- ===================== JOGADORES ===================== -->
+<section id="pagina-jogadores" class="pagina ativa">
+    <header class="app-header">
+        <h1>👤 Jogadores</h1>
+        <div class="topo-acoes">
+            <a href="jogadores.html" class="btn-acao ativo">👤 Jogadores</a>
+            <a href="sorteio.html" class="btn-acao">🎲 Sorteio</a>
+            <a href="ranking.html" class="btn-acao">🏆 Ranking</a>
+            <a href="partidas.html" class="btn-acao">📋 Partidas</a>
+            <a href="index.html" class="btn-acao">
+                <span class="icone-placar-blocos">
+                    <span class="bloco-placar bloco-azul-claro"></span>
+                    <span class="bloco-placar bloco-vermelho-escuro"></span>
+                </span> Placar
+            </a>
+        </div>
+    </header>
+
+    <div class="secao">
+        <h2>Novo Jogador</h2>
+        <div class="form-grupo">
+            <label for="inputNome">Nome do Jogador:</label>
+            <input type="text" id="inputNome" placeholder="Digite o nome...">
+        </div>
+        <div class="form-grupo">
+            <label>Sexo:</label>
+            <div class="opcoes-sexo">
+                <input type="radio" id="sexoM" name="sexo" value="m" checked>
+                <label for="sexoM" class="radio-label">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="icone-m"><circle cx="10" cy="14" r="6"></circle><line x1="14.24" y1="9.76" x2="20" y2="4"></line><polyline points="15 4 20 4 20 9"></polyline></svg>
+                    Masculino
+                </label>
+                <input type="radio" id="sexoF" name="sexo" value="f">
+                <label for="sexoF" class="radio-label">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="icone-f"><circle cx="12" cy="9" r="6"></circle><line x1="12" y1="15" x2="12" y2="22"></line><line x1="9" y1="19" x2="15" y2="19"></line></svg>
+                    Feminino
+                </label>
+            </div>
+        </div>
+        <div class="form-grupo">
+            <label for="selectEstrelas">Nível (Estrelas):</label>
+            <select id="selectEstrelas">
+                <option value="1">⭐ 1 Estrela</option>
+                <option value="2">⭐⭐ 2 Estrelas</option>
+                <option value="3">⭐⭐⭐ 3 Estrelas</option>
+                <option value="4" selected>⭐⭐⭐⭐ 4 Estrelas</option>
+                <option value="5">⭐⭐⭐⭐⭐ 5 Estrelas</option>
+                <option value="6">⭐⭐⭐⭐⭐⭐ 6 Estrelas</option>
+                <option value="7">⭐⭐⭐⭐⭐⭐⭐ 7 Estrelas</option>
+            </select>
+        </div>
+        <button class="btn-principal" id="btnAdicionar" type="button">Adicionar Jogador</button>
+    </div>
+
+    <div class="secao">
+        <h2>Cadastrados (<span id="contadorJogadores">0</span>)</h2>
+        <div class="lista-jogadores" id="listaJogadores">
+            <span style="color: #777; font-size: 0.85rem; text-align: center; padding: 10px;">Nenhum jogador cadastrado ainda.</span>
+        </div>
+    </div>
+    <div class="versao-app">Jogadores V1.9</div>
+</section>
+
+<script src="jogadores.js"></script>
+</body>
+</html>
