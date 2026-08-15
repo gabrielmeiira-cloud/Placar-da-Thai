@@ -137,6 +137,9 @@ body {
     pointer-events: none;
     transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
     overflow: hidden;
+    touch-action: pan-y;
+    user-select: auto;
+    -webkit-user-select: auto;
 }
 
 .painel-gestao-overlay.aberto {
@@ -150,6 +153,10 @@ body.painel-aberto #secao-placar,
 body.painel-aberto .lado-azul,
 body.painel-aberto .lado-vermelho,
 body.painel-aberto .pontos,
+body.painel-aberto .lado-tag-time,
+body.painel-aberto .controles-centro,
+body.painel-aberto .controles-baixo,
+body.painel-aberto .controles-topo-centro,
 body.modal-aberto .secao-placar-wrapper,
 body.modal-aberto #secao-placar,
 body.modal-aberto .lado-azul,
@@ -158,6 +165,7 @@ body.modal-aberto .pontos {
     pointer-events: none !important;
     touch-action: none !important;
     user-select: none !important;
+    visibility: hidden !important;
 }
 
 .painel-overlay-header {
@@ -186,6 +194,8 @@ body.modal-aberto .pontos {
     flex: 1;
     justify-content: center;
     align-items: center;
+    touch-action: pan-x;
+    overscroll-behavior-x: contain;
 }
 
 .painel-abas-nav::-webkit-scrollbar {
@@ -294,6 +304,8 @@ body.modal-aberto .pontos {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
 }
 
 .secao-painel-item {

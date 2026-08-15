@@ -221,6 +221,12 @@
                 }, { passive: true });
             }
 
+            if (this.painel) {
+                this.painel.addEventListener('touchstart', (e) => { e.stopPropagation(); }, { passive: true });
+                this.painel.addEventListener('touchend', (e) => { e.stopPropagation(); }, { passive: true });
+                this.painel.addEventListener('touchmove', (e) => { e.stopPropagation(); }, { passive: true });
+            }
+
             window.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && this.estaAberto()) {
                     this.fechar();
@@ -235,6 +241,7 @@
                 this.painel.classList.add('aberto');
             }
             document.body.classList.add('painel-aberto');
+            if (typeof Placar !== 'undefined') Placar.interagindo = false;
             const barreira = document.getElementById('barreiraTouchPlacar');
             if (barreira) barreira.style.display = 'block';
             const dropdown = document.getElementById('dropdownMenu');
@@ -251,6 +258,7 @@
                 this.painel.classList.remove('aberto');
             }
             document.body.classList.remove('painel-aberto');
+            if (typeof Placar !== 'undefined') Placar.interagindo = false;
             const barreira = document.getElementById('barreiraTouchPlacar');
             if (barreira) barreira.style.display = 'none';
             const dropdown = document.getElementById('dropdownMenu');
@@ -489,9 +497,10 @@
             };
             const estaBloqueado = () => {
                 if (document.body.classList.contains('painel-aberto') || document.body.classList.contains('modal-aberto')) return true;
+                const painel = document.getElementById('painelGestaoOverlay');
+                if (painel && (painel.classList.contains('aberto') || (typeof OverlayModule !== 'undefined' && OverlayModule.estaAberto()))) return true;
                 const barreira = document.getElementById('barreiraTouchPlacar');
                 if (barreira && barreira.style.display !== 'none') return true;
-                if (OverlayModule.estaAberto()) return true;
                 const dropdown = document.getElementById('dropdownMenu');
                 if (dropdown && dropdown.classList.contains('ativo')) return true;
                 const modal = document.querySelector('.modal-overlay:not([style*="display: none"])');
@@ -500,25 +509,32 @@
             };
 
             const handleStart = (e) => {
-                if (estaBloqueado()) return;
-
-                if (e.type === 'mousedown' && Date.now() - lastTouchTime < 600) return;
-                if (e.type.startsWith('touch')) lastTouchTime = Date.now();
-                if (e.target.closest('.controles-centro, .controles-baixo, .controles-wrapper, .modal-overlay, .painel-gestao-overlay, .dropdown-menu, .bloqueio-touch-menu, button, a, .indicador-rolagem-baixo')) return;
-                interagindo = true;
-                const pos = getPos(e);
-                startX = pos.x; startY = pos.y;
-            };
-            const handleEnd = (e) => {
                 if (estaBloqueado()) {
                     interagindo = false;
                     return;
                 }
 
+                if (e.type === 'mousedown' && Date.now() - lastTouchTime < 600) return;
+                if (e.type.startsWith('touch')) lastTouchTime = Date.now();
+                if (e.target.closest('.controles-centro, .controles-baixo, .controles-wrapper, .modal-overlay, .painel-gestao-overlay, .dropdown-menu, .bloqueio-touch-menu, button, a, input, select, label, .indicador-rolagem-baixo, .menu-container')) {
+                    interagindo = false;
+                    return;
+                }
+                interagindo = true;
+                const pos = getPos(e);
+                startX = pos.x; startY = pos.y;
+            };
+            const handleEnd = (e) => {
+                if (!interagindo || estaBloqueado()) {
+                    interagindo = false;
+                    return;
+                }
+
                 if (e.type === 'mouseup' && Date.now() - lastTouchTime < 600) return;
-                if (!interagindo) return;
                 interagindo = false;
-                if (e.target.closest('.controles-centro, .controles-baixo, .controles-wrapper, .modal-overlay, .painel-gestao-overlay, .dropdown-menu, .bloqueio-touch-menu, button, a, .indicador-rolagem-baixo')) return;
+                if (e.target.closest('.controles-centro, .controles-baixo, .controles-wrapper, .modal-overlay, .painel-gestao-overlay, .dropdown-menu, .bloqueio-touch-menu, button, a, input, select, label, .indicador-rolagem-baixo, .menu-container')) {
+                    return;
+                }
                 
                 const agora = Date.now();
                 if (agora - lastActionTime < 180) return;
