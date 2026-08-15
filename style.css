@@ -220,29 +220,30 @@ body.modal-aberto .pontos {
 }
 
 .btn-fechar-circulo-topo {
-    width: 38px;
-    height: 38px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
     border-radius: 50%;
-    background-color: #dc3545;
-    border: 2px solid rgba(255, 255, 255, 0.85);
+    background: linear-gradient(135deg, #ff4d4f, #d32f2f);
+    border: 2.5px solid #ffffff;
     color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.15rem;
-    font-weight: 700;
+    font-size: 1.35rem;
+    font-weight: 900;
     cursor: pointer;
-    box-shadow: 0 4px 14px rgba(220, 53, 69, 0.4);
-    transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 16px rgba(220, 53, 69, 0.55);
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
     flex-shrink: 0;
     line-height: 1;
     padding: 0;
 }
 
 .btn-fechar-circulo-topo:hover {
-    background-color: #c82333;
-    transform: scale(1.08);
-    box-shadow: 0 6px 18px rgba(220, 53, 69, 0.6);
+    background: linear-gradient(135deg, #ff7875, #f5222d);
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.75);
 }
 
 .btn-fechar-circulo-topo:active {

@@ -480,8 +480,6 @@
                 if (OverlayModule.estaAberto()) return true;
                 const dropdown = document.getElementById('dropdownMenu');
                 if (dropdown && dropdown.classList.contains('ativo')) return true;
-                const bloqueio = document.getElementById('bloqueioTouchMenu');
-                if (bloqueio && bloqueio.style.display !== 'none') return true;
                 const modal = document.querySelector('.modal-overlay:not([style*="display: none"])');
                 if (modal) return true;
                 return false;
@@ -1161,6 +1159,11 @@
         iniciarNoPlacar(id) {
             const p = this.partidas.find(item => item.id === id);
             if (!p) return;
+            const jaEstaNoPlacar = State.data.partidaAtual && State.data.partidaAtual.idPartida === id;
+            if (jaEstaNoPlacar) {
+                OverlayModule.fechar();
+                return;
+            }
             State.carregarPartidaNoPlacar(p.time1, p.time2, p.id);
             this.renderizar();
         },
@@ -1294,8 +1297,6 @@
     function initMenuConfig() {
         const btnMenuToggle = document.getElementById('btnMenuToggle');
         const dropdownMenu = document.getElementById('dropdownMenu');
-        const btnToggleControlesTopo = document.getElementById('btnToggleControlesTopo');
-        const placarHeader = document.getElementById('placarHeader');
 
         const btnToggleFullscreen = document.getElementById('btnToggleFullscreen');
         const checkFullscreen = document.getElementById('checkFullscreen');
@@ -1311,22 +1312,17 @@
 
         const overlayIntro = document.getElementById('overlayFigurinhaInicial');
 
-        const bloqueioTouchMenu = document.getElementById('bloqueioTouchMenu');
-
         const fecharDropdown = () => {
             if (dropdownMenu) dropdownMenu.classList.remove('ativo');
-            if (bloqueioTouchMenu) bloqueioTouchMenu.style.display = 'none';
         };
 
         const abrirDropdown = () => {
             if (dropdownMenu) dropdownMenu.classList.add('ativo');
-            if (bloqueioTouchMenu) bloqueioTouchMenu.style.display = 'block';
         };
 
         const toggleDropdown = (e) => {
             if (e) {
                 e.stopPropagation();
-                e.preventDefault();
             }
             if (dropdownMenu && dropdownMenu.classList.contains('ativo')) {
                 fecharDropdown();
@@ -1339,18 +1335,11 @@
         if (btnMenuToggle && dropdownMenu) {
             btnMenuToggle.addEventListener('click', toggleDropdown);
 
-            if (bloqueioTouchMenu) {
-                bloqueioTouchMenu.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    fecharDropdown();
-                });
-            }
-
             dropdownMenu.addEventListener('click', (e) => {
                 e.stopPropagation();
             });
 
-            window.addEventListener('click', (e) => {
+            document.addEventListener('click', (e) => {
                 if (!e.target.closest('#btnMenuToggle') && !e.target.closest('#dropdownMenu')) {
                     fecharDropdown();
                 }
@@ -1383,7 +1372,10 @@
         if (btnToggleFullscreen) {
             btnToggleFullscreen.addEventListener('click', (e) => {
                 if (e.target !== checkFullscreen && !e.target.closest('.switch')) {
-                    if (checkFullscreen) checkFullscreen.click();
+                    if (checkFullscreen) {
+                        checkFullscreen.checked = !checkFullscreen.checked;
+                        alternarFullscreen();
+                    }
                 }
             });
         }
@@ -1398,6 +1390,7 @@
         document.addEventListener('webkitfullscreenchange', atualizarFullscreenUI);
         atualizarFullscreenUI();
 
+        // FIGURINHAS
         function atualizarFigurinhasUI() {
             const ativa = State.data.configs.figurinhas !== false;
             if (checkFig) checkFig.checked = ativa;
@@ -1407,7 +1400,11 @@
         if (btnToggleFig) {
             btnToggleFig.addEventListener('click', (e) => {
                 if (e.target !== checkFig && !e.target.closest('.switch')) {
-                    if (checkFig) checkFig.click();
+                    if (checkFig) {
+                        checkFig.checked = !checkFig.checked;
+                        State.salvarConfigs({ figurinhas: checkFig.checked });
+                        atualizarFigurinhasUI();
+                    }
                 }
             });
         }
@@ -1420,6 +1417,7 @@
         }
         atualizarFigurinhasUI();
 
+        // TEMA
         function aplicarTemaUI() {
             const tema = State.data.configs.tema || 'claro';
             if (tema === 'escuro') {
@@ -1436,7 +1434,12 @@
         if (btnToggleTema) {
             btnToggleTema.addEventListener('click', (e) => {
                 if (e.target !== checkTema && !e.target.closest('.switch')) {
-                    if (checkTema) checkTema.click();
+                    if (checkTema) {
+                        checkTema.checked = !checkTema.checked;
+                        const novo = checkTema.checked ? 'claro' : 'escuro';
+                        State.salvarConfigs({ tema: novo });
+                        aplicarTemaUI();
+                    }
                 }
             });
         }
