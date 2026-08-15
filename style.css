@@ -437,33 +437,41 @@ body.tema-escuro .time-header {
     background-color: #a71d2a;
 }
 
-/* NOME DOS TIMES - COMPACTO E ELEGANTE NO TOPO */
+/* NOME DOS TIMES - COMPACTO E ELEGANTE NOS CANTOS SUPERIORES */
 .lado-tag-time {
     position: absolute;
-    top: 58px;
+    top: 56px;
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    padding: 5px 16px;
-    border-radius: 20px;
-    font-size: 0.88rem;
+    padding: 4px 14px;
+    border-radius: 16px;
+    font-size: 0.85rem;
     font-weight: 600;
-    max-width: 82%;
+    max-width: 40vw;
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     z-index: 10;
-    border: 1px solid rgba(255, 255, 255, 0.38);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     color: #ffffff;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
     pointer-events: none;
     transition: transform 0.3s ease;
 }
 
+.lado-azul .lado-tag-time {
+    left: 16px;
+}
+
+.lado-vermelho .lado-tag-time {
+    right: 16px;
+}
+
 .pontos {
-    font-size: clamp(90px, 58vh, 34vw);
+    font-size: 100vh;
     line-height: 1;
     font-weight: 600;
     font-family: 'Fredoka', sans-serif;
@@ -471,30 +479,27 @@ body.tema-escuro .time-header {
     z-index: 2;
     transition: transform 0.3s ease;
     pointer-events: none;
-    margin-top: 36px;
 }
 
 @media (orientation: portrait) {
     .pontos {
-        font-size: clamp(65px, 28vh, 52vw);
+        font-size: 50vh;
     }
     .lado-azul .lado-tag-time {
-        top: 56px;
-        font-size: 0.82rem;
-        padding: 4px 14px;
-    }
-    .lado-azul .pontos {
-        margin-top: 42px;
-        margin-bottom: 0;
+        top: 54px;
+        left: 14px;
+        right: auto;
+        font-size: 0.8rem;
+        padding: 3px 12px;
+        max-width: 80vw;
     }
     .lado-vermelho .lado-tag-time {
         top: 14px;
-        font-size: 0.82rem;
-        padding: 4px 14px;
-    }
-    .lado-vermelho .pontos {
-        margin-top: 24px;
-        margin-bottom: 24px;
+        left: 14px;
+        right: auto;
+        font-size: 0.8rem;
+        padding: 3px 12px;
+        max-width: 80vw;
     }
 }
 
