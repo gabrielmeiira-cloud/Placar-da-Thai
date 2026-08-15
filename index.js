@@ -1065,19 +1065,17 @@
             const containerPodio = document.getElementById('containerPodio');
             const listaCompleta = document.getElementById('listaRankingCompleta');
             if (!containerPodio || !listaCompleta) return;
-            if (ranking.length === 0) {
-                if (secaoPodio) secaoPodio.style.display = 'none';
-                if (secaoCompleta) secaoCompleta.style.display = 'none';
-                if (secaoSemTimes) secaoSemTimes.style.display = 'block';
-                return;
+
+            const semPartidas = ranking.length === 0;
+            if (secaoSemTimes) {
+                secaoSemTimes.style.display = semPartidas ? 'block' : 'none';
             }
             if (secaoPodio) secaoPodio.style.display = 'block';
             if (secaoCompleta) secaoCompleta.style.display = 'block';
-            if (secaoSemTimes) secaoSemTimes.style.display = 'none';
 
-            let p1 = ranking[0] || { nomeTime: '-', membros: '-', vitorias: 0 };
-            let p2 = ranking[1] || { nomeTime: '-', membros: '-', vitorias: 0 };
-            let p3 = ranking[2] || { nomeTime: '-', membros: '-', vitorias: 0 };
+            let p1 = ranking[0] || { nomeTime: '1º Lugar', membros: 'Aguardando jogos', vitorias: 0 };
+            let p2 = ranking[1] || { nomeTime: '2º Lugar', membros: 'Aguardando jogos', vitorias: 0 };
+            let p3 = ranking[2] || { nomeTime: '3º Lugar', membros: 'Aguardando jogos', vitorias: 0 };
 
             containerPodio.innerHTML = `
                 <div class="podio-coluna">
@@ -1095,25 +1093,29 @@
             `;
 
             listaCompleta.innerHTML = '';
-            ranking.forEach((t, i) => {
-                let classe = 'ranking-card';
-                if (i === 0) classe += ' lider';
-                else if (i === 1) classe += ' vice';
-                else if (i === 2) classe += ' terceiro';
-                listaCompleta.innerHTML += `
-                    <div class="${classe}">
-                        <div class="ranking-info">
-                            <span class="ranking-pos">${i + 1}º</span>
-                            <div class="ranking-detalhes-time">
-                                <div class="ranking-nome-time">${t.nomeTime}</div>
-                                <div class="ranking-membros-txt">(${t.membros || 'Avulso'})</div>
-                                <div class="ranking-stats-sub">${t.jogos} jogos | ${t.vitorias}V - ${t.derrotas}D | Saldo: ${t.saldoPontos > 0 ? '+' : ''}${t.saldoPontos}</div>
+            if (semPartidas) {
+                listaCompleta.innerHTML = '<div class="aviso-vazio" style="padding: 12px;">Os times aparecerão aqui conforme as partidas forem jogadas e finalizadas no placar.</div>';
+            } else {
+                ranking.forEach((t, i) => {
+                    let classe = 'ranking-card';
+                    if (i === 0) classe += ' lider';
+                    else if (i === 1) classe += ' vice';
+                    else if (i === 2) classe += ' terceiro';
+                    listaCompleta.innerHTML += `
+                        <div class="${classe}">
+                            <div class="ranking-info">
+                                <span class="ranking-pos">${i + 1}º</span>
+                                <div class="ranking-detalhes-time">
+                                    <div class="ranking-nome-time">${t.nomeTime}</div>
+                                    <div class="ranking-membros-txt">(${t.membros || 'Avulso'})</div>
+                                    <div class="ranking-stats-sub">${t.jogos} jogos | ${t.vitorias}V - ${t.derrotas}D | Saldo: ${t.saldoPontos > 0 ? '+' : ''}${t.saldoPontos}</div>
+                                </div>
                             </div>
+                            <div class="ranking-qtd-trofeus">${this.formatarTrofeus(t.vitorias)}</div>
                         </div>
-                        <div class="ranking-qtd-trofeus">${this.formatarTrofeus(t.vitorias)}</div>
-                    </div>
-                `;
-            });
+                    `;
+                });
+            }
         }
     };
 
