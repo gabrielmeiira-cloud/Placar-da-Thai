@@ -219,36 +219,42 @@ body.modal-aberto .pontos {
     font-weight: 600;
 }
 
-.btn-voltar-painel {
-    background-color: rgba(220, 53, 69, 0.45);
-    border: 1.5px solid rgba(255, 255, 255, 0.55);
+.btn-fechar-transparente {
+    background: rgba(255, 255, 255, 0.14);
+    border: 1.5px solid rgba(255, 255, 255, 0.45);
     color: #ffffff;
-    padding: 8px 16px;
+    padding: 7px 16px;
     border-radius: 20px;
     font-family: 'Fredoka', sans-serif;
     font-size: 0.95rem;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     white-space: nowrap;
-    transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    transition: background-color 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
     display: flex;
     align-items: center;
     gap: 6px;
     flex-shrink: 0;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
 }
 
-.btn-voltar-painel:hover {
-    background-color: rgba(220, 53, 69, 0.8);
-    border-color: rgba(255, 255, 255, 0.9);
+.btn-fechar-transparente span {
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+
+.btn-fechar-transparente:hover {
+    background: rgba(255, 255, 255, 0.28);
+    border-color: rgba(255, 255, 255, 0.75);
     transform: scale(1.05);
-    box-shadow: 0 6px 18px rgba(220, 53, 69, 0.5);
+    box-shadow: 0 4px 18px rgba(255, 255, 255, 0.2);
 }
 
-.btn-voltar-painel:active {
+.btn-fechar-transparente:active {
     transform: scale(0.95);
+    background: rgba(255, 255, 255, 0.38);
 }
 
 .painel-overlay-conteudo {
