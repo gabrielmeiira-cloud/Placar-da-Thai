@@ -160,10 +160,6 @@ body.modal-aberto .pontos {
     user-select: none !important;
 }
 
-body.painel-aberto #secao-placar {
-    visibility: hidden !important;
-}
-
 .painel-overlay-header {
     display: flex;
     align-items: center;

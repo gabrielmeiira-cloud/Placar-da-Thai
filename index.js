@@ -1007,7 +1007,7 @@
                 this.filaEspera.forEach((j, i) => {
                     banco.innerHTML += `
                         <div class="chip-jogador" onclick="SorteioModule.adicionarAoTimeAtivo(${i})">
-                            ${j.genero === 'm' ? this.svgM14 : this.svgF14} ${j.nome} <span style="color:#ffc107; font-size: 0.82rem; font-weight: 600;">⭐ ${j.nivel}</span>
+                            ${j.genero === 'm' ? this.svgM14 : this.svgF14} ${j.nome} <span style="color:#ffc107">${'⭐'.repeat(j.nivel)}</span>
                         </div>
                     `;
                 });
@@ -1040,7 +1040,7 @@
                     htmlTime += `
                         <div class="jogador-item-lista clicavel" onclick="SorteioModule.removerDoTime(${indice}, ${idxJogador}); event.stopPropagation();" title="Toque para remover">
                             <span class="j-nome-icone">${j.genero === 'm' ? this.svgM14 : this.svgF14} ${j.nome}</span>
-                            <span style="color: #ffc107; font-size: 0.82rem; font-weight: 600;">⭐ ${j.nivel}</span>
+                            <span style="color: #ffc107; font-size: 0.85rem;">${'⭐'.repeat(j.nivel)}</span>
                         </div>
                     `;
                 });
@@ -1144,6 +1144,9 @@
             const deveSerAtiva = this.partidas.length === 0 || !this.partidas.some(p => p.status === 'ativa');
             this.partidas.push({ id: novoId, time1: t1, time2: t2, vencedor: null, status: deveSerAtiva ? 'ativa' : 'bloqueada' });
             State.salvarPartidas(this.partidas);
+            if (deveSerAtiva || !State.data.partidaAtual) {
+                State.carregarPartidaNoPlacar(t1, t2, novoId);
+            }
         },
         limparPartidas() {
             if (confirm("Tem certeza que deseja apagar todas as partidas e o histórico?")) State.salvarPartidas([]);
@@ -1328,26 +1331,16 @@
         // Toggle do Menu Dropdown (☰)
         if (btnMenuToggle && dropdownMenu) {
             btnMenuToggle.addEventListener('click', toggleDropdown);
-            btnMenuToggle.addEventListener('pointerup', (e) => { e.stopPropagation(); });
-            btnMenuToggle.addEventListener('touchend', (e) => { e.stopPropagation(); });
 
             if (bloqueioTouchMenu) {
-                ['touchstart', 'touchend', 'pointerdown', 'pointerup', 'mousedown', 'click'].forEach(evt => {
-                    bloqueioTouchMenu.addEventListener(evt, (e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        fecharDropdown();
-                    });
+                bloqueioTouchMenu.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    fecharDropdown();
                 });
             }
 
             dropdownMenu.addEventListener('click', (e) => {
                 e.stopPropagation();
-            });
-            ['touchstart', 'touchend', 'touchmove', 'pointerdown', 'pointerup', 'mousedown'].forEach(evt => {
-                dropdownMenu.addEventListener(evt, (e) => {
-                    e.stopPropagation();
-                });
             });
 
             window.addEventListener('click', (e) => {
@@ -1382,8 +1375,9 @@
 
         if (btnToggleFullscreen) {
             btnToggleFullscreen.addEventListener('click', (e) => {
-                if (e.target.closest('.switch')) return;
-                alternarFullscreen();
+                if (e.target !== checkFullscreen) {
+                    alternarFullscreen();
+                }
             });
         }
 
@@ -1405,10 +1399,11 @@
 
         if (btnToggleFig) {
             btnToggleFig.addEventListener('click', (e) => {
-                if (e.target.closest('.switch')) return;
-                const novo = !State.data.configs.figurinhas;
-                State.salvarConfigs({ figurinhas: novo });
-                atualizarFigurinhasUI();
+                if (e.target !== checkFig) {
+                    const novo = !State.data.configs.figurinhas;
+                    State.salvarConfigs({ figurinhas: novo });
+                    atualizarFigurinhasUI();
+                }
             });
         }
 
@@ -1419,8 +1414,6 @@
             });
         }
         atualizarFigurinhasUI();
-
-
 
         function aplicarTemaUI() {
             const tema = State.data.configs.tema || 'claro';
@@ -1437,8 +1430,18 @@
 
         if (btnToggleTema) {
             btnToggleTema.addEventListener('click', (e) => {
-                if (e.target.closest('.switch')) return;
-                const novo = State.data.configs.tema === 'claro' ? 'escuro' : 'claro';
+                if (e.target !== checkTema) {
+                    const atual = State.data.configs.tema || 'claro';
+                    const novo = atual === 'escuro' ? 'claro' : 'escuro';
+                    State.salvarConfigs({ tema: novo });
+                    aplicarTemaUI();
+                }
+            });
+        }
+
+        if (checkTema) {
+            checkTema.addEventListener('change', () => {
+                const novo = checkTema.checked ? 'claro' : 'escuro';
                 State.salvarConfigs({ tema: novo });
                 aplicarTemaUI();
             });
