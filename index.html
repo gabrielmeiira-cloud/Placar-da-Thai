@@ -25,7 +25,7 @@
          ========================================================================== -->
     <div class="secao-placar-wrapper">
         <section id="secao-placar">
-            <div class="versao-placar">Placar da Thai V6.4</div>
+            <div class="versao-placar">Placar da Thai V6.5</div>
 
             <div class="controles-topo-centro">
                 <button class="btn-central" id="btnToggleControlesTopo" type="button" title="Configurações e Gestão">
@@ -180,12 +180,12 @@
                     <div class="sub-bloco-secao">
                         <div class="card-painel-titulo">
                             <span>1. Quem vai Jogar? (<span id="contadorSelecionados">0 / 0</span>)</span>
-                            <div style="display: flex; flex-direction: column; gap: 6px;">
-                                <button class="btn-atalho" type="button" onclick="SorteioModule.selecionarTodos(true)">Marcar Todos</button>
-                                <button class="btn-atalho" type="button" onclick="SorteioModule.selecionarTodos(false)">Limpar</button>
-                            </div>
                         </div>
                         <div class="grade-selecao" id="gradeJogadores"></div>
+                        <div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 10px;">
+                            <button class="btn-atalho" type="button" onclick="SorteioModule.selecionarTodos(true)" style="flex: 1; padding: 8px 12px; font-size: 0.9rem;">✓ Marcar Todos</button>
+                            <button class="btn-atalho" type="button" onclick="SorteioModule.selecionarTodos(false)" style="flex: 1; padding: 8px 12px; font-size: 0.9rem;">✕ Limpar Todos</button>
+                        </div>
                     </div>
 
                     <!-- BLOCO 2: MODO DE FORMAÇÃO DOS TIMES -->

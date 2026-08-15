@@ -1007,7 +1007,7 @@
                 this.filaEspera.forEach((j, i) => {
                     banco.innerHTML += `
                         <div class="chip-jogador" onclick="SorteioModule.adicionarAoTimeAtivo(${i})">
-                            ${j.genero === 'm' ? this.svgM14 : this.svgF14} ${j.nome} <span style="color:#ffc107">${'⭐'.repeat(j.nivel)}</span>
+                            ${j.genero === 'm' ? this.svgM14 : this.svgF14} ${j.nome} <span style="color:#ffc107; font-size: 0.82rem; font-weight: 600;">⭐ ${j.nivel}</span>
                         </div>
                     `;
                 });
@@ -1027,7 +1027,7 @@
                         <div class="time-header">
                             <span class="time-titulo-nome" style="font-weight: 600;">Time ${indice + 1}</span>
                             <div class="time-header-acoes" style="display: flex; align-items: center; gap: 8px;">
-                                <span class="time-forca">⭐ Força: ${estrelasTotais}</span>
+                                <span class="time-forca">⚡ Força: ${estrelasTotais}</span>
                                 <button class="btn-fechar-time" onclick="SorteioModule.removerTimeManual(${indice}, event)" type="button" title="Excluir Time">✕</button>
                             </div>
                         </div>
@@ -1040,7 +1040,7 @@
                     htmlTime += `
                         <div class="jogador-item-lista clicavel" onclick="SorteioModule.removerDoTime(${indice}, ${idxJogador}); event.stopPropagation();" title="Toque para remover">
                             <span class="j-nome-icone">${j.genero === 'm' ? this.svgM14 : this.svgF14} ${j.nome}</span>
-                            <span style="color: #ffc107; font-size: 0.85rem;">${'⭐'.repeat(j.nivel)}</span>
+                            <span style="color: #ffc107; font-size: 0.82rem; font-weight: 600;">⭐ ${j.nivel}</span>
                         </div>
                     `;
                 });
