@@ -230,8 +230,7 @@
                 this.painel.classList.add('aberto');
             }
             if (this.gatilho) {
-                this.gatilho.classList.add('revertido');
-                this.gatilho.setAttribute('title', 'Fechar e Voltar ao Placar');
+                this.gatilho.setAttribute('title', 'Fechar Configurações');
             }
             if (targetId) {
                 setTimeout(() => this.irPara(targetId), 50);
@@ -242,8 +241,7 @@
                 this.painel.classList.remove('aberto');
             }
             if (this.gatilho) {
-                this.gatilho.classList.remove('revertido');
-                this.gatilho.setAttribute('title', 'Abrir Opções & Gestão');
+                this.gatilho.setAttribute('title', 'Configurações e Gestão');
             }
         },
         toggle() {
