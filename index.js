@@ -316,6 +316,9 @@
             this.textoVencedorModal = document.getElementById('textoVencedorModal');
             this.btnSalvarFimJogo = document.getElementById('btnSalvarFimJogo');
             this.btnVoltarPonto = document.getElementById('btnVoltarPonto');
+            this.modalRodadaConcluida = document.getElementById('modalRodadaConcluida');
+            this.btnIrParaRankingModal = document.getElementById('btnIrParaRankingModal');
+            this.btnContinuarPlacarModal = document.getElementById('btnContinuarPlacarModal');
         },
         bindEvents() {
             if (this.containerAzul) this.bindTouchLado(this.containerAzul, 'azul');
@@ -355,10 +358,25 @@
                     if (prox) {
                         this.dispararAviso(`Próximo Jogo: ${prox.time1} vs ${prox.time2}`);
                     } else {
-                        this.dispararAviso('Rodada Concluída! 🏆');
-                        const sec = document.getElementById('secao-ranking');
-                        if (sec) sec.scrollIntoView({ behavior: 'smooth' });
+                        if (this.modalRodadaConcluida) {
+                            this.modalRodadaConcluida.style.display = 'flex';
+                        } else {
+                            this.dispararAviso('Rodada Concluída! 🏆');
+                        }
                     }
+                });
+            }
+            if (this.btnIrParaRankingModal) {
+                this.btnIrParaRankingModal.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (this.modalRodadaConcluida) this.modalRodadaConcluida.style.display = 'none';
+                    OverlayModule.irPara('topico-ranking');
+                });
+            }
+            if (this.btnContinuarPlacarModal) {
+                this.btnContinuarPlacarModal.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (this.modalRodadaConcluida) this.modalRodadaConcluida.style.display = 'none';
                 });
             }
             if (this.btnVoltarPonto) {

@@ -25,7 +25,7 @@
          ========================================================================== -->
     <div class="secao-placar-wrapper">
         <section id="secao-placar">
-            <div class="versao-placar">Placar da Thai V5.1</div>
+            <div class="versao-placar">Placar da Thai V5.2</div>
 
             <div class="controles-topo-centro">
                 <button class="btn-central" id="btnToggleControlesTopo" type="button" title="Configurações e Gestão">
@@ -353,6 +353,23 @@
                 </button>
                 <button class="modal-btn modal-btn-cancelar" type="button" id="btnVoltarPonto" style="width: 100%; padding: 10px; font-size: 0.95rem;">
                     ↩ Voltar Ponto
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Rodada Concluída -->
+    <div class="modal-overlay" id="modalRodadaConcluida" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-icone-status">🎉</div>
+            <div class="modal-titulo">Rodada Concluída! 🏆</div>
+            <div class="modal-texto">Todas as partidas foram jogadas e finalizadas com sucesso!</div>
+            <div class="modal-botoes" style="display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 15px;">
+                <button class="modal-btn modal-btn-confirmar" type="button" id="btnIrParaRankingModal" style="background-color: #ffc107; color: #111; width: 100%; padding: 12px; font-size: 1rem; font-weight: 700;">
+                    🏆 Ver Ranking & Pódio
+                </button>
+                <button class="modal-btn modal-btn-cancelar" type="button" id="btnContinuarPlacarModal" style="width: 100%; padding: 10px; font-size: 0.95rem;">
+                    🏐 Continuar no Placar
                 </button>
             </div>
         </div>
