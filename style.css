@@ -82,26 +82,27 @@ body {
 
 .btn-gatilho-painel {
     pointer-events: auto;
-    padding: 6px 22px;
-    background-color: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 10px 42px;
+    background-color: rgba(255, 255, 255, 0.24);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1.5px solid rgba(255, 255, 255, 0.45);
     border-top: none;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
-    border-radius: 0 0 16px 16px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+    border-radius: 0 0 22px 22px;
     cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3px;
-    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    gap: 4px;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .btn-gatilho-painel:hover {
-    background-color: rgba(255, 255, 255, 0.35);
-    border-color: rgba(255, 255, 255, 0.65);
-    transform: translateY(2px);
+    background-color: rgba(255, 255, 255, 0.38);
+    border-color: rgba(255, 255, 255, 0.75);
+    transform: translateY(3px);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
 }
 
 /* ==========================================================================
@@ -406,12 +407,13 @@ body {
 }
 
 .seta-animada {
-    width: 6px;
-    height: 6px;
-    border-top: 2px solid rgba(255, 255, 255, 0.85);
-    border-left: 2px solid rgba(255, 255, 255, 0.85);
+    width: 12px;
+    height: 12px;
+    border-top: 3px solid rgba(255, 255, 255, 0.95);
+    border-left: 3px solid rgba(255, 255, 255, 0.95);
     transform: rotate(225deg); /* Aponta para baixo quando no placar */
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: -2px 0;
 }
 
 #btnToggleControlesTopo.revertido .seta-animada {
