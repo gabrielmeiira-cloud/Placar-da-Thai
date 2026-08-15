@@ -497,11 +497,21 @@
                 venceu = true; ladoVencedor = this.scoreAzul > this.scoreVermelho ? 'azul' : 'vermelho';
             }
             if (venceu) {
-                this.jogoEncerrado = true; this.ultimoLadoVencedor = ladoVencedor;
+                this.jogoEncerrado = true;
+                this.ultimoLadoVencedor = ladoVencedor;
                 this.dispararChuvaConfetes(ladoVencedor);
                 let elVencedor = ladoVencedor === 'azul' ? this.elAzul : this.elVermelho;
                 elVencedor.innerHTML = '<span class="trofeu-animado">🏆</span>';
-                setTimeout(() => { this.atualizarPlacar(); this.abrirModalVencedor(ladoVencedor); }, 1800);
+
+                const temPartidaAtiva = State.data.partidaAtual && State.data.partidaAtual.idPartida;
+                const temPartidasCadastradas = State.data.partidas && State.data.partidas.some(p => p.status === 'pendente' || p.status === 'ativa');
+
+                if (temPartidaAtiva || temPartidasCadastradas) {
+                    setTimeout(() => {
+                        this.atualizarPlacar();
+                        this.abrirModalVencedor(ladoVencedor);
+                    }, 1800);
+                }
                 return;
             }
             if (this.scoreAzul === this.scoreVermelho && [11, 12, 13, 14].includes(this.scoreAzul) && ladoModificado) {
