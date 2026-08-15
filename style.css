@@ -155,6 +155,8 @@ body {
     gap: 12px;
     flex-shrink: 0;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .painel-abas-nav {
@@ -163,9 +165,10 @@ body {
     overflow-x: auto;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
-    padding: 2px 4px;
+    padding: 4px 6px;
     flex: 1;
     justify-content: center;
+    align-items: center;
 }
 
 .painel-abas-nav::-webkit-scrollbar {
@@ -173,56 +176,57 @@ body {
 }
 
 .btn-aba {
-    background-color: rgba(255, 255, 255, 0.16);
-    border: 1px solid rgba(255, 255, 255, 0.32);
+    background-color: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.35);
     color: white;
-    padding: 6px 14px;
-    border-radius: 20px;
+    padding: 8px 16px;
+    border-radius: 22px;
     font-family: 'Fredoka', sans-serif;
-    font-size: 0.92rem;
+    font-size: 0.95rem;
     font-weight: 500;
     cursor: pointer;
     white-space: nowrap;
+    flex-shrink: 0;
     transition: background-color 0.2s ease, transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 .btn-aba:hover {
-    background-color: rgba(255, 255, 255, 0.28);
-    border-color: rgba(255, 255, 255, 0.55);
+    background-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.6);
     transform: translateY(-1px);
 }
 
 .btn-aba.ativo {
-    background: rgba(255, 255, 255, 0.38);
-    border-color: rgba(255, 255, 255, 0.75);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2), 0 0 12px rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.42);
+    border-color: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25), 0 0 12px rgba(255, 255, 255, 0.45);
     font-weight: 600;
 }
 
 .btn-fechar-painel {
-    background-color: rgba(220, 53, 69, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    background-color: rgba(220, 53, 69, 0.45);
+    border: 1.5px solid rgba(255, 255, 255, 0.5);
     color: white;
-    padding: 6px 14px;
-    border-radius: 20px;
+    padding: 8px 18px;
+    border-radius: 24px;
     font-family: 'Fredoka', sans-serif;
-    font-size: 0.88rem;
+    font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     white-space: nowrap;
     transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
     flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
 .btn-fechar-painel:hover {
-    background-color: rgba(220, 53, 69, 0.65);
-    border-color: rgba(255, 255, 255, 0.7);
-    transform: scale(1.04);
+    background-color: rgba(220, 53, 69, 0.75);
+    border-color: rgba(255, 255, 255, 0.85);
+    transform: scale(1.05);
 }
 
 .painel-overlay-conteudo {
@@ -295,11 +299,12 @@ body {
     box-shadow: 0 14px 35px rgba(0, 0, 0, 0.35);
     display: none;
     flex-direction: column;
-    min-width: 230px;
+    min-width: 255px;
     border: 1px solid rgba(255, 255, 255, 0.35);
     padding: 8px;
     z-index: 9999;
     pointer-events: auto;
+    box-sizing: border-box;
 }
 
 .dropdown-menu.ativo {
@@ -320,10 +325,18 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
+    gap: 12px;
     width: 100%;
     border-radius: 8px;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    box-sizing: border-box;
+}
+
+.dropdown-item span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
 }
 
 .dropdown-item:hover {
@@ -1521,6 +1534,8 @@ body.tema-escuro .time-header {
     display: inline-block;
     width: 44px;
     height: 24px;
+    flex-shrink: 0;
+    margin: 0;
 }
 
 .switch input {
@@ -1533,9 +1548,10 @@ body.tema-escuro .time-header {
     position: absolute;
     cursor: pointer;
     top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #555;
+    background-color: rgba(255, 255, 255, 0.25);
     transition: .3s;
     border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .slider:before {
@@ -1543,17 +1559,40 @@ body.tema-escuro .time-header {
     content: "";
     height: 18px;
     width: 18px;
-    left: 3px;
-    bottom: 3px;
+    left: 2px;
+    bottom: 2px;
     background-color: white;
     transition: .3s;
     border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 input:checked + .slider {
     background-color: #28a745;
+    border-color: #28a745;
 }
 
 input:checked + .slider:before {
     transform: translateX(20px);
+}
+
+/* Responsividade de Abas e Cabeçalho para Portrait */
+@media (max-width: 680px) {
+    .painel-overlay-header {
+        padding: 8px 10px;
+        gap: 6px;
+    }
+    .painel-abas-nav {
+        justify-content: flex-start;
+        gap: 6px;
+        padding: 2px 2px;
+    }
+    .btn-aba {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+    .btn-fechar-painel {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+    }
 }

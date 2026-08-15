@@ -1111,6 +1111,10 @@
         const btnToggleControlesTopo = document.getElementById('btnToggleControlesTopo');
         const placarHeader = document.getElementById('placarHeader');
 
+        const btnToggleFullscreen = document.getElementById('btnToggleFullscreen');
+        const checkFullscreen = document.getElementById('checkFullscreen');
+        const labelFullscreen = document.getElementById('labelFullscreen');
+
         const btnToggleFig = document.getElementById('btnToggleFigurinhas');
         const checkFig = document.getElementById('checkFigurinhas');
         const labelFig = document.getElementById('labelFigurinhas');
@@ -1139,6 +1143,46 @@
                 }
             });
         }
+
+        // TELA CHEIA (FULLSCREEN)
+        function atualizarFullscreenUI() {
+            const isFull = !!(document.fullscreenElement || document.webkitFullscreenElement);
+            if (checkFullscreen) checkFullscreen.checked = isFull;
+            if (labelFullscreen) labelFullscreen.textContent = isFull ? '🖥️ Tela Cheia: Ativada' : '🖥️ Tela Cheia: Desativada';
+        }
+
+        function alternarFullscreen() {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen().catch(() => {});
+                } else if (document.documentElement.webkitRequestFullscreen) {
+                    document.documentElement.webkitRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen().catch(() => {});
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+            }
+        }
+
+        if (btnToggleFullscreen) {
+            btnToggleFullscreen.addEventListener('click', (e) => {
+                if (e.target.closest('.switch')) return;
+                alternarFullscreen();
+            });
+        }
+
+        if (checkFullscreen) {
+            checkFullscreen.addEventListener('change', () => {
+                alternarFullscreen();
+            });
+        }
+
+        document.addEventListener('fullscreenchange', atualizarFullscreenUI);
+        document.addEventListener('webkitfullscreenchange', atualizarFullscreenUI);
+        atualizarFullscreenUI();
 
         function atualizarFigurinhasUI() {
             const ativa = State.data.configs.figurinhas !== false;
