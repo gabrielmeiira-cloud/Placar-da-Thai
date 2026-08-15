@@ -1067,7 +1067,12 @@
             btnMenuToggle.addEventListener('click', (e) => {
                 e.stopPropagation();
                 e.preventDefault();
-                dropdownMenu.classList.toggle('ativo');
+                const abrindo = !dropdownMenu.classList.contains('ativo');
+                dropdownMenu.classList.toggle('ativo', abrindo);
+                if (abrindo) {
+                    const secaoGestao = document.getElementById('secao-jogadores');
+                    if (secaoGestao) secaoGestao.scrollIntoView({ behavior: 'smooth' });
+                }
             });
 
             dropdownMenu.addEventListener('click', (e) => {
