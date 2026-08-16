@@ -19,11 +19,6 @@
 
 <body>
 
-    <!-- FIGURINHA INICIAL AO ABRIR (SOME AO CLICAR/TOCAR NA TELA) -->
-    <div class="figurinha-inicial-overlay" id="overlayFigurinhaInicial" style="display: none;" onclick="this.style.display='none'; this.remove();">
-        <img src="Thai01.webp" alt="Figurinha 01" class="figurinha-inicial-img" onclick="event.stopPropagation(); this.parentElement.style.display='none'; this.parentElement.remove();">
-    </div>
-
     <!-- ==========================================================================
          SEÇÃO 1: PLACAR AO VIVO (BASE PERMANENTE FULLSCREEN 100dvh)
          ========================================================================== -->
@@ -482,14 +477,13 @@
             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <span style="font-size: 1.5rem;">🖼️</span>
-                    <span class="modal-titulo" style="font-size: 1.25rem;">Figurinhas Colaborativas</span>
-                    <span id="badgeStatusNuvem" style="font-size: 0.75rem; background: rgba(40, 167, 69, 0.22); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); padding: 2px 7px; border-radius: 10px; font-weight: 600; margin-left: 4px;">🟢 Nuvem Ao Vivo</span>
+                    <span class="modal-titulo" style="font-size: 1.25rem;">Gerenciar Figurinhas</span>
                 </div>
                 <button class="btn-fechar-modal-x" id="btnFecharModalFigurinhas" type="button" title="Fechar">✕</button>
             </div>
             
             <p class="modal-texto" style="font-size: 0.88rem; margin-top: -4px;">
-                Mural colaborativo em tempo real! Qualquer figurinha adicionada aqui aparece automaticamente para todos os usuários do app.
+                Adicione suas fotos ou figurinhas. Ao marcar pontos, uma delas será exibida aleatoriamente!
             </p>
 
             <!-- AÇÕES DO TOPO -->
@@ -497,7 +491,7 @@
                 <input type="file" id="inputUploadFigurinha" accept="image/*" multiple style="display: none;">
                 <button class="btn-sucesso" id="btnAdicionarFigurinha" type="button" style="width: 100%; padding: 10px 14px; font-size: 0.95rem; min-height: 42px; display: flex; align-items: center; justify-content: center; gap: 8px;">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    <span>Adicionar Figurinha na Nuvem</span>
+                    <span>➕ Adicionar Figurinha</span>
                 </button>
             </div>
 
