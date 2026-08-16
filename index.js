@@ -167,9 +167,6 @@
         salvarFigurinhas(lista) {
             this.data.figurinhas = Array.isArray(lista) ? lista : [];
             localStorage.setItem(this.KEYS.FIGURINHAS, JSON.stringify(this.data.figurinhas));
-            if (typeof FigurinhasModule !== 'undefined' && FigurinhasModule.salvarNuvem) {
-                FigurinhasModule.salvarNuvem(this.data.figurinhas);
-            }
             this.notify('figurinhas', this.data.figurinhas);
         },
         adicionarFigurinha(src) {
@@ -828,6 +825,14 @@
             const antiga = document.querySelector('.figurinha-ponto'); if (antiga) antiga.remove();
             this.limparConfetes();
             this.atualizarPlacar();
+
+            // Animação de giro do botão de reset
+            const botoesReset = [this.btnResetBaixo, this.btnReset, document.getElementById('btnResetBaixo')].filter(Boolean);
+            botoesReset.forEach(btn => {
+                btn.classList.remove('girando');
+                void btn.offsetWidth;
+                btn.classList.add('girando');
+            });
         },
         dispararAviso(texto) {
             const aviso = document.createElement('div');
@@ -1989,7 +1994,7 @@
         }
     }
 
-    // 8. GERENCIADOR DE FIGURINHAS COM SINCRONIZAÇÃO EM NUVEM
+    // 8. GERENCIADOR DE FIGURINHAS
     const FigurinhasModule = {
         modal: null,
         grade: null,
@@ -1999,7 +2004,6 @@
         btnFechar: null,
         btnConcluir: null,
         contadorTotal: null,
-        CLOUD_URL: 'https://api.restful-api.dev/objects/ff8081819ff5b11001a00b9aba522eb1',
         init() {
             this.modal = document.getElementById('modalGerenciarFigurinhas');
             this.grade = document.getElementById('gradeFigurinhasGestao');
@@ -2028,36 +2032,12 @@
                 if (tipo === 'figurinhas') this.render();
             });
 
-            this.sincronizarNuvem();
             this.render();
-        },
-        sincronizarNuvem() {
-            fetch(this.CLOUD_URL)
-                .then(r => r.json())
-                .then(res => {
-                    if (res && res.data && Array.isArray(res.data.figurinhas)) {
-                        State.data.figurinhas = res.data.figurinhas;
-                        localStorage.setItem(State.KEYS.FIGURINHAS, JSON.stringify(res.data.figurinhas));
-                        State.notify('figurinhas', res.data.figurinhas);
-                    }
-                })
-                .catch(() => {});
-        },
-        salvarNuvem(lista) {
-            fetch(this.CLOUD_URL, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: 'placar_da_thai_figurinhas',
-                    data: { figurinhas: lista }
-                })
-            }).catch(() => {});
         },
         abrirModal() {
             if (this.modal) {
                 this.modal.style.display = 'flex';
                 document.body.classList.add('modal-aberto');
-                this.sincronizarNuvem();
                 this.render();
             }
         },
@@ -2095,7 +2075,6 @@
             this.inputUpload.value = '';
         },
         remover(index) {
-            const lista = State.obterFigurinhas();
             if (confirm("Deseja realmente excluir esta figurinha?")) {
                 State.removerFigurinha(index);
             }
