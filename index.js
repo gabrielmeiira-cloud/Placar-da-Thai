@@ -804,12 +804,26 @@
             });
 
             State.subscribe((tipo) => {
-                if (tipo === 'jogadores') this.carregarGrade();
-                if (tipo === 'times') { this.timesAtuais = State.data.times; this.renderizarVisualizacao(); }
+                if (tipo === 'jogadores') {
+                    this.atualizarVisibilidade();
+                    this.carregarGrade();
+                }
+                if (tipo === 'times') {
+                    this.timesAtuais = State.data.times;
+                    this.renderizarVisualizacao();
+                }
             });
+            this.atualizarVisibilidade();
             this.carregarGrade();
             alternarVisibilidadeModo();
             if (this.timesAtuais.length > 0) this.renderizarVisualizacao();
+        },
+        atualizarVisibilidade() {
+            const avisoSemJogadores = document.getElementById('secaoSemJogadores');
+            const conteudoSecaoTimes = document.getElementById('conteudoSecaoTimes');
+            const temJogadores = State.data.jogadores && State.data.jogadores.length > 0;
+            if (avisoSemJogadores) avisoSemJogadores.style.display = temJogadores ? 'none' : 'block';
+            if (conteudoSecaoTimes) conteudoSecaoTimes.style.display = temJogadores ? 'flex' : 'none';
         },
         carregarGrade() {
             const grade = document.getElementById('gradeJogadores');
@@ -1096,8 +1110,19 @@
             this.atualizar();
         },
         atualizar() {
-            this.carregarTimes(); this.partidas = State.data.partidas || [];
-            this.recalcularContadores(); this.atualizarStatus(); this.renderizar();
+            this.carregarTimes();
+            this.partidas = State.data.partidas || [];
+            this.recalcularContadores();
+            this.atualizarVisibilidade();
+            this.atualizarStatus();
+            this.renderizar();
+        },
+        atualizarVisibilidade() {
+            const avisoSemTimes = document.getElementById('secaoSemTimesPartidas');
+            const conteudoSecaoPartidas = document.getElementById('conteudoSecaoPartidas');
+            const temTimes = this.timesDisponiveis && this.timesDisponiveis.length >= 2;
+            if (avisoSemTimes) avisoSemTimes.style.display = temTimes ? 'none' : 'block';
+            if (conteudoSecaoPartidas) conteudoSecaoPartidas.style.display = temTimes ? 'flex' : 'none';
         },
         carregarTimes() {
             this.timesDisponiveis = [];
