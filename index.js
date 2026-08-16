@@ -1194,24 +1194,10 @@
             const btnGerar = document.getElementById('btnGerarLista'); if (btnGerar) btnGerar.addEventListener('click', () => this.abrirModalGerar());
             const btnAdd = document.getElementById('btnAddPartidaManual'); if (btnAdd) btnAdd.addEventListener('click', () => this.abrirModalEscolherTimes('manual'));
             const btnLimpar = document.getElementById('btnLimparPartidas'); if (btnLimpar) btnLimpar.addEventListener('click', () => this.limparPartidas());
-            const btnCancEscolha = document.getElementById('btnCancelarEscolhaTimes'); if (btnCancEscolha) btnCancEscolha.addEventListener('click', () => this.fecharModalEscolherTimes(true));
-            const btnConfEscolha = document.getElementById('btnConfirmarEscolhaTimes'); if (btnConfEscolha) btnConfEscolha.addEventListener('click', () => this.confirmarPartidaEscolhida());
 
             const alternarModoPartidas = (e) => {
                 const modo = document.querySelector('input[name="modoPartidas"]:checked')?.value || 'sorteio';
                 if (modo === 'filas') {
-                    const temPartidasAtivas = this.partidas && this.partidas.length > 0;
-                    if (temPartidasAtivas) {
-                        const confirmou = confirm("Atenção: Ao iniciar o Modo Filas, todas as partidas atuais e o histórico serão resetados. Deseja continuar?");
-                        if (!confirmou) {
-                            const radioAnterior = document.querySelector(`input[name="modoPartidas"][value="${this.modoAnterior || 'sorteio'}"]`);
-                            if (radioAnterior) radioAnterior.checked = true;
-                            this.atualizarVisibilidadeModo();
-                            return;
-                        }
-                        State.salvarPartidas([]);
-                    }
-                    this.modoAnterior = 'filas';
                     this.atualizarVisibilidadeModo();
                     this.abrirModalEscolherTimes('filas');
                 } else {
@@ -1364,16 +1350,30 @@
             }
 
             if (this.modoAberturaModal === 'filas') {
+                const temPartidas = this.partidas && this.partidas.length > 0;
+                if (temPartidas) {
+                    const confirmou = confirm("Atenção: Ao iniciar o Modo Filas, todas as partidas anteriores e o histórico serão resetados. Deseja continuar?");
+                    if (!confirmou) {
+                        return;
+                    }
+                }
+
                 const modalidade = document.querySelector('input[name="modalidadeFilaAuto"]:checked')?.value || 'ganha2_descansa1_volta';
                 State.data.modalidadeFilaAuto = modalidade;
                 State.data.filaTimes = this.timesDisponiveis.filter(t => t !== t1 && t !== t2);
                 State.salvar();
 
-                const novoId = this.partidas.length > 0 ? Math.max(...this.partidas.map(p => p.id)) + 1 : 1;
-                this.partidas.forEach(p => { if (p.status === 'ativa') p.status = 'bloqueada'; });
-                this.partidas.push({ id: novoId, time1: t1, time2: t2, vencedor: null, status: 'ativa', modalidade });
+                // Cria apenas 1 partida inicial (Jogo 1) com status 'ativa'
+                this.partidas = [{
+                    id: 1,
+                    time1: t1,
+                    time2: t2,
+                    vencedor: null,
+                    status: 'ativa',
+                    modalidade
+                }];
                 State.salvarPartidas(this.partidas);
-                State.carregarPartidaNoPlacar(t1, t2, novoId);
+                State.carregarPartidaNoPlacar(t1, t2, 1);
                 this.fecharModalEscolherTimes(false);
                 if (typeof OverlayModule !== 'undefined' && OverlayModule.fechar) {
                     OverlayModule.fechar();
