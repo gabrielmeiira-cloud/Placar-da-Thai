@@ -41,6 +41,8 @@
                 this.data.partidas = p ? JSON.parse(p) : [];
                 const pa = localStorage.getItem(this.KEYS.PARTIDA_ATUAL);
                 this.data.partidaAtual = pa ? JSON.parse(pa) : null;
+                const modFila = localStorage.getItem('modalidade_fila_auto'); if (modFila) this.data.modalidadeFilaAuto = modFila;
+                const fila = localStorage.getItem('fila_times_auto'); if (fila) this.data.filaTimes = JSON.parse(fila);
                 const cfg = localStorage.getItem(this.KEYS.CONFIGS);
                 if (cfg) {
                     this.data.configs = { ...this.data.configs, ...JSON.parse(cfg) };
@@ -52,6 +54,16 @@
                     this.data.configs.controlesEscondidos = localStorage.getItem('controles_topo_escondidos') === 'true';
                 }
             } catch (e) { console.error('Erro ao carregar dados:', e); }
+        },
+        salvar() {
+            try {
+                if (this.data.modalidadeFilaAuto) {
+                    localStorage.setItem('modalidade_fila_auto', this.data.modalidadeFilaAuto);
+                }
+                if (this.data.filaTimes) {
+                    localStorage.setItem('fila_times_auto', JSON.stringify(this.data.filaTimes));
+                }
+            } catch (e) { console.error('Erro ao salvar:', e); }
         },
         salvarJogadores(lista) {
             this.data.jogadores = lista;
@@ -1327,6 +1339,10 @@
             if (!select1 || !select2) return;
             const t1 = select1.value;
             const t2 = select2.value;
+            if (!t1 || !t2) {
+                alert("Selecione os dois times para iniciar a partida!");
+                return;
+            }
             if (t1 === t2) {
                 alert("Escolha dois times diferentes para o confronto!");
                 return;
@@ -1344,7 +1360,9 @@
                 State.salvarPartidas(this.partidas);
                 State.carregarPartidaNoPlacar(t1, t2, novoId);
                 this.fecharModalEscolherTimes(false);
-                OverlayModule.fechar(); // Vai direto pro placar com os times!
+                if (typeof OverlayModule !== 'undefined' && OverlayModule.fechar) {
+                    OverlayModule.fechar();
+                }
             } else {
                 // Modo Manual
                 const novoId = this.partidas.length > 0 ? Math.max(...this.partidas.map(p => p.id)) + 1 : 1;
