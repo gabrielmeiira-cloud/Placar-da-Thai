@@ -25,7 +25,7 @@
          ========================================================================== -->
     <div class="secao-placar-wrapper">
         <section id="secao-placar">
-            <div class="versao-placar">Placar da Thai V8.7</div>
+            <div class="versao-placar">Placar da Thai V8.8</div>
 
             <div class="controles-topo-centro">
                 <button class="btn-central" id="btnToggleControlesTopo" type="button" title="Configurações e Gestão">
@@ -288,8 +288,13 @@
                     </div>
 
                     <div id="conteudoSecaoPartidas">
-                        <!-- MODO DE PARTIDAS: AUTOMÁTICA VS SORTEIO -->
-                        <div class="sub-bloco-secao">
+                        <!-- BLOCO 1: TIMES CARREGADOS -->
+                        <div class="sub-bloco-secao" id="blocoTimesCarregados">
+                            <div id="infoTimesStatus"></div>
+                        </div>
+
+                        <!-- BLOCO 2: MODO DE PARTIDAS: AUTOMÁTICA VS SORTEIO -->
+                        <div class="sub-bloco-secao" id="blocoModoPartidas">
                             <div class="card-painel-titulo">Modo de Partidas</div>
                             <div class="grupo-form-linha" style="gap: 8px;">
                                 <label class="radio-chip" style="flex: 1; justify-content: center;">
@@ -299,35 +304,35 @@
                                     <input type="radio" name="modoPartidas" value="sorteio"> 🎲 Sorteio
                                 </label>
                             </div>
-                        </div>
 
-                        <!-- BLOCO: GERADOR DE SORTEIO (APENAS QUANDO MODO = SORTEIO) -->
-                        <div class="sub-bloco-secao" id="blocoGeradorSorteio" style="display: none; flex-direction: column; gap: 10px;">
-                            <div style="display: flex; flex-direction: column; gap: 6px;">
-                                <span style="font-size: 0.9rem; color: var(--texto-secundario); font-weight: 500;">Ritmo de Jogos:</span>
-                                <div class="grupo-form-linha" style="gap: 8px;">
-                                    <label class="radio-chip" style="flex: 1; justify-content: center;">
-                                        <input type="radio" name="ritmoSorteio" value="equilibrado" checked> ⚖️ Modo Equilibrado (Joga 1, Folga 1)
-                                    </label>
-                                    <label class="radio-chip" style="flex: 1; justify-content: center;">
-                                        <input type="radio" name="ritmoSorteio" value="intensidade"> 🔥 Modo Intensidade (Joga 2, Folga 2)
-                                    </label>
+                            <!-- OPÇÕES DE SORTEIO (VISÍVEL APENAS QUANDO MODO = SORTEIO) -->
+                            <div id="blocoGeradorSorteio" style="display: none; flex-direction: column; gap: 10px; margin-top: 10px;">
+                                <div style="display: flex; flex-direction: column; gap: 6px;">
+                                    <span style="font-size: 0.9rem; color: var(--texto-secundario); font-weight: 500;">Ritmo de Jogos:</span>
+                                    <div class="grupo-form-linha" style="gap: 8px;">
+                                        <label class="radio-chip" style="flex: 1; justify-content: center;">
+                                            <input type="radio" name="ritmoSorteio" value="equilibrado" checked> ⚖️ Modo Equilibrado (Joga 1, Folga 1)
+                                        </label>
+                                        <label class="radio-chip" style="flex: 1; justify-content: center;">
+                                            <input type="radio" name="ritmoSorteio" value="intensidade"> 🔥 Modo Intensidade (Joga 2, Folga 2)
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; flex-direction: column; gap: 6px;">
+                                    <span style="font-size: 0.9rem; color: var(--texto-secundario); font-weight: 500;">Duração prevista:</span>
+                                    <select id="selectHoras" class="input-padrao" style="width: 100%;">
+                                        <option value="1">1 hora (~12 jogos)</option>
+                                        <option value="2" selected>2 horas (~24 jogos)</option>
+                                        <option value="3">3 horas (~36 jogos)</option>
+                                        <option value="4">4 horas (~48 jogos)</option>
+                                    </select>
+                                    <button class="btn-sucesso" id="btnGerarLista" type="button" style="width: 100%; padding: 12px; font-size: 1.02rem; margin-top: 2px;">📅 Gerar Partidas</button>
                                 </div>
                             </div>
-
-                            <div style="display: flex; flex-direction: column; gap: 6px;">
-                                <span style="font-size: 0.9rem; color: var(--texto-secundario); font-weight: 500;">Duração prevista:</span>
-                                <select id="selectHoras" class="input-padrao" style="width: 100%;">
-                                    <option value="1">1 hora (~12 jogos)</option>
-                                    <option value="2" selected>2 horas (~24 jogos)</option>
-                                    <option value="3">3 horas (~36 jogos)</option>
-                                    <option value="4">4 horas (~48 jogos)</option>
-                                </select>
-                                <button class="btn-sucesso" id="btnGerarLista" type="button" style="width: 100%; padding: 12px; font-size: 1.02rem; margin-top: 2px;">📅 Gerar Partidas</button>
-                            </div>
                         </div>
 
-                        <!-- BLOCO: PARTIDAS (CONFRONTOS) -->
+                        <!-- BLOCO 3: PARTIDAS (CONFRONTOS) -->
                         <div class="sub-bloco-secao" id="blocoListaPartidas">
                             <div class="card-painel-titulo">
                                 <span>Partidas</span>
@@ -336,7 +341,6 @@
                                     <button class="btn-perigo" id="btnLimparPartidas" type="button" style="padding: 4px 10px; font-size: 0.82rem;">🗑️ Limpar</button>
                                 </div>
                             </div>
-                            <div id="infoTimesStatus" style="margin-top: 4px;"></div>
                             <div class="lista-partidas" id="listaPartidasCorpo" style="margin-top: 6px;"></div>
                         </div>
                     </div>
