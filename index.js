@@ -1166,23 +1166,20 @@
 
     // 6. PARTIDAS
     const PartidasModule = {
-        timesDisponiveis: [], partidas: [], contadorPartidasTimes: {},
+        timesDisponiveis: [], partidas: [], contadorPartidasTimes: {}, modoAberturaModal: 'automatico',
         init() {
             State.subscribe((tipo) => { if (tipo === 'times' || tipo === 'partidas' || tipo === 'partida_ativa' || tipo === 'partida_finalizada') this.atualizar(); });
             const btnGerar = document.getElementById('btnGerarLista'); if (btnGerar) btnGerar.addEventListener('click', () => this.abrirModalGerar());
-            const btnAdd = document.getElementById('btnAddPartidaManual'); if (btnAdd) btnAdd.addEventListener('click', () => this.abrirModalEscolherTimes());
+            const btnAdd = document.getElementById('btnAddPartidaManual'); if (btnAdd) btnAdd.addEventListener('click', () => this.abrirModalEscolherTimes('manual'));
             const btnLimpar = document.getElementById('btnLimparPartidas'); if (btnLimpar) btnLimpar.addEventListener('click', () => this.limparPartidas());
             const btnCancEscolha = document.getElementById('btnCancelarEscolhaTimes'); if (btnCancEscolha) btnCancEscolha.addEventListener('click', () => this.fecharModalEscolherTimes(true));
             const btnConfEscolha = document.getElementById('btnConfirmarEscolhaTimes'); if (btnConfEscolha) btnConfEscolha.addEventListener('click', () => this.confirmarPartidaEscolhida());
 
             const alternarModoPartidas = (e) => {
                 const modo = document.querySelector('input[name="modoPartidas"]:checked')?.value || 'sorteio';
-                const blocoSorteio = document.getElementById('blocoGeradorSorteio');
-                if (blocoSorteio) {
-                    blocoSorteio.style.display = modo === 'sorteio' ? 'flex' : 'none';
-                }
+                this.atualizarVisibilidadeModo();
                 if (modo === 'automatico') {
-                    this.abrirModalEscolherTimes();
+                    this.abrirModalEscolherTimes('automatico');
                 }
             };
             document.querySelectorAll('input[name="modoPartidas"]').forEach(r => r.addEventListener('change', alternarModoPartidas));
@@ -1193,6 +1190,7 @@
             this.partidas = State.data.partidas || [];
             this.recalcularContadores();
             this.atualizarVisibilidade();
+            this.atualizarVisibilidadeModo();
             this.atualizarStatus();
             this.renderizar();
         },
@@ -1202,6 +1200,28 @@
             const temTimes = this.timesDisponiveis && this.timesDisponiveis.length >= 2;
             if (avisoSemTimes) avisoSemTimes.style.display = temTimes ? 'none' : 'block';
             if (conteudoSecaoPartidas) conteudoSecaoPartidas.style.display = temTimes ? 'flex' : 'none';
+        },
+        atualizarVisibilidadeModo() {
+            const modo = document.querySelector('input[name="modoPartidas"]:checked')?.value || 'sorteio';
+            const blocoSorteio = document.getElementById('blocoGeradorSorteio');
+            const blocoListaPartidas = document.getElementById('blocoListaPartidas');
+            const btnAddManual = document.getElementById('btnAddPartidaManual');
+
+            if (blocoSorteio) {
+                blocoSorteio.style.display = (modo === 'sorteio') ? 'flex' : 'none';
+            }
+
+            if (btnAddManual) {
+                btnAddManual.style.display = (modo === 'manual') ? 'inline-flex' : 'none';
+            }
+
+            if (blocoListaPartidas) {
+                if (modo === 'manual') {
+                    blocoListaPartidas.style.display = 'flex';
+                } else {
+                    blocoListaPartidas.style.display = (this.partidas && this.partidas.length > 0) ? 'flex' : 'none';
+                }
+            }
         },
         carregarTimes() {
             this.timesDisponiveis = [];
@@ -1233,7 +1253,8 @@
                 info.innerHTML = '⚠️ <strong>Nenhum time sorteado encontrado.</strong> Vá na seção <a href="#topico-sorteio" class="link-interno" onclick="OverlayModule.irPara(\'topico-sorteio\')">👥 Times</a> para sortear ou montar seus times primeiro!';
             }
         },
-        abrirModalEscolherTimes() {
+        abrirModalEscolherTimes(tipo = 'automatico') {
+            this.modoAberturaModal = tipo;
             if (this.timesDisponiveis.length < 2) {
                 alert("Você precisa ter pelo menos 2 times cadastrados para criar uma partida!");
                 this.fecharModalEscolherTimes(true);
@@ -1242,8 +1263,25 @@
             const select1 = document.getElementById('selectTime1');
             const select2 = document.getElementById('selectTime2');
             const modal = document.getElementById('modalEscolherTimes');
+            const tituloModal = document.getElementById('tituloModalEscolherTimes');
+            const campoMod = document.getElementById('campoModalidadeFila');
+            const btnConf = document.getElementById('btnConfirmarEscolhaTimes');
+            const subTxt = document.getElementById('textoSubtituloModalTimes');
+
             if (!select1 || !select2 || !modal) return;
             
+            if (tipo === 'automatico') {
+                if (tituloModal) tituloModal.textContent = "Nova Partida Automática";
+                if (subTxt) subTxt.textContent = "Escolha os times e a modalidade da partida:";
+                if (campoMod) campoMod.style.display = 'flex';
+                if (btnConf) btnConf.textContent = "▶ Começar Partidas";
+            } else {
+                if (tituloModal) tituloModal.textContent = "Adicionar Partida Manual";
+                if (subTxt) subTxt.textContent = "Escolha os times que vão se enfrentar:";
+                if (campoMod) campoMod.style.display = 'none';
+                if (btnConf) btnConf.textContent = "✓ Adicionar Partida";
+            }
+
             select1.innerHTML = '';
             select2.innerHTML = '';
             this.timesDisponiveis.forEach((timeNome, idx) => {
@@ -1266,11 +1304,10 @@
             const modal = document.getElementById('modalEscolherTimes');
             if (modal) modal.style.display = 'none';
             document.body.classList.remove('modal-aberto');
-            if (cancelou) {
+            if (cancelou && this.modoAberturaModal === 'automatico') {
                 const rSorteio = document.querySelector('input[name="modoPartidas"][value="sorteio"]');
                 if (rSorteio) rSorteio.checked = true;
-                const blocoSorteio = document.getElementById('blocoGeradorSorteio');
-                if (blocoSorteio) blocoSorteio.style.display = 'flex';
+                this.atualizarVisibilidadeModo();
             }
         },
         confirmarPartidaEscolhida() {
@@ -1283,17 +1320,30 @@
                 alert("Escolha dois times diferentes para o confronto!");
                 return;
             }
-            const modalidade = document.querySelector('input[name="modalidadeFilaAuto"]:checked')?.value || 'ganha2_descansa1_volta';
-            State.data.modalidadeFilaAuto = modalidade;
-            State.salvar();
 
-            const novoId = this.partidas.length > 0 ? Math.max(...this.partidas.map(p => p.id)) + 1 : 1;
-            this.partidas.forEach(p => { if (p.status === 'ativa') p.status = 'bloqueada'; });
-            this.partidas.push({ id: novoId, time1: t1, time2: t2, vencedor: null, status: 'ativa', modalidade });
-            State.salvarPartidas(this.partidas);
-            State.carregarPartidaNoPlacar(t1, t2, novoId);
-            this.fecharModalEscolherTimes(false);
-            OverlayModule.fechar(); // Vai direto pro placar com os times!
+            if (this.modoAberturaModal === 'automatico') {
+                const modalidade = document.querySelector('input[name="modalidadeFilaAuto"]:checked')?.value || 'ganha2_descansa1_volta';
+                State.data.modalidadeFilaAuto = modalidade;
+                State.salvar();
+
+                const novoId = this.partidas.length > 0 ? Math.max(...this.partidas.map(p => p.id)) + 1 : 1;
+                this.partidas.forEach(p => { if (p.status === 'ativa') p.status = 'bloqueada'; });
+                this.partidas.push({ id: novoId, time1: t1, time2: t2, vencedor: null, status: 'ativa', modalidade });
+                State.salvarPartidas(this.partidas);
+                State.carregarPartidaNoPlacar(t1, t2, novoId);
+                this.fecharModalEscolherTimes(false);
+                OverlayModule.fechar(); // Vai direto pro placar com os times!
+            } else {
+                // Modo Manual
+                const novoId = this.partidas.length > 0 ? Math.max(...this.partidas.map(p => p.id)) + 1 : 1;
+                const deveSerAtiva = this.partidas.length === 0 || !this.partidas.some(p => p.status === 'ativa');
+                this.partidas.push({ id: novoId, time1: t1, time2: t2, vencedor: null, status: deveSerAtiva ? 'ativa' : 'bloqueada' });
+                State.salvarPartidas(this.partidas);
+                if (deveSerAtiva || !State.data.partidaAtual) {
+                    State.carregarPartidaNoPlacar(t1, t2, novoId);
+                }
+                this.fecharModalEscolherTimes(false);
+            }
         },
         abrirModalGerar() {
             if (this.timesDisponiveis.length < 2) { alert("Você precisa ter pelo menos 2 times sorteados para gerar a lista de partidas!"); return; }
@@ -1369,10 +1419,32 @@
             }
         },
         adicionarPartidaManual() {
-            this.abrirModalEscolherTimes();
+            this.abrirModalEscolherTimes('manual');
         },
         limparPartidas() {
             if (confirm("Tem certeza que deseja apagar todas as partidas e o histórico?")) State.salvarPartidas([]);
+        },
+        apagarPartida(id) {
+            const p = this.partidas.find(item => item.id === id);
+            if (!p) return;
+            if (confirm(`Deseja realmente apagar a partida Jogo ${p.id} (${p.time1} vs ${p.time2})?`)) {
+                const eraAtiva = p.status === 'ativa' || (State.data.partidaAtual && State.data.partidaAtual.idPartida === id);
+                this.partidas = this.partidas.filter(item => item.id !== id);
+                State.salvarPartidas(this.partidas);
+                if (eraAtiva) {
+                    const prox = this.partidas.find(item => item.status === 'ativa' || !item.vencedor);
+                    if (prox) {
+                        prox.status = 'ativa';
+                        State.salvarPartidas(this.partidas);
+                        State.carregarPartidaNoPlacar(prox.time1, prox.time2, prox.id);
+                    } else {
+                        State.data.partidaAtual = null;
+                        localStorage.removeItem(State.KEYS.PARTIDA_ATUAL);
+                        State.notify('partida_ativa', null);
+                    }
+                }
+                this.atualizar();
+            }
         },
         iniciarNoPlacar(id) {
             const p = this.partidas.find(item => item.id === id);
@@ -1396,7 +1468,12 @@
             if (!corpo) return;
             corpo.innerHTML = '';
             if (this.partidas.length === 0) {
-                corpo.innerHTML = '<div class="aviso-vazio">Nenhuma partida gerada. Clique em "📅 Gerar Partidas" acima para iniciar a rodada!</div>';
+                const modo = document.querySelector('input[name="modoPartidas"]:checked')?.value || 'sorteio';
+                if (modo === 'manual') {
+                    corpo.innerHTML = '<div class="aviso-vazio">Nenhuma partida adicionada ainda. Clique em "+ Adicionar Partida" acima para criar os confrontos!</div>';
+                } else {
+                    corpo.innerHTML = '<div class="aviso-vazio">Nenhuma partida gerada. Clique em "📅 Gerar Partidas" acima para iniciar a rodada!</div>';
+                }
                 return;
             }
             const pa = State.data.partidaAtual;
@@ -1407,7 +1484,12 @@
                 let acoes = '';
                 if (p.vencedor) {
                     const placarTxt = (p.placar1 !== undefined && p.placar2 !== undefined) ? ` (${p.placar1} x ${p.placar2})` : '';
-                    acoes = `<span class="badge-vencedor">🏆 ${p.vencedor}${placarTxt}</span>`;
+                    acoes = `
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="badge-vencedor">🏆 ${p.vencedor}${placarTxt}</span>
+                            <button class="btn-apagar-partida-redondo" type="button" title="Apagar Partida" onclick="PartidasModule.apagarPartida(${p.id})">✕</button>
+                        </div>
+                    `;
                 } else if (p.status === 'ativa') {
                     const isJogando = pa && pa.idPartida === p.id;
                     acoes = `
@@ -1416,10 +1498,16 @@
                                 ${isJogando ? '▶ No Placar (Jogando)' : '▶ Jogar no Placar'}
                             </button>
                             ${isJogando ? `<button class="btn-pausar-partida" type="button" onclick="PartidasModule.pausarPartida(${p.id})">⏸️ Pausar Partida</button>` : ''}
+                            <button class="btn-apagar-partida-redondo" type="button" title="Apagar Partida" onclick="PartidasModule.apagarPartida(${p.id})">✕</button>
                         </div>
                     `;
                 } else {
-                    acoes = '<span class="badge-aguardando">⏳ Aguardando...</span>';
+                    acoes = `
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="badge-aguardando">⏳ Aguardando...</span>
+                            <button class="btn-apagar-partida-redondo" type="button" title="Apagar Partida" onclick="PartidasModule.apagarPartida(${p.id})">✕</button>
+                        </div>
+                    `;
                 }
                 linha.innerHTML = `
                     <div class="col-partida">
