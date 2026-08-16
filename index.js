@@ -11,13 +11,15 @@
             TIMES: 'times_salvos',
             PARTIDAS: 'partidas_geradas',
             PARTIDA_ATUAL: 'thai_partida_ativa',
-            CONFIGS: 'thai_configs'
+            CONFIGS: 'thai_configs',
+            FIGURINHAS: 'thai_figurinhas_custom'
         },
         data: {
             jogadores: [],
             times: [],
             partidas: [],
             partidaAtual: null,
+            figurinhas: ['Thai01.webp', 'Thai02.webp', 'Thai03.webp'],
             configs: {
                 tema: 'claro',
                 figurinhas: false,
@@ -70,6 +72,19 @@
 
                 const modFila = localStorage.getItem('modalidade_fila_auto'); if (modFila) this.data.modalidadeFilaAuto = modFila;
                 const fila = localStorage.getItem('fila_times_auto'); if (fila) this.data.filaTimes = JSON.parse(fila);
+
+                const fig = localStorage.getItem(this.KEYS.FIGURINHAS);
+                if (fig) {
+                    try {
+                        const parsed = JSON.parse(fig);
+                        this.data.figurinhas = Array.isArray(parsed) && parsed.length > 0 ? parsed : ['Thai01.webp', 'Thai02.webp', 'Thai03.webp'];
+                    } catch (e) {
+                        this.data.figurinhas = ['Thai01.webp', 'Thai02.webp', 'Thai03.webp'];
+                    }
+                } else {
+                    this.data.figurinhas = ['Thai01.webp', 'Thai02.webp', 'Thai03.webp'];
+                }
+
                 const cfg = localStorage.getItem(this.KEYS.CONFIGS);
                 if (cfg) {
                     this.data.configs = { ...this.data.configs, ...JSON.parse(cfg) };
@@ -145,6 +160,29 @@
                 }
             }
             this.notify('partidas', partidas);
+        },
+        obterFigurinhas() {
+            if (!this.data.figurinhas || this.data.figurinhas.length === 0) {
+                return ['Thai01.webp', 'Thai02.webp', 'Thai03.webp'];
+            }
+            return this.data.figurinhas;
+        },
+        salvarFigurinhas(lista) {
+            this.data.figurinhas = lista;
+            localStorage.setItem(this.KEYS.FIGURINHAS, JSON.stringify(lista));
+            this.notify('figurinhas', lista);
+        },
+        adicionarFigurinha(src) {
+            const lista = [...this.obterFigurinhas(), src];
+            this.salvarFigurinhas(lista);
+        },
+        removerFigurinha(index) {
+            const lista = [...this.obterFigurinhas()];
+            lista.splice(index, 1);
+            this.salvarFigurinhas(lista);
+        },
+        restaurarFigurinhasPadrao() {
+            this.salvarFigurinhas(['Thai01.webp', 'Thai02.webp', 'Thai03.webp']);
         },
         salvarConfigs(parciais) {
             this.data.configs = { ...this.data.configs, ...parciais };
@@ -803,9 +841,11 @@
             const antiga = document.querySelector('.figurinha-ponto'); if (antiga) antiga.remove();
             const container = lado === 'azul' ? this.containerAzul : this.containerVermelho;
             if (!container) return;
+            const lista = State.obterFigurinhas();
+            if (!lista || lista.length === 0) return;
             const img = document.createElement('img');
             img.className = 'figurinha-ponto';
-            img.src = this.IMAGENS_DA_THAI[Math.floor(Math.random() * this.IMAGENS_DA_THAI.length)];
+            img.src = lista[Math.floor(Math.random() * lista.length)];
             container.appendChild(img);
             img.addEventListener('animationend', () => img.remove());
         },
@@ -1944,6 +1984,146 @@
         }
     }
 
+    // 8. GERENCIADOR DE FIGURINHAS
+    const FigurinhasModule = {
+        modal: null,
+        grade: null,
+        inputUpload: null,
+        btnAdicionar: null,
+        btnRestaurar: null,
+        btnFechar: null,
+        btnConcluir: null,
+        contadorTotal: null,
+        init() {
+            this.modal = document.getElementById('modalGerenciarFigurinhas');
+            this.grade = document.getElementById('gradeFigurinhasGestao');
+            this.inputUpload = document.getElementById('inputUploadFigurinha');
+            this.btnAdicionar = document.getElementById('btnAdicionarFigurinha');
+            this.btnRestaurar = document.getElementById('btnRestaurarFigurinhasPadrao');
+            this.btnFechar = document.getElementById('btnFecharModalFigurinhas');
+            this.btnConcluir = document.getElementById('btnConcluirFigurinhas');
+            this.contadorTotal = document.getElementById('contadorFigurinhasTotal');
+
+            const btnAbrir = document.getElementById('btnAbrirModalFigurinhas');
+            if (btnAbrir) {
+                btnAbrir.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const dropdown = document.getElementById('dropdownMenu');
+                    if (dropdown) dropdown.classList.remove('ativo');
+                    this.abrirModal();
+                });
+            }
+
+            if (this.btnFechar) this.btnFechar.addEventListener('click', () => this.fecharModal());
+            if (this.btnConcluir) this.btnConcluir.addEventListener('click', () => this.fecharModal());
+            if (this.btnAdicionar && this.inputUpload) {
+                this.btnAdicionar.addEventListener('click', () => this.inputUpload.click());
+                this.inputUpload.addEventListener('change', (e) => this.processarUpload(e));
+            }
+            if (this.btnRestaurar) {
+                this.btnRestaurar.addEventListener('click', () => {
+                    if (confirm("Deseja restaurar as figurinhas padrão da Thai (Thai01, Thai02, Thai03)?")) {
+                        State.restaurarFigurinhasPadrao();
+                    }
+                });
+            }
+
+            State.subscribe((tipo) => {
+                if (tipo === 'figurinhas') this.render();
+            });
+
+            this.render();
+        },
+        abrirModal() {
+            if (this.modal) {
+                this.modal.style.display = 'flex';
+                document.body.classList.add('modal-aberto');
+                this.render();
+            }
+        },
+        fecharModal() {
+            if (this.modal) {
+                this.modal.style.display = 'none';
+                document.body.classList.remove('modal-aberto');
+            }
+        },
+        processarUpload(e) {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+            Array.from(files).forEach(file => {
+                if (!file.type.startsWith('image/')) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const maxDim = 400;
+                        let w = img.width, h = img.height;
+                        if (w > h && w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; }
+                        else if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        const dataUrl = canvas.toDataURL('image/webp', 0.88);
+                        State.adicionarFigurinha(dataUrl);
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+            this.inputUpload.value = '';
+        },
+        remover(index) {
+            const lista = State.obterFigurinhas();
+            if (lista.length <= 1) {
+                if (!confirm("Esta é a sua última figurinha ativa. Deseja realmente remover?")) {
+                    return;
+                }
+            }
+            State.removerFigurinha(index);
+        },
+        testarAnimacao(src) {
+            const antiga = document.querySelector('.figurinha-ponto');
+            if (antiga) antiga.remove();
+            const container = document.getElementById('btnAzul') || document.body;
+            const img = document.createElement('img');
+            img.className = 'figurinha-ponto';
+            img.src = src;
+            container.appendChild(img);
+            img.addEventListener('animationend', () => img.remove());
+        },
+        render() {
+            if (!this.grade) return;
+            const lista = State.obterFigurinhas();
+            if (this.contadorTotal) {
+                this.contadorTotal.textContent = `Total: ${lista.length} figurinha${lista.length === 1 ? '' : 's'}`;
+            }
+            this.grade.innerHTML = '';
+            if (lista.length === 0) {
+                this.grade.innerHTML = '<div class="aviso-vazio" style="grid-column: 1 / -1; padding: 20px;">Nenhuma figurinha cadastrada. Clique em "+ Adicionar Figurinha" acima!</div>';
+                return;
+            }
+            lista.forEach((src, idx) => {
+                const isPadrao = typeof src === 'string' && (src.includes('Thai01') || src.includes('Thai02') || src.includes('Thai03'));
+                let label = isPadrao ? (src.includes('Thai01') ? 'Thai 01' : (src.includes('Thai02') ? 'Thai 02' : 'Thai 03')) : `Figurinha #${idx + 1}`;
+
+                const card = document.createElement('div');
+                card.className = 'card-figurinha-item';
+                card.title = 'Toque para testar animação';
+                card.onclick = () => this.testarAnimacao(src);
+                card.innerHTML = `
+                    <button class="btn-excluir-figurinha" type="button" title="Excluir figurinha" onclick="event.stopPropagation(); FigurinhasModule.remover(${idx})">✕</button>
+                    <div class="card-figurinha-img-wrap">
+                        <img src="${src}" class="card-figurinha-img" alt="${label}" loading="lazy">
+                    </div>
+                    <span class="card-figurinha-badge">${label}</span>
+                `;
+                this.grade.appendChild(card);
+            });
+        }
+    };
+
     // 9. INICIALIZAÇÃO
     function inicializarApp() {
         Placar.init();
@@ -1952,6 +2132,7 @@
         SorteioModule.init();
         PartidasModule.init();
         RankingModule.init();
+        FigurinhasModule.init();
         initMenuConfig();
     }
 
@@ -1959,6 +2140,7 @@
     window.SorteioModule = SorteioModule;
     window.PartidasModule = PartidasModule;
     window.RankingModule = RankingModule;
+    window.FigurinhasModule = FigurinhasModule;
     window.Placar = Placar;
 
     if (document.readyState === 'loading') {

@@ -1802,6 +1802,124 @@ body.tema-escuro .modal-btn-cancelar {
     color: white;
 }
 
+.modal-card-largo {
+    max-width: 520px !important;
+    width: 95vw !important;
+}
+
+.btn-fechar-modal-x {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.btn-fechar-modal-x:hover {
+    background: rgba(220, 53, 69, 0.8);
+    border-color: #dc3545;
+    transform: scale(1.1);
+}
+
+.grade-figurinhas-gestao {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 12px;
+    max-height: 48vh;
+    overflow-y: auto;
+    padding: 6px 2px;
+    scrollbar-width: thin;
+}
+
+.card-figurinha-item {
+    position: relative;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    border-radius: 14px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    cursor: pointer;
+}
+
+.card-figurinha-item:hover {
+    transform: translateY(-2px);
+    border-color: #007bff;
+    background: rgba(0, 123, 255, 0.18);
+}
+
+.card-figurinha-img-wrap {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.25);
+}
+
+.card-figurinha-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transition: transform 0.25s ease;
+}
+
+.card-figurinha-item:hover .card-figurinha-img {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.card-figurinha-badge {
+    font-size: 0.75rem;
+    color: var(--texto-secundario, #e0e0e0);
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.btn-excluir-figurinha {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #dc3545;
+    color: white;
+    border: 1.5px solid rgba(255, 255, 255, 0.8);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    transition: transform 0.15s ease, background-color 0.2s ease;
+    z-index: 5;
+}
+
+.btn-excluir-figurinha:hover {
+    background: #bd2130;
+    transform: scale(1.2);
+}
+
 /* Confetes & Figurinhas */
 .confete {
     position: absolute;
@@ -2122,7 +2240,11 @@ input:checked + .slider:before {
                             <span class="slider"></span>
                         </label>
                     </div>
-                    <div class="dropdown-item" id="btnToggleTema" style="cursor: pointer;">
+                    <div class="dropdown-item" id="btnAbrirModalFigurinhas" style="cursor: pointer; border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 10px;">
+                        <span>🎨 Gerenciar Figurinhas</span>
+                        <span style="font-size: 1.1rem; opacity: 0.9;">⚙️</span>
+                    </div>
+                    <div class="dropdown-item" id="btnToggleTema" style="cursor: pointer; border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 10px;">
                         <span id="labelTema">☀️ Tema: Vidro</span>
                         <label class="switch">
                             <input type="checkbox" id="checkTema">
@@ -2516,6 +2638,44 @@ input:checked + .slider:before {
         </div>
     </div>
 
+    <!-- Modal Gerenciar Figurinhas -->
+    <div class="modal-overlay" id="modalGerenciarFigurinhas" style="display: none;">
+        <div class="modal-card modal-card-largo" style="text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 1.5rem;">🖼️</span>
+                    <span class="modal-titulo" style="font-size: 1.25rem;">Gerenciar Figurinhas</span>
+                </div>
+                <button class="btn-fechar-modal-x" id="btnFecharModalFigurinhas" type="button" title="Fechar">✕</button>
+            </div>
+            
+            <p class="modal-texto" style="font-size: 0.9rem; margin-top: -4px;">
+                Adicione suas fotos ou figurinhas personalizadas. Ao marcar pontos, uma delas será exibida <strong>aleatoriamente</strong>!
+            </p>
+
+            <!-- AÇÕES DO TOPO -->
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
+                <input type="file" id="inputUploadFigurinha" accept="image/*" multiple style="display: none;">
+                <button class="btn-sucesso" id="btnAdicionarFigurinha" type="button" style="flex: 1.2; padding: 10px 14px; font-size: 0.92rem; min-height: 40px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    <span>➕ Adicionar Figurinha</span>
+                </button>
+                <button class="btn-atalho" id="btnRestaurarFigurinhasPadrao" type="button" style="flex: 0.9; padding: 10px 12px; font-size: 0.86rem; min-height: 40px;" title="Restaura as 3 figurinhas originais da Thai">
+                    <span>🔄 Restaurar Padrões</span>
+                </button>
+            </div>
+
+            <!-- GRADE / GALERIA DE FIGURINHAS -->
+            <div class="grade-figurinhas-gestao" id="gradeFigurinhasGestao" style="margin-top: 8px;"></div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.15);">
+                <span id="contadorFigurinhasTotal" style="font-size: 0.85rem; color: var(--texto-secundario);">Total: 3 figurinhas</span>
+                <button class="modal-btn modal-btn-confirmar" id="btnConcluirFigurinhas" type="button" style="max-width: 120px; padding: 8px 16px;">
+                    Concluir
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
 /**
  * PLACAR DA THAI V2.0 - SCRIPT UNIFICADO (TEMA VIDRO + ONE-PAGE SCROLLSPY)
@@ -2530,13 +2690,15 @@ input:checked + .slider:before {
             TIMES: 'times_salvos',
             PARTIDAS: 'partidas_geradas',
             PARTIDA_ATUAL: 'thai_partida_ativa',
-            CONFIGS: 'thai_configs'
+            CONFIGS: 'thai_configs',
+            FIGURINHAS: 'thai_figurinhas_custom'
         },
         data: {
             jogadores: [],
             times: [],
             partidas: [],
             partidaAtual: null,
+            figurinhas: ['Thai01.webp', 'Thai02.webp', 'Thai03.webp'],
             configs: {
                 tema: 'claro',
                 figurinhas: false,
@@ -2589,6 +2751,19 @@ input:checked + .slider:before {
 
                 const modFila = localStorage.getItem('modalidade_fila_auto'); if (modFila) this.data.modalidadeFilaAuto = modFila;
                 const fila = localStorage.getItem('fila_times_auto'); if (fila) this.data.filaTimes = JSON.parse(fila);
+
+                const fig = localStorage.getItem(this.KEYS.FIGURINHAS);
+                if (fig) {
+                    try {
+                        const parsed = JSON.parse(fig);
+                        this.data.figurinhas = Array.isArray(parsed) && parsed.length > 0 ? parsed : ['Thai01.webp', 'Thai02.webp', 'Thai03.webp'];
+                    } catch (e) {
+                        this.data.figurinhas = ['Thai01.webp', 'Thai02.webp', 'Thai03.webp'];
+                    }
+                } else {
+                    this.data.figurinhas = ['Thai01.webp', 'Thai02.webp', 'Thai03.webp'];
+                }
+
                 const cfg = localStorage.getItem(this.KEYS.CONFIGS);
                 if (cfg) {
                     this.data.configs = { ...this.data.configs, ...JSON.parse(cfg) };
@@ -2664,6 +2839,29 @@ input:checked + .slider:before {
                 }
             }
             this.notify('partidas', partidas);
+        },
+        obterFigurinhas() {
+            if (!this.data.figurinhas || this.data.figurinhas.length === 0) {
+                return ['Thai01.webp', 'Thai02.webp', 'Thai03.webp'];
+            }
+            return this.data.figurinhas;
+        },
+        salvarFigurinhas(lista) {
+            this.data.figurinhas = lista;
+            localStorage.setItem(this.KEYS.FIGURINHAS, JSON.stringify(lista));
+            this.notify('figurinhas', lista);
+        },
+        adicionarFigurinha(src) {
+            const lista = [...this.obterFigurinhas(), src];
+            this.salvarFigurinhas(lista);
+        },
+        removerFigurinha(index) {
+            const lista = [...this.obterFigurinhas()];
+            lista.splice(index, 1);
+            this.salvarFigurinhas(lista);
+        },
+        restaurarFigurinhasPadrao() {
+            this.salvarFigurinhas(['Thai01.webp', 'Thai02.webp', 'Thai03.webp']);
         },
         salvarConfigs(parciais) {
             this.data.configs = { ...this.data.configs, ...parciais };
@@ -3322,9 +3520,11 @@ input:checked + .slider:before {
             const antiga = document.querySelector('.figurinha-ponto'); if (antiga) antiga.remove();
             const container = lado === 'azul' ? this.containerAzul : this.containerVermelho;
             if (!container) return;
+            const lista = State.obterFigurinhas();
+            if (!lista || lista.length === 0) return;
             const img = document.createElement('img');
             img.className = 'figurinha-ponto';
-            img.src = this.IMAGENS_DA_THAI[Math.floor(Math.random() * this.IMAGENS_DA_THAI.length)];
+            img.src = lista[Math.floor(Math.random() * lista.length)];
             container.appendChild(img);
             img.addEventListener('animationend', () => img.remove());
         },
@@ -4463,6 +4663,146 @@ input:checked + .slider:before {
         }
     }
 
+    // 8. GERENCIADOR DE FIGURINHAS
+    const FigurinhasModule = {
+        modal: null,
+        grade: null,
+        inputUpload: null,
+        btnAdicionar: null,
+        btnRestaurar: null,
+        btnFechar: null,
+        btnConcluir: null,
+        contadorTotal: null,
+        init() {
+            this.modal = document.getElementById('modalGerenciarFigurinhas');
+            this.grade = document.getElementById('gradeFigurinhasGestao');
+            this.inputUpload = document.getElementById('inputUploadFigurinha');
+            this.btnAdicionar = document.getElementById('btnAdicionarFigurinha');
+            this.btnRestaurar = document.getElementById('btnRestaurarFigurinhasPadrao');
+            this.btnFechar = document.getElementById('btnFecharModalFigurinhas');
+            this.btnConcluir = document.getElementById('btnConcluirFigurinhas');
+            this.contadorTotal = document.getElementById('contadorFigurinhasTotal');
+
+            const btnAbrir = document.getElementById('btnAbrirModalFigurinhas');
+            if (btnAbrir) {
+                btnAbrir.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const dropdown = document.getElementById('dropdownMenu');
+                    if (dropdown) dropdown.classList.remove('ativo');
+                    this.abrirModal();
+                });
+            }
+
+            if (this.btnFechar) this.btnFechar.addEventListener('click', () => this.fecharModal());
+            if (this.btnConcluir) this.btnConcluir.addEventListener('click', () => this.fecharModal());
+            if (this.btnAdicionar && this.inputUpload) {
+                this.btnAdicionar.addEventListener('click', () => this.inputUpload.click());
+                this.inputUpload.addEventListener('change', (e) => this.processarUpload(e));
+            }
+            if (this.btnRestaurar) {
+                this.btnRestaurar.addEventListener('click', () => {
+                    if (confirm("Deseja restaurar as figurinhas padrão da Thai (Thai01, Thai02, Thai03)?")) {
+                        State.restaurarFigurinhasPadrao();
+                    }
+                });
+            }
+
+            State.subscribe((tipo) => {
+                if (tipo === 'figurinhas') this.render();
+            });
+
+            this.render();
+        },
+        abrirModal() {
+            if (this.modal) {
+                this.modal.style.display = 'flex';
+                document.body.classList.add('modal-aberto');
+                this.render();
+            }
+        },
+        fecharModal() {
+            if (this.modal) {
+                this.modal.style.display = 'none';
+                document.body.classList.remove('modal-aberto');
+            }
+        },
+        processarUpload(e) {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+            Array.from(files).forEach(file => {
+                if (!file.type.startsWith('image/')) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const maxDim = 400;
+                        let w = img.width, h = img.height;
+                        if (w > h && w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; }
+                        else if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        const dataUrl = canvas.toDataURL('image/webp', 0.88);
+                        State.adicionarFigurinha(dataUrl);
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+            this.inputUpload.value = '';
+        },
+        remover(index) {
+            const lista = State.obterFigurinhas();
+            if (lista.length <= 1) {
+                if (!confirm("Esta é a sua última figurinha ativa. Deseja realmente remover?")) {
+                    return;
+                }
+            }
+            State.removerFigurinha(index);
+        },
+        testarAnimacao(src) {
+            const antiga = document.querySelector('.figurinha-ponto');
+            if (antiga) antiga.remove();
+            const container = document.getElementById('btnAzul') || document.body;
+            const img = document.createElement('img');
+            img.className = 'figurinha-ponto';
+            img.src = src;
+            container.appendChild(img);
+            img.addEventListener('animationend', () => img.remove());
+        },
+        render() {
+            if (!this.grade) return;
+            const lista = State.obterFigurinhas();
+            if (this.contadorTotal) {
+                this.contadorTotal.textContent = `Total: ${lista.length} figurinha${lista.length === 1 ? '' : 's'}`;
+            }
+            this.grade.innerHTML = '';
+            if (lista.length === 0) {
+                this.grade.innerHTML = '<div class="aviso-vazio" style="grid-column: 1 / -1; padding: 20px;">Nenhuma figurinha cadastrada. Clique em "+ Adicionar Figurinha" acima!</div>';
+                return;
+            }
+            lista.forEach((src, idx) => {
+                const isPadrao = typeof src === 'string' && (src.includes('Thai01') || src.includes('Thai02') || src.includes('Thai03'));
+                let label = isPadrao ? (src.includes('Thai01') ? 'Thai 01' : (src.includes('Thai02') ? 'Thai 02' : 'Thai 03')) : `Figurinha #${idx + 1}`;
+
+                const card = document.createElement('div');
+                card.className = 'card-figurinha-item';
+                card.title = 'Toque para testar animação';
+                card.onclick = () => this.testarAnimacao(src);
+                card.innerHTML = `
+                    <button class="btn-excluir-figurinha" type="button" title="Excluir figurinha" onclick="event.stopPropagation(); FigurinhasModule.remover(${idx})">✕</button>
+                    <div class="card-figurinha-img-wrap">
+                        <img src="${src}" class="card-figurinha-img" alt="${label}" loading="lazy">
+                    </div>
+                    <span class="card-figurinha-badge">${label}</span>
+                `;
+                this.grade.appendChild(card);
+            });
+        }
+    };
+
     // 9. INICIALIZAÇÃO
     function inicializarApp() {
         Placar.init();
@@ -4471,6 +4811,7 @@ input:checked + .slider:before {
         SorteioModule.init();
         PartidasModule.init();
         RankingModule.init();
+        FigurinhasModule.init();
         initMenuConfig();
     }
 
@@ -4478,6 +4819,7 @@ input:checked + .slider:before {
     window.SorteioModule = SorteioModule;
     window.PartidasModule = PartidasModule;
     window.RankingModule = RankingModule;
+    window.FigurinhasModule = FigurinhasModule;
     window.Placar = Placar;
 
     if (document.readyState === 'loading') {
