@@ -1105,8 +1105,20 @@
         init() {
             State.subscribe((tipo) => { if (tipo === 'times' || tipo === 'partidas' || tipo === 'partida_ativa' || tipo === 'partida_finalizada') this.atualizar(); });
             const btnGerar = document.getElementById('btnGerarLista'); if (btnGerar) btnGerar.addEventListener('click', () => this.abrirModalGerar());
-            const btnAdd = document.getElementById('btnAddPartidaManual'); if (btnAdd) btnAdd.addEventListener('click', () => this.adicionarPartidaManual());
+            const btnAdd = document.getElementById('btnAddPartidaManual'); if (btnAdd) btnAdd.addEventListener('click', () => this.abrirModalEscolherTimes());
             const btnLimpar = document.getElementById('btnLimparPartidas'); if (btnLimpar) btnLimpar.addEventListener('click', () => this.limparPartidas());
+            const btnCancEscolha = document.getElementById('btnCancelarEscolhaTimes'); if (btnCancEscolha) btnCancEscolha.addEventListener('click', () => this.fecharModalEscolherTimes());
+            const btnConfEscolha = document.getElementById('btnConfirmarEscolhaTimes'); if (btnConfEscolha) btnConfEscolha.addEventListener('click', () => this.confirmarPartidaEscolhida());
+
+            const alternarModoPartidas = () => {
+                const modo = document.querySelector('input[name="modoPartidas"]:checked')?.value || 'automatico';
+                const blocoSorteio = document.getElementById('blocoGeradorSorteio');
+                if (blocoSorteio) {
+                    blocoSorteio.style.display = modo === 'sorteio' ? 'flex' : 'none';
+                }
+            };
+            document.querySelectorAll('input[name="modoPartidas"]').forEach(r => r.addEventListener('change', alternarModoPartidas));
+            alternarModoPartidas();
             this.atualizar();
         },
         atualizar() {
@@ -1154,6 +1166,58 @@
                 info.innerHTML = '⚠️ <strong>Nenhum time sorteado encontrado.</strong> Vá na seção <a href="#topico-sorteio" class="link-interno" onclick="OverlayModule.irPara(\'topico-sorteio\')">👥 Times</a> para sortear ou montar seus times primeiro!';
             }
         },
+        abrirModalEscolherTimes() {
+            if (this.timesDisponiveis.length < 2) {
+                alert("Você precisa ter pelo menos 2 times cadastrados para criar uma partida!");
+                return;
+            }
+            const select1 = document.getElementById('selectTime1');
+            const select2 = document.getElementById('selectTime2');
+            const modal = document.getElementById('modalEscolherTimes');
+            if (!select1 || !select2 || !modal) return;
+            
+            select1.innerHTML = '';
+            select2.innerHTML = '';
+            this.timesDisponiveis.forEach((timeNome, idx) => {
+                const opt1 = document.createElement('option');
+                opt1.value = timeNome;
+                opt1.textContent = timeNome;
+                if (idx === 0) opt1.selected = true;
+                select1.appendChild(opt1);
+
+                const opt2 = document.createElement('option');
+                opt2.value = timeNome;
+                opt2.textContent = timeNome;
+                if (idx === 1) opt2.selected = true;
+                select2.appendChild(opt2);
+            });
+            modal.style.display = 'flex';
+            document.body.classList.add('modal-aberto');
+        },
+        fecharModalEscolherTimes() {
+            const modal = document.getElementById('modalEscolherTimes');
+            if (modal) modal.style.display = 'none';
+            document.body.classList.remove('modal-aberto');
+        },
+        confirmarPartidaEscolhida() {
+            const select1 = document.getElementById('selectTime1');
+            const select2 = document.getElementById('selectTime2');
+            if (!select1 || !select2) return;
+            const t1 = select1.value;
+            const t2 = select2.value;
+            if (t1 === t2) {
+                alert("Escolha dois times diferentes para o confronto!");
+                return;
+            }
+            const novoId = this.partidas.length > 0 ? Math.max(...this.partidas.map(p => p.id)) + 1 : 1;
+            const deveSerAtiva = this.partidas.length === 0 || !this.partidas.some(p => p.status === 'ativa');
+            this.partidas.push({ id: novoId, time1: t1, time2: t2, vencedor: null, status: deveSerAtiva ? 'ativa' : 'bloqueada' });
+            State.salvarPartidas(this.partidas);
+            if (deveSerAtiva || !State.data.partidaAtual) {
+                State.carregarPartidaNoPlacar(t1, t2, novoId);
+            }
+            this.fecharModalEscolherTimes();
+        },
         abrirModalGerar() {
             if (this.timesDisponiveis.length < 2) { alert("Você precisa ter pelo menos 2 times sorteados para gerar a lista de partidas!"); return; }
             if (this.partidas.length > 0) {
@@ -1163,6 +1227,7 @@
         executarGeracao() {
             const horasEl = document.getElementById('selectHoras');
             const horas = horasEl ? parseInt(horasEl.value) : 2;
+            const ritmo = document.querySelector('input[name="ritmoSorteio"]:checked')?.value || 'equilibrado';
             const numTimes = this.timesDisponiveis.length;
             const partidasBaseAlvo = horas * 12;
             let jogosPorTime = Math.round((partidasBaseAlvo * 2) / numTimes);
@@ -1172,21 +1237,54 @@
             this.timesDisponiveis.forEach(t => this.contadorPartidasTimes[t] = 0);
             this.partidas = [];
             let idContador = 1;
-            for (let i = 0; i < totalPartidas; i++) {
-                let ordenados = [...this.timesDisponiveis].sort((a, b) => {
-                    if (this.contadorPartidasTimes[a] !== this.contadorPartidasTimes[b]) return this.contadorPartidasTimes[a] - this.contadorPartidasTimes[b];
-                    return Math.random() - 0.5;
-                });
-                let t1 = ordenados[0], t2 = ordenados[1];
-                if (numTimes > 2 && i > 0) {
-                    let ult = this.partidas[i - 1];
-                    if ((ult.time1 === t1 && ult.time2 === t2) || (ult.time1 === t2 && ult.time2 === t1)) {
-                        if (ordenados[2]) t2 = ordenados[2];
+
+            if (ritmo === 'intensidade' && numTimes >= 4) {
+                // Modo Intensidade: Organiza em pares/blocos de 2 jogos consecutivos
+                for (let i = 0; i < totalPartidas; i++) {
+                    let t1, t2;
+                    if (i % 2 === 1 && i > 0) {
+                        const ult = this.partidas[i - 1];
+                        t1 = ult.time1;
+                        let outros = this.timesDisponiveis.filter(t => t !== t1 && t !== ult.time2)
+                            .sort((a, b) => (this.contadorPartidasTimes[a] || 0) - (this.contadorPartidasTimes[b] || 0));
+                        t2 = outros[0] || this.timesDisponiveis.find(t => t !== t1);
+                    } else {
+                        let ordenados = [...this.timesDisponiveis].sort((a, b) => {
+                            if (this.contadorPartidasTimes[a] !== this.contadorPartidasTimes[b]) return this.contadorPartidasTimes[a] - this.contadorPartidasTimes[b];
+                            return Math.random() - 0.5;
+                        });
+                        t1 = ordenados[0];
+                        t2 = ordenados[1];
                     }
+                    this.contadorPartidasTimes[t1]++;
+                    this.contadorPartidasTimes[t2]++;
+                    this.partidas.push({ id: idContador++, time1: t1, time2: t2, vencedor: null, status: i === 0 ? 'ativa' : 'bloqueada' });
                 }
-                this.contadorPartidasTimes[t1]++; this.contadorPartidasTimes[t2]++;
-                this.partidas.push({ id: idContador++, time1: t1, time2: t2, vencedor: null, status: i === 0 ? 'ativa' : 'bloqueada' });
+            } else {
+                // Modo Equilibrado (Joga 1, Folga 1): Evita que o mesmo time jogue duas vezes seguidas se houver 3+ times
+                for (let i = 0; i < totalPartidas; i++) {
+                    let ordenados = [...this.timesDisponiveis].sort((a, b) => {
+                        if (this.contadorPartidasTimes[a] !== this.contadorPartidasTimes[b]) return this.contadorPartidasTimes[a] - this.contadorPartidasTimes[b];
+                        return Math.random() - 0.5;
+                    });
+                    let t1 = ordenados[0], t2 = ordenados[1];
+                    if (numTimes > 2 && i > 0) {
+                        const ult = this.partidas[i - 1];
+                        let descansados = ordenados.filter(t => t !== ult.time1 && t !== ult.time2);
+                        if (descansados.length >= 2) {
+                            t1 = descansados[0];
+                            t2 = descansados[1];
+                        } else if (descansados.length === 1) {
+                            t1 = descansados[0];
+                            t2 = ordenados.find(t => t !== t1);
+                        }
+                    }
+                    this.contadorPartidasTimes[t1]++;
+                    this.contadorPartidasTimes[t2]++;
+                    this.partidas.push({ id: idContador++, time1: t1, time2: t2, vencedor: null, status: i === 0 ? 'ativa' : 'bloqueada' });
+                }
             }
+
             State.salvarPartidas(this.partidas);
             if (this.partidas.length > 0) {
                 const p = this.partidas[0];
@@ -1194,18 +1292,7 @@
             }
         },
         adicionarPartidaManual() {
-            if (this.timesDisponiveis.length < 2) { alert("Você precisa ter times disponíveis para adicionar partidas!"); return; }
-            const novoId = this.partidas.length > 0 ? this.partidas[this.partidas.length - 1].id + 1 : 1;
-            let ordenados = [...this.timesDisponiveis].sort((a, b) => (this.contadorPartidasTimes[a] || 0) - (this.contadorPartidasTimes[b] || 0));
-            const t1 = ordenados[0], t2 = ordenados[1] || ordenados[0];
-            this.contadorPartidasTimes[t1] = (this.contadorPartidasTimes[t1] || 0) + 1;
-            this.contadorPartidasTimes[t2] = (this.contadorPartidasTimes[t2] || 0) + 1;
-            const deveSerAtiva = this.partidas.length === 0 || !this.partidas.some(p => p.status === 'ativa');
-            this.partidas.push({ id: novoId, time1: t1, time2: t2, vencedor: null, status: deveSerAtiva ? 'ativa' : 'bloqueada' });
-            State.salvarPartidas(this.partidas);
-            if (deveSerAtiva || !State.data.partidaAtual) {
-                State.carregarPartidaNoPlacar(t1, t2, novoId);
-            }
+            this.abrirModalEscolherTimes();
         },
         limparPartidas() {
             if (confirm("Tem certeza que deseja apagar todas as partidas e o histórico?")) State.salvarPartidas([]);
