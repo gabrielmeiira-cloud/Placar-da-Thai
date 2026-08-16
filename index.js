@@ -74,12 +74,12 @@
                 const fila = localStorage.getItem('fila_times_auto'); if (fila) this.data.filaTimes = JSON.parse(fila);
 
                 const fig = localStorage.getItem(this.KEYS.FIGURINHAS);
-                if (fig) {
+                if (fig !== null) {
                     try {
                         const parsed = JSON.parse(fig);
-                        this.data.figurinhas = Array.isArray(parsed) && parsed.length > 0 ? parsed : ['Thai01.webp', 'Thai02.webp', 'Thai03.webp'];
+                        this.data.figurinhas = Array.isArray(parsed) ? parsed : [];
                     } catch (e) {
-                        this.data.figurinhas = ['Thai01.webp', 'Thai02.webp', 'Thai03.webp'];
+                        this.data.figurinhas = [];
                     }
                 } else {
                     this.data.figurinhas = ['Thai01.webp', 'Thai02.webp', 'Thai03.webp'];
@@ -162,15 +162,15 @@
             this.notify('partidas', partidas);
         },
         obterFigurinhas() {
-            if (!this.data.figurinhas || this.data.figurinhas.length === 0) {
-                return ['Thai01.webp', 'Thai02.webp', 'Thai03.webp'];
-            }
-            return this.data.figurinhas;
+            return Array.isArray(this.data.figurinhas) ? this.data.figurinhas : [];
         },
         salvarFigurinhas(lista) {
-            this.data.figurinhas = lista;
-            localStorage.setItem(this.KEYS.FIGURINHAS, JSON.stringify(lista));
-            this.notify('figurinhas', lista);
+            this.data.figurinhas = Array.isArray(lista) ? lista : [];
+            localStorage.setItem(this.KEYS.FIGURINHAS, JSON.stringify(this.data.figurinhas));
+            if (typeof FigurinhasModule !== 'undefined' && FigurinhasModule.salvarNuvem) {
+                FigurinhasModule.salvarNuvem(this.data.figurinhas);
+            }
+            this.notify('figurinhas', this.data.figurinhas);
         },
         adicionarFigurinha(src) {
             const lista = [...this.obterFigurinhas(), src];
@@ -1989,7 +1989,7 @@
         }
     }
 
-    // 8. GERENCIADOR DE FIGURINHAS
+    // 8. GERENCIADOR DE FIGURINHAS COM SINCRONIZAÇÃO EM NUVEM
     const FigurinhasModule = {
         modal: null,
         grade: null,
@@ -1999,6 +1999,7 @@
         btnFechar: null,
         btnConcluir: null,
         contadorTotal: null,
+        CLOUD_URL: 'https://api.restful-api.dev/objects/ff8081819ff5b11001a00b9aba522eb1',
         init() {
             this.modal = document.getElementById('modalGerenciarFigurinhas');
             this.grade = document.getElementById('gradeFigurinhasGestao');
@@ -2008,16 +2009,6 @@
             this.btnFechar = document.getElementById('btnFecharModalFigurinhas');
             this.btnConcluir = document.getElementById('btnConcluirFigurinhas');
             this.contadorTotal = document.getElementById('contadorFigurinhasTotal');
-
-            const btnAbrir = document.getElementById('btnAbrirModalFigurinhas');
-            if (btnAbrir) {
-                btnAbrir.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const dropdown = document.getElementById('dropdownMenu');
-                    if (dropdown) dropdown.classList.remove('ativo');
-                    this.abrirModal();
-                });
-            }
 
             if (this.btnFechar) this.btnFechar.addEventListener('click', () => this.fecharModal());
             if (this.btnConcluir) this.btnConcluir.addEventListener('click', () => this.fecharModal());
@@ -2037,12 +2028,36 @@
                 if (tipo === 'figurinhas') this.render();
             });
 
+            this.sincronizarNuvem();
             this.render();
+        },
+        sincronizarNuvem() {
+            fetch(this.CLOUD_URL)
+                .then(r => r.json())
+                .then(res => {
+                    if (res && res.data && Array.isArray(res.data.figurinhas)) {
+                        State.data.figurinhas = res.data.figurinhas;
+                        localStorage.setItem(State.KEYS.FIGURINHAS, JSON.stringify(res.data.figurinhas));
+                        State.notify('figurinhas', res.data.figurinhas);
+                    }
+                })
+                .catch(() => {});
+        },
+        salvarNuvem(lista) {
+            fetch(this.CLOUD_URL, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: 'placar_da_thai_figurinhas',
+                    data: { figurinhas: lista }
+                })
+            }).catch(() => {});
         },
         abrirModal() {
             if (this.modal) {
                 this.modal.style.display = 'flex';
                 document.body.classList.add('modal-aberto');
+                this.sincronizarNuvem();
                 this.render();
             }
         },
@@ -2062,7 +2077,7 @@
                     const img = new Image();
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        const maxDim = 400;
+                        const maxDim = 380;
                         let w = img.width, h = img.height;
                         if (w > h && w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; }
                         else if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
@@ -2070,7 +2085,7 @@
                         canvas.height = h;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, w, h);
-                        const dataUrl = canvas.toDataURL('image/webp', 0.88);
+                        const dataUrl = canvas.toDataURL('image/webp', 0.85);
                         State.adicionarFigurinha(dataUrl);
                     };
                     img.src = event.target.result;
@@ -2081,12 +2096,9 @@
         },
         remover(index) {
             const lista = State.obterFigurinhas();
-            if (lista.length <= 1) {
-                if (!confirm("Esta é a sua última figurinha ativa. Deseja realmente remover?")) {
-                    return;
-                }
+            if (confirm("Deseja realmente excluir esta figurinha?")) {
+                State.removerFigurinha(index);
             }
-            State.removerFigurinha(index);
         },
         testarAnimacao(src) {
             const antiga = document.querySelector('.figurinha-ponto');
