@@ -1876,7 +1876,7 @@ body.tema-escuro .modal-btn-cancelar {
     align-items: center;
     justify-content: center;
     gap: 6px;
-    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
     cursor: pointer;
 }
 
@@ -1884,6 +1884,155 @@ body.tema-escuro .modal-btn-cancelar {
     transform: translateY(-2px);
     border-color: #007bff;
     background: rgba(0, 123, 255, 0.18);
+}
+
+.card-figurinha-item.eh-abertura {
+    border-color: #ffc107 !important;
+    background: rgba(255, 193, 7, 0.18) !important;
+    box-shadow: 0 0 16px rgba(255, 193, 7, 0.45);
+}
+
+.badge-estrela-abertura {
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    background: #ffc107;
+    color: #111111;
+    border: 1.5px solid #ffffff;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    z-index: 10;
+}
+
+.btn-toggle-abertura {
+    margin-top: 2px;
+    padding: 3px 6px;
+    font-size: 0.68rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.15s ease;
+    width: 100%;
+    text-align: center;
+}
+
+.btn-toggle-abertura:hover {
+    background: rgba(255, 193, 7, 0.35);
+    border-color: #ffc107;
+    color: #ffc107;
+}
+
+.card-figurinha-item.eh-abertura .btn-toggle-abertura {
+    background: #ffc107;
+    color: #111111;
+    border-color: #ffc107;
+}
+
+/* ==========================================================================
+   TELA DE ABERTURA / BLOQUEIO PERSONALIZADA
+   ========================================================================== */
+.overlay-abertura-app {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    background: rgba(10, 14, 22, 0.92);
+    backdrop-filter: blur(28px) saturate(140%);
+    -webkit-backdrop-filter: blur(28px) saturate(140%);
+    z-index: 99999 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.overlay-abertura-app.saindo {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.card-abertura-app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    text-align: center;
+    max-width: 90vw;
+    animation: animAberturaEntrada 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes animAberturaEntrada {
+    0% { transform: scale(0.6); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.titulo-abertura-app {
+    font-family: 'Fredoka', sans-serif;
+    font-size: clamp(1.8rem, 6vw, 2.8rem);
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 4px 15px rgba(0, 123, 255, 0.6), 0 2px 4px rgba(0, 0, 0, 0.8);
+    letter-spacing: 0.5px;
+}
+
+.moldura-figurinha-abertura {
+    width: min(70vw, 70vh, 320px);
+    height: min(70vw, 70vh, 320px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 123, 255, 0.3);
+    padding: 12px;
+    box-sizing: border-box;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.img-figurinha-abertura {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.5));
+    animation: animFigurinhaFloat 3s ease-in-out infinite;
+}
+
+@keyframes animFigurinhaFloat {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-8px) rotate(2deg); }
+}
+
+.dica-abertura-app {
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.75);
+    animation: animPulsarDica 2s ease-in-out infinite;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+@keyframes animPulsarDica {
+    0%, 100% { opacity: 0.5; transform: scale(0.98); }
+    50% { opacity: 1; transform: scale(1.02); }
 }
 
 .card-figurinha-img-wrap {
@@ -2207,6 +2356,17 @@ input:checked + .slider:before {
 </head>
 
 <body>
+
+    <!-- TELA DE BLOQUEIO / ABERTURA PERSONALIZADA (SOME AO CLICAR EM QUALQUER LUGAR) -->
+    <div id="overlayAberturaApp" class="overlay-abertura-app" style="display: none;">
+        <div class="card-abertura-app">
+            <div class="titulo-abertura-app">🏐 Placar da Thai 🏆</div>
+            <div class="moldura-figurinha-abertura">
+                <img id="imgFigurinhaAbertura" src="" alt="Figurinha de Abertura" class="img-figurinha-abertura">
+            </div>
+            <div class="dica-abertura-app">👉 Toque em qualquer lugar para entrar</div>
+        </div>
+    </div>
 
     <!-- ==========================================================================
          SEÇÃO 1: PLACAR AO VIVO (BASE PERMANENTE FULLSCREEN 100dvh)
@@ -2667,21 +2827,21 @@ input:checked + .slider:before {
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <span style="font-size: 1.5rem;">🖼️</span>
                     <span class="modal-titulo" style="font-size: 1.25rem;">Gerenciar Figurinhas</span>
-                    <span id="badgeStatusNuvem" style="font-size: 0.75rem; background: rgba(40, 167, 69, 0.22); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); padding: 2px 7px; border-radius: 10px; font-weight: 600; margin-left: 4px;">🟢 Firebase Ao Vivo</span>
+                    <span id="badgeStatusNuvem" style="font-size: 0.75rem; background: rgba(40, 167, 69, 0.22); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); padding: 2px 7px; border-radius: 10px; font-weight: 600; margin-left: 4px;">🟢 Ao Vivo</span>
                 </div>
                 <button class="btn-fechar-modal-x" id="btnFecharModalFigurinhas" type="button" title="Fechar">✕</button>
             </div>
             
             <p class="modal-texto" style="font-size: 0.88rem; margin-top: -4px;">
-                Adicione suas fotos ou figurinhas. Ao marcar pontos, uma delas será exibida aleatoriamente!
+                Adicione fotos para os pontos e selecione qual será a <strong>🌟 Figurinha de Abertura</strong> do app!
             </p>
 
             <!-- AÇÕES DO TOPO -->
             <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
                 <input type="file" id="inputUploadFigurinha" accept="image/*" multiple style="display: none;">
                 <button class="btn-sucesso" id="btnAdicionarFigurinha" type="button" style="width: 100%; padding: 10px 14px; font-size: 0.95rem; min-height: 42px; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    <span>➕ Adicionar Figurinha</span>
+                    <span style="font-size: 1.3rem; font-weight: 700; color: #ffffff; line-height: 1;">+</span>
+                    <span style="color: #ffffff; font-weight: 600;">Adicionar Figurinha</span>
                 </button>
             </div>
 
@@ -2712,7 +2872,8 @@ input:checked + .slider:before {
             PARTIDAS: 'partidas_geradas',
             PARTIDA_ATUAL: 'thai_partida_ativa',
             CONFIGS: 'thai_configs',
-            FIGURINHAS: 'thai_figurinhas_custom'
+            FIGURINHAS: 'thai_figurinhas_custom',
+            ABERTURA: 'thai_figurinha_abertura'
         },
         data: {
             jogadores: [],
@@ -2720,6 +2881,7 @@ input:checked + .slider:before {
             partidas: [],
             partidaAtual: null,
             figurinhas: [],
+            figurinhaAbertura: null,
             configs: {
                 tema: 'claro',
                 figurinhas: false,
@@ -2784,6 +2946,8 @@ input:checked + .slider:before {
                 } else {
                     this.data.figurinhas = [];
                 }
+
+                this.data.figurinhaAbertura = localStorage.getItem(this.KEYS.ABERTURA) || null;
 
                 const cfg = localStorage.getItem(this.KEYS.CONFIGS);
                 if (cfg) {
@@ -2878,11 +3042,25 @@ input:checked + .slider:before {
         },
         removerFigurinha(index) {
             const lista = [...this.obterFigurinhas()];
+            const removida = lista[index];
             lista.splice(index, 1);
+            if (this.data.figurinhaAbertura === removida) {
+                this.definirFigurinhaAbertura(null);
+            }
             this.salvarFigurinhas(lista);
         },
-        restaurarFigurinhasPadrao() {
-            this.salvarFigurinhas(['Thai01.webp', 'Thai02.webp', 'Thai03.webp']);
+        definirFigurinhaAbertura(src) {
+            if (this.data.figurinhaAbertura === src || !src) {
+                this.data.figurinhaAbertura = null;
+                localStorage.removeItem(this.KEYS.ABERTURA);
+            } else {
+                this.data.figurinhaAbertura = src;
+                localStorage.setItem(this.KEYS.ABERTURA, src);
+            }
+            if (typeof FigurinhasModule !== 'undefined' && FigurinhasModule.salvarAberturaNuvem) {
+                FigurinhasModule.salvarAberturaNuvem(this.data.figurinhaAbertura);
+            }
+            this.notify('abertura', this.data.figurinhaAbertura);
         },
         salvarConfigs(parciais) {
             this.data.configs = { ...this.data.configs, ...parciais };
@@ -4691,6 +4869,7 @@ input:checked + .slider:before {
         badgeNuvem: null,
         eventSource: null,
         FIREBASE_URL: 'https://placardathai-default-rtdb.firebaseio.com/figurinhas.json',
+        FIREBASE_ABERTURA_URL: 'https://placardathai-default-rtdb.firebaseio.com/figurinhaAbertura.json',
         init() {
             this.modal = document.getElementById('modalGerenciarFigurinhas');
             this.grade = document.getElementById('gradeFigurinhasGestao');
@@ -4709,7 +4888,7 @@ input:checked + .slider:before {
             }
 
             State.subscribe((tipo) => {
-                if (tipo === 'figurinhas') this.render();
+                if (tipo === 'figurinhas' || tipo === 'abertura') this.render();
             });
 
             this.conectarFirebase();
@@ -4731,16 +4910,11 @@ input:checked + .slider:before {
                                 State.notify('figurinhas', lista);
                             }
                             if (this.badgeNuvem) {
-                                this.badgeNuvem.textContent = '🟢 Firebase Ao Vivo';
+                                this.badgeNuvem.textContent = '🟢 Ao Vivo';
                                 this.badgeNuvem.style.color = '#4ade80';
                             }
                         } catch (err) {}
                     });
-                    this.eventSource.onerror = () => {
-                        if (this.badgeNuvem) {
-                            this.badgeNuvem.textContent = '🟡 Firebase Conectando...';
-                        }
-                    };
                 } catch (err) {}
             }
         },
@@ -4754,39 +4928,38 @@ input:checked + .slider:before {
                         State.notify('figurinhas', res);
                     }
                     if (this.badgeNuvem) {
-                        this.badgeNuvem.textContent = '🟢 Firebase Ao Vivo';
+                        this.badgeNuvem.textContent = '🟢 Ao Vivo';
                         this.badgeNuvem.style.color = '#4ade80';
                     }
                 })
-                .catch(() => {
-                    if (this.badgeNuvem) {
-                        this.badgeNuvem.textContent = '🟡 Offline';
-                        this.badgeNuvem.style.color = '#ffc107';
+                .catch(() => {});
+
+            fetch(this.FIREBASE_ABERTURA_URL)
+                .then(r => r.json())
+                .then(abertura => {
+                    if (abertura !== undefined) {
+                        const val = abertura || null;
+                        State.data.figurinhaAbertura = val;
+                        if (val) localStorage.setItem(State.KEYS.ABERTURA, val);
+                        else localStorage.removeItem(State.KEYS.ABERTURA);
+                        State.notify('abertura', val);
                     }
-                });
+                })
+                .catch(() => {});
         },
         salvarNuvem(lista) {
-            if (this.badgeNuvem) {
-                this.badgeNuvem.textContent = '☁️ Sincronizando...';
-                this.badgeNuvem.style.color = '#00d2ff';
-            }
             fetch(this.FIREBASE_URL, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(lista)
-            })
-            .then(() => {
-                if (this.badgeNuvem) {
-                    this.badgeNuvem.textContent = '🟢 Firebase Ao Vivo';
-                    this.badgeNuvem.style.color = '#4ade80';
-                }
-            })
-            .catch(() => {
-                if (this.badgeNuvem) {
-                    this.badgeNuvem.textContent = '🟡 Salvo Localmente';
-                    this.badgeNuvem.style.color = '#ffc107';
-                }
-            });
+            }).catch(() => {});
+        },
+        salvarAberturaNuvem(src) {
+            fetch(this.FIREBASE_ABERTURA_URL, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(src)
+            }).catch(() => {});
         },
         abrirModal() {
             if (this.modal) {
@@ -4847,6 +5020,7 @@ input:checked + .slider:before {
         render() {
             if (!this.grade) return;
             const lista = State.obterFigurinhas();
+            const aberturaAtual = State.data.figurinhaAbertura;
             if (this.contadorTotal) {
                 this.contadorTotal.textContent = `Total: ${lista.length} figurinha${lista.length === 1 ? '' : 's'}`;
             }
@@ -4856,23 +5030,64 @@ input:checked + .slider:before {
                 return;
             }
             lista.forEach((src, idx) => {
+                const ehAbertura = src === aberturaAtual;
                 const card = document.createElement('div');
-                card.className = 'card-figurinha-item';
-                card.title = 'Toque para testar animação';
-                card.onclick = () => this.testarAnimacao(src);
+                card.className = `card-figurinha-item ${ehAbertura ? 'eh-abertura' : ''}`;
+                card.title = 'Toque na imagem para testar animação de ponto';
                 card.innerHTML = `
+                    ${ehAbertura ? '<span class="badge-estrela-abertura" title="Figurinha de Abertura Ativa">🌟</span>' : ''}
                     <button class="btn-excluir-figurinha" type="button" title="Excluir figurinha" onclick="event.stopPropagation(); FigurinhasModule.remover(${idx})">✕</button>
-                    <div class="card-figurinha-img-wrap">
+                    <div class="card-figurinha-img-wrap" onclick="FigurinhasModule.testarAnimacao('${src}')">
                         <img src="${src}" class="card-figurinha-img" alt="Figurinha #${idx + 1}" loading="lazy">
                     </div>
                     <span class="card-figurinha-badge">Figurinha #${idx + 1}</span>
+                    <button class="btn-toggle-abertura" type="button" onclick="event.stopPropagation(); State.definirFigurinhaAbertura('${src}')" title="Definir/remover como figurinha de abertura do app">
+                        ${ehAbertura ? '⭐ Abertura Ativa' : '☆ Definir Abertura'}
+                    </button>
                 `;
                 this.grade.appendChild(card);
             });
         }
     };
 
-    // 9. INICIALIZAÇÃO
+    // 9. TELA DE ABERTURA / BLOQUEIO (SPLASH)
+    const AberturaModule = {
+        overlay: null,
+        img: null,
+        init() {
+            this.overlay = document.getElementById('overlayAberturaApp');
+            this.img = document.getElementById('imgFigurinhaAbertura');
+
+            if (this.overlay) {
+                const fechar = () => {
+                    this.overlay.classList.add('saindo');
+                    setTimeout(() => {
+                        this.overlay.style.display = 'none';
+                        this.overlay.classList.remove('saindo');
+                    }, 350);
+                };
+                this.overlay.addEventListener('click', fechar);
+                this.overlay.addEventListener('pointerup', fechar);
+            }
+
+            State.subscribe((tipo) => {
+                if (tipo === 'abertura') this.verificar();
+            });
+
+            this.verificar();
+        },
+        verificar() {
+            const src = State.data.figurinhaAbertura;
+            if (src && this.overlay && this.img) {
+                this.img.src = src;
+                this.overlay.style.display = 'flex';
+            } else if (this.overlay) {
+                this.overlay.style.display = 'none';
+            }
+        }
+    };
+
+    // 10. INICIALIZAÇÃO
     function inicializarApp() {
         Placar.init();
         OverlayModule.init();
@@ -4881,6 +5096,7 @@ input:checked + .slider:before {
         PartidasModule.init();
         RankingModule.init();
         FigurinhasModule.init();
+        AberturaModule.init();
         initMenuConfig();
     }
 
@@ -4889,6 +5105,7 @@ input:checked + .slider:before {
     window.PartidasModule = PartidasModule;
     window.RankingModule = RankingModule;
     window.FigurinhasModule = FigurinhasModule;
+    window.AberturaModule = AberturaModule;
     window.Placar = Placar;
 
     if (document.readyState === 'loading') {

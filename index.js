@@ -12,7 +12,8 @@
             PARTIDAS: 'partidas_geradas',
             PARTIDA_ATUAL: 'thai_partida_ativa',
             CONFIGS: 'thai_configs',
-            FIGURINHAS: 'thai_figurinhas_custom'
+            FIGURINHAS: 'thai_figurinhas_custom',
+            ABERTURA: 'thai_figurinha_abertura'
         },
         data: {
             jogadores: [],
@@ -20,6 +21,7 @@
             partidas: [],
             partidaAtual: null,
             figurinhas: [],
+            figurinhaAbertura: null,
             configs: {
                 tema: 'claro',
                 figurinhas: false,
@@ -84,6 +86,8 @@
                 } else {
                     this.data.figurinhas = [];
                 }
+
+                this.data.figurinhaAbertura = localStorage.getItem(this.KEYS.ABERTURA) || null;
 
                 const cfg = localStorage.getItem(this.KEYS.CONFIGS);
                 if (cfg) {
@@ -178,11 +182,25 @@
         },
         removerFigurinha(index) {
             const lista = [...this.obterFigurinhas()];
+            const removida = lista[index];
             lista.splice(index, 1);
+            if (this.data.figurinhaAbertura === removida) {
+                this.definirFigurinhaAbertura(null);
+            }
             this.salvarFigurinhas(lista);
         },
-        restaurarFigurinhasPadrao() {
-            this.salvarFigurinhas(['Thai01.webp', 'Thai02.webp', 'Thai03.webp']);
+        definirFigurinhaAbertura(src) {
+            if (this.data.figurinhaAbertura === src || !src) {
+                this.data.figurinhaAbertura = null;
+                localStorage.removeItem(this.KEYS.ABERTURA);
+            } else {
+                this.data.figurinhaAbertura = src;
+                localStorage.setItem(this.KEYS.ABERTURA, src);
+            }
+            if (typeof FigurinhasModule !== 'undefined' && FigurinhasModule.salvarAberturaNuvem) {
+                FigurinhasModule.salvarAberturaNuvem(this.data.figurinhaAbertura);
+            }
+            this.notify('abertura', this.data.figurinhaAbertura);
         },
         salvarConfigs(parciais) {
             this.data.configs = { ...this.data.configs, ...parciais };
@@ -1991,6 +2009,7 @@
         badgeNuvem: null,
         eventSource: null,
         FIREBASE_URL: 'https://placardathai-default-rtdb.firebaseio.com/figurinhas.json',
+        FIREBASE_ABERTURA_URL: 'https://placardathai-default-rtdb.firebaseio.com/figurinhaAbertura.json',
         init() {
             this.modal = document.getElementById('modalGerenciarFigurinhas');
             this.grade = document.getElementById('gradeFigurinhasGestao');
@@ -2009,7 +2028,7 @@
             }
 
             State.subscribe((tipo) => {
-                if (tipo === 'figurinhas') this.render();
+                if (tipo === 'figurinhas' || tipo === 'abertura') this.render();
             });
 
             this.conectarFirebase();
@@ -2031,16 +2050,11 @@
                                 State.notify('figurinhas', lista);
                             }
                             if (this.badgeNuvem) {
-                                this.badgeNuvem.textContent = '🟢 Firebase Ao Vivo';
+                                this.badgeNuvem.textContent = '🟢 Ao Vivo';
                                 this.badgeNuvem.style.color = '#4ade80';
                             }
                         } catch (err) {}
                     });
-                    this.eventSource.onerror = () => {
-                        if (this.badgeNuvem) {
-                            this.badgeNuvem.textContent = '🟡 Firebase Conectando...';
-                        }
-                    };
                 } catch (err) {}
             }
         },
@@ -2054,39 +2068,38 @@
                         State.notify('figurinhas', res);
                     }
                     if (this.badgeNuvem) {
-                        this.badgeNuvem.textContent = '🟢 Firebase Ao Vivo';
+                        this.badgeNuvem.textContent = '🟢 Ao Vivo';
                         this.badgeNuvem.style.color = '#4ade80';
                     }
                 })
-                .catch(() => {
-                    if (this.badgeNuvem) {
-                        this.badgeNuvem.textContent = '🟡 Offline';
-                        this.badgeNuvem.style.color = '#ffc107';
+                .catch(() => {});
+
+            fetch(this.FIREBASE_ABERTURA_URL)
+                .then(r => r.json())
+                .then(abertura => {
+                    if (abertura !== undefined) {
+                        const val = abertura || null;
+                        State.data.figurinhaAbertura = val;
+                        if (val) localStorage.setItem(State.KEYS.ABERTURA, val);
+                        else localStorage.removeItem(State.KEYS.ABERTURA);
+                        State.notify('abertura', val);
                     }
-                });
+                })
+                .catch(() => {});
         },
         salvarNuvem(lista) {
-            if (this.badgeNuvem) {
-                this.badgeNuvem.textContent = '☁️ Sincronizando...';
-                this.badgeNuvem.style.color = '#00d2ff';
-            }
             fetch(this.FIREBASE_URL, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(lista)
-            })
-            .then(() => {
-                if (this.badgeNuvem) {
-                    this.badgeNuvem.textContent = '🟢 Firebase Ao Vivo';
-                    this.badgeNuvem.style.color = '#4ade80';
-                }
-            })
-            .catch(() => {
-                if (this.badgeNuvem) {
-                    this.badgeNuvem.textContent = '🟡 Salvo Localmente';
-                    this.badgeNuvem.style.color = '#ffc107';
-                }
-            });
+            }).catch(() => {});
+        },
+        salvarAberturaNuvem(src) {
+            fetch(this.FIREBASE_ABERTURA_URL, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(src)
+            }).catch(() => {});
         },
         abrirModal() {
             if (this.modal) {
@@ -2147,6 +2160,7 @@
         render() {
             if (!this.grade) return;
             const lista = State.obterFigurinhas();
+            const aberturaAtual = State.data.figurinhaAbertura;
             if (this.contadorTotal) {
                 this.contadorTotal.textContent = `Total: ${lista.length} figurinha${lista.length === 1 ? '' : 's'}`;
             }
@@ -2156,23 +2170,64 @@
                 return;
             }
             lista.forEach((src, idx) => {
+                const ehAbertura = src === aberturaAtual;
                 const card = document.createElement('div');
-                card.className = 'card-figurinha-item';
-                card.title = 'Toque para testar animação';
-                card.onclick = () => this.testarAnimacao(src);
+                card.className = `card-figurinha-item ${ehAbertura ? 'eh-abertura' : ''}`;
+                card.title = 'Toque na imagem para testar animação de ponto';
                 card.innerHTML = `
+                    ${ehAbertura ? '<span class="badge-estrela-abertura" title="Figurinha de Abertura Ativa">🌟</span>' : ''}
                     <button class="btn-excluir-figurinha" type="button" title="Excluir figurinha" onclick="event.stopPropagation(); FigurinhasModule.remover(${idx})">✕</button>
-                    <div class="card-figurinha-img-wrap">
+                    <div class="card-figurinha-img-wrap" onclick="FigurinhasModule.testarAnimacao('${src}')">
                         <img src="${src}" class="card-figurinha-img" alt="Figurinha #${idx + 1}" loading="lazy">
                     </div>
                     <span class="card-figurinha-badge">Figurinha #${idx + 1}</span>
+                    <button class="btn-toggle-abertura" type="button" onclick="event.stopPropagation(); State.definirFigurinhaAbertura('${src}')" title="Definir/remover como figurinha de abertura do app">
+                        ${ehAbertura ? '⭐ Abertura Ativa' : '☆ Definir Abertura'}
+                    </button>
                 `;
                 this.grade.appendChild(card);
             });
         }
     };
 
-    // 9. INICIALIZAÇÃO
+    // 9. TELA DE ABERTURA / BLOQUEIO (SPLASH)
+    const AberturaModule = {
+        overlay: null,
+        img: null,
+        init() {
+            this.overlay = document.getElementById('overlayAberturaApp');
+            this.img = document.getElementById('imgFigurinhaAbertura');
+
+            if (this.overlay) {
+                const fechar = () => {
+                    this.overlay.classList.add('saindo');
+                    setTimeout(() => {
+                        this.overlay.style.display = 'none';
+                        this.overlay.classList.remove('saindo');
+                    }, 350);
+                };
+                this.overlay.addEventListener('click', fechar);
+                this.overlay.addEventListener('pointerup', fechar);
+            }
+
+            State.subscribe((tipo) => {
+                if (tipo === 'abertura') this.verificar();
+            });
+
+            this.verificar();
+        },
+        verificar() {
+            const src = State.data.figurinhaAbertura;
+            if (src && this.overlay && this.img) {
+                this.img.src = src;
+                this.overlay.style.display = 'flex';
+            } else if (this.overlay) {
+                this.overlay.style.display = 'none';
+            }
+        }
+    };
+
+    // 10. INICIALIZAÇÃO
     function inicializarApp() {
         Placar.init();
         OverlayModule.init();
@@ -2181,6 +2236,7 @@
         PartidasModule.init();
         RankingModule.init();
         FigurinhasModule.init();
+        AberturaModule.init();
         initMenuConfig();
     }
 
@@ -2189,6 +2245,7 @@
     window.PartidasModule = PartidasModule;
     window.RankingModule = RankingModule;
     window.FigurinhasModule = FigurinhasModule;
+    window.AberturaModule = AberturaModule;
     window.Placar = Placar;
 
     if (document.readyState === 'loading') {
