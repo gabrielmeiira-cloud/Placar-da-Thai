@@ -167,6 +167,9 @@
         salvarFigurinhas(lista) {
             this.data.figurinhas = Array.isArray(lista) ? lista : [];
             localStorage.setItem(this.KEYS.FIGURINHAS, JSON.stringify(this.data.figurinhas));
+            if (typeof FigurinhasModule !== 'undefined' && FigurinhasModule.salvarNuvem) {
+                FigurinhasModule.salvarNuvem(this.data.figurinhas);
+            }
             this.notify('figurinhas', this.data.figurinhas);
         },
         adicionarFigurinha(src) {
@@ -1986,7 +1989,7 @@
         }
     }
 
-    // 8. GERENCIADOR DE FIGURINHAS
+    // 8. GERENCIADOR DE FIGURINHAS COLABORATIVO EM TEMPO REAL
     const FigurinhasModule = {
         modal: null,
         grade: null,
@@ -1995,6 +1998,9 @@
         btnFechar: null,
         btnConcluir: null,
         contadorTotal: null,
+        badgeNuvem: null,
+        intervaloSync: null,
+        CLOUD_URL: 'https://api.restful-api.dev/objects/ff8081819ff5b11001a00b9aba522eb1',
         init() {
             this.modal = document.getElementById('modalGerenciarFigurinhas');
             this.grade = document.getElementById('gradeFigurinhasGestao');
@@ -2003,6 +2009,7 @@
             this.btnFechar = document.getElementById('btnFecharModalFigurinhas');
             this.btnConcluir = document.getElementById('btnConcluirFigurinhas');
             this.contadorTotal = document.getElementById('contadorFigurinhasTotal');
+            this.badgeNuvem = document.getElementById('badgeStatusNuvem');
 
             if (this.btnFechar) this.btnFechar.addEventListener('click', () => this.fecharModal());
             if (this.btnConcluir) this.btnConcluir.addEventListener('click', () => this.fecharModal());
@@ -2015,12 +2022,78 @@
                 if (tipo === 'figurinhas') this.render();
             });
 
+            this.sincronizarNuvem();
+            this.iniciarSyncPeriodico();
             this.render();
+        },
+        iniciarSyncPeriodico() {
+            if (this.intervaloSync) clearInterval(this.intervaloSync);
+            this.intervaloSync = setInterval(() => {
+                this.sincronizarNuvem(true);
+            }, 8000);
+        },
+        sincronizarNuvem(silencioso = false) {
+            if (!silencioso && this.badgeNuvem) {
+                this.badgeNuvem.textContent = '🔄 Sincronizando...';
+                this.badgeNuvem.style.color = '#ffc107';
+                this.badgeNuvem.style.borderColor = 'rgba(255, 193, 7, 0.4)';
+            }
+            fetch(this.CLOUD_URL)
+                .then(r => r.json())
+                .then(res => {
+                    if (res && res.data && Array.isArray(res.data.figurinhas)) {
+                        const nuvemLista = res.data.figurinhas;
+                        const localLista = State.obterFigurinhas();
+                        if (JSON.stringify(nuvemLista) !== JSON.stringify(localLista)) {
+                            State.data.figurinhas = nuvemLista;
+                            localStorage.setItem(State.KEYS.FIGURINHAS, JSON.stringify(nuvemLista));
+                            State.notify('figurinhas', nuvemLista);
+                        }
+                    }
+                    if (this.badgeNuvem) {
+                        this.badgeNuvem.textContent = '🟢 Nuvem Ao Vivo';
+                        this.badgeNuvem.style.color = '#4ade80';
+                        this.badgeNuvem.style.borderColor = 'rgba(74, 222, 128, 0.4)';
+                    }
+                })
+                .catch(() => {
+                    if (this.badgeNuvem) {
+                        this.badgeNuvem.textContent = '🟡 Offline (Local)';
+                        this.badgeNuvem.style.color = '#ffc107';
+                    }
+                });
+        },
+        salvarNuvem(lista) {
+            if (this.badgeNuvem) {
+                this.badgeNuvem.textContent = '☁️ Enviando...';
+                this.badgeNuvem.style.color = '#00d2ff';
+            }
+            fetch(this.CLOUD_URL, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: 'placar_da_thai_figurinhas_colaborativas',
+                    data: { figurinhas: lista }
+                })
+            })
+            .then(() => {
+                if (this.badgeNuvem) {
+                    this.badgeNuvem.textContent = '🟢 Nuvem Ao Vivo';
+                    this.badgeNuvem.style.color = '#4ade80';
+                }
+            })
+            .catch(() => {
+                if (this.badgeNuvem) {
+                    this.badgeNuvem.textContent = '🟡 Salvo Localmente';
+                    this.badgeNuvem.style.color = '#ffc107';
+                }
+            });
         },
         abrirModal() {
             if (this.modal) {
                 this.modal.style.display = 'flex';
                 document.body.classList.add('modal-aberto');
+                this.sincronizarNuvem();
                 this.render();
             }
         },
@@ -2040,7 +2113,7 @@
                     const img = new Image();
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        const maxDim = 380;
+                        const maxDim = 360;
                         let w = img.width, h = img.height;
                         if (w > h && w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; }
                         else if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
@@ -2048,7 +2121,7 @@
                         canvas.height = h;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, w, h);
-                        const dataUrl = canvas.toDataURL('image/webp', 0.85);
+                        const dataUrl = canvas.toDataURL('image/webp', 0.82);
                         State.adicionarFigurinha(dataUrl);
                     };
                     img.src = event.target.result;
@@ -2058,7 +2131,7 @@
             this.inputUpload.value = '';
         },
         remover(index) {
-            if (confirm("Deseja realmente excluir esta figurinha?")) {
+            if (confirm("Deseja realmente excluir esta figurinha do mural compartilhado?")) {
                 State.removerFigurinha(index);
             }
         },
@@ -2080,23 +2153,20 @@
             }
             this.grade.innerHTML = '';
             if (lista.length === 0) {
-                this.grade.innerHTML = '<div class="aviso-vazio" style="grid-column: 1 / -1; padding: 20px;">Nenhuma figurinha cadastrada. Clique em "+ Adicionar Figurinha" acima!</div>';
+                this.grade.innerHTML = '<div class="aviso-vazio" style="grid-column: 1 / -1; padding: 24px 12px; font-size: 0.92rem; text-align: center;">Nenhuma figurinha no mural ainda.<br>Clique em "+ Adicionar Figurinha na Nuvem" para estrear o mural!</div>';
                 return;
             }
             lista.forEach((src, idx) => {
-                const isPadrao = typeof src === 'string' && (src.includes('Thai01') || src.includes('Thai02') || src.includes('Thai03'));
-                let label = isPadrao ? (src.includes('Thai01') ? 'Thai 01' : (src.includes('Thai02') ? 'Thai 02' : 'Thai 03')) : `Figurinha #${idx + 1}`;
-
                 const card = document.createElement('div');
                 card.className = 'card-figurinha-item';
                 card.title = 'Toque para testar animação';
                 card.onclick = () => this.testarAnimacao(src);
                 card.innerHTML = `
-                    <button class="btn-excluir-figurinha" type="button" title="Excluir figurinha" onclick="event.stopPropagation(); FigurinhasModule.remover(${idx})">✕</button>
+                    <button class="btn-excluir-figurinha" type="button" title="Excluir do mural" onclick="event.stopPropagation(); FigurinhasModule.remover(${idx})">✕</button>
                     <div class="card-figurinha-img-wrap">
-                        <img src="${src}" class="card-figurinha-img" alt="${label}" loading="lazy">
+                        <img src="${src}" class="card-figurinha-img" alt="Figurinha #${idx + 1}" loading="lazy">
                     </div>
-                    <span class="card-figurinha-badge">${label}</span>
+                    <span class="card-figurinha-badge">Figurinha #${idx + 1}</span>
                 `;
                 this.grade.appendChild(card);
             });
