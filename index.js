@@ -167,6 +167,9 @@
         salvarFigurinhas(lista) {
             this.data.figurinhas = Array.isArray(lista) ? lista : [];
             localStorage.setItem(this.KEYS.FIGURINHAS, JSON.stringify(this.data.figurinhas));
+            if (typeof FigurinhasModule !== 'undefined' && FigurinhasModule.salvarNuvem) {
+                FigurinhasModule.salvarNuvem(this.data.figurinhas);
+            }
             this.notify('figurinhas', this.data.figurinhas);
         },
         adicionarFigurinha(src) {
@@ -1976,7 +1979,7 @@
 
     }
 
-    // 8. GERENCIADOR DE FIGURINHAS
+    // 8. GERENCIADOR DE FIGURINHAS EM TEMPO REAL (FIREBASE)
     const FigurinhasModule = {
         modal: null,
         grade: null,
@@ -1985,6 +1988,9 @@
         btnFechar: null,
         btnConcluir: null,
         contadorTotal: null,
+        badgeNuvem: null,
+        eventSource: null,
+        FIREBASE_URL: 'https://placardathai-default-rtdb.firebaseio.com/figurinhas.json',
         init() {
             this.modal = document.getElementById('modalGerenciarFigurinhas');
             this.grade = document.getElementById('gradeFigurinhasGestao');
@@ -1993,6 +1999,7 @@
             this.btnFechar = document.getElementById('btnFecharModalFigurinhas');
             this.btnConcluir = document.getElementById('btnConcluirFigurinhas');
             this.contadorTotal = document.getElementById('contadorFigurinhasTotal');
+            this.badgeNuvem = document.getElementById('badgeStatusNuvem');
 
             if (this.btnFechar) this.btnFechar.addEventListener('click', () => this.fecharModal());
             if (this.btnConcluir) this.btnConcluir.addEventListener('click', () => this.fecharModal());
@@ -2005,12 +2012,87 @@
                 if (tipo === 'figurinhas') this.render();
             });
 
+            this.conectarFirebase();
             this.render();
+        },
+        conectarFirebase() {
+            this.sincronizarNuvem();
+            if (window.EventSource) {
+                try {
+                    if (this.eventSource) this.eventSource.close();
+                    this.eventSource = new EventSource(this.FIREBASE_URL);
+                    this.eventSource.addEventListener('put', (e) => {
+                        try {
+                            const res = JSON.parse(e.data);
+                            const lista = res && res.data && Array.isArray(res.data) ? res.data : (Array.isArray(res) ? res : []);
+                            if (JSON.stringify(lista) !== JSON.stringify(State.obterFigurinhas())) {
+                                State.data.figurinhas = lista;
+                                localStorage.setItem(State.KEYS.FIGURINHAS, JSON.stringify(lista));
+                                State.notify('figurinhas', lista);
+                            }
+                            if (this.badgeNuvem) {
+                                this.badgeNuvem.textContent = '🟢 Firebase Ao Vivo';
+                                this.badgeNuvem.style.color = '#4ade80';
+                            }
+                        } catch (err) {}
+                    });
+                    this.eventSource.onerror = () => {
+                        if (this.badgeNuvem) {
+                            this.badgeNuvem.textContent = '🟡 Firebase Conectando...';
+                        }
+                    };
+                } catch (err) {}
+            }
+        },
+        sincronizarNuvem() {
+            fetch(this.FIREBASE_URL)
+                .then(r => r.json())
+                .then(res => {
+                    if (Array.isArray(res)) {
+                        State.data.figurinhas = res;
+                        localStorage.setItem(State.KEYS.FIGURINHAS, JSON.stringify(res));
+                        State.notify('figurinhas', res);
+                    }
+                    if (this.badgeNuvem) {
+                        this.badgeNuvem.textContent = '🟢 Firebase Ao Vivo';
+                        this.badgeNuvem.style.color = '#4ade80';
+                    }
+                })
+                .catch(() => {
+                    if (this.badgeNuvem) {
+                        this.badgeNuvem.textContent = '🟡 Offline';
+                        this.badgeNuvem.style.color = '#ffc107';
+                    }
+                });
+        },
+        salvarNuvem(lista) {
+            if (this.badgeNuvem) {
+                this.badgeNuvem.textContent = '☁️ Sincronizando...';
+                this.badgeNuvem.style.color = '#00d2ff';
+            }
+            fetch(this.FIREBASE_URL, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(lista)
+            })
+            .then(() => {
+                if (this.badgeNuvem) {
+                    this.badgeNuvem.textContent = '🟢 Firebase Ao Vivo';
+                    this.badgeNuvem.style.color = '#4ade80';
+                }
+            })
+            .catch(() => {
+                if (this.badgeNuvem) {
+                    this.badgeNuvem.textContent = '🟡 Salvo Localmente';
+                    this.badgeNuvem.style.color = '#ffc107';
+                }
+            });
         },
         abrirModal() {
             if (this.modal) {
                 this.modal.style.display = 'flex';
                 document.body.classList.add('modal-aberto');
+                this.sincronizarNuvem();
                 this.render();
             }
         },
@@ -2048,7 +2130,7 @@
             this.inputUpload.value = '';
         },
         remover(index) {
-            if (confirm("Deseja realmente excluir esta figurinha?")) {
+            if (confirm("Deseja realmente excluir esta figurinha do mural compartilhado?")) {
                 State.removerFigurinha(index);
             }
         },
