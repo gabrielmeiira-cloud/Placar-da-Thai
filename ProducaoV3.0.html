@@ -509,6 +509,37 @@ body.painel-aberto .barreira-touch-placar {
     background-color: rgba(255, 255, 255, 0.22);
 }
 
+.dropdown-rodape-creditos {
+    margin-top: 6px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    text-align: center;
+    pointer-events: none;
+    user-select: none;
+}
+
+.credito-versao {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.65);
+    letter-spacing: 0.3px;
+    font-family: 'Fredoka', sans-serif;
+}
+
+.credito-autor {
+    font-size: 0.74rem;
+    font-weight: 500;
+    color: #00d2ff;
+    text-shadow: 0 0 10px rgba(0, 210, 255, 0.45);
+    letter-spacing: 0.2px;
+    font-family: 'Fredoka', sans-serif;
+}
+
 /* INTERRUPTORES (SWITCH TOGGLE) */
 .switch {
     position: relative;
@@ -2363,8 +2394,6 @@ input:checked + .slider:before {
          ========================================================================== -->
     <div class="secao-placar-wrapper">
         <section id="secao-placar">
-            <div class="versao-placar">Placar da Thai V10.2</div>
-
             <div class="controles-topo-centro">
                 <button class="btn-central" id="btnToggleControlesTopo" type="button" title="Configurações e Gestão">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -2429,6 +2458,10 @@ input:checked + .slider:before {
                             <input type="checkbox" id="checkFullscreen">
                             <span class="slider"></span>
                         </label>
+                    </div>
+                    <div class="dropdown-rodape-creditos">
+                        <span class="credito-versao">Placar da Thai V10.2</span>
+                        <span class="credito-autor">By Gabriel Meira</span>
                     </div>
                 </div>
             </div>

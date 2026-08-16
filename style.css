@@ -492,6 +492,37 @@ body.painel-aberto .barreira-touch-placar {
     background-color: rgba(255, 255, 255, 0.22);
 }
 
+.dropdown-rodape-creditos {
+    margin-top: 6px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    text-align: center;
+    pointer-events: none;
+    user-select: none;
+}
+
+.credito-versao {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.65);
+    letter-spacing: 0.3px;
+    font-family: 'Fredoka', sans-serif;
+}
+
+.credito-autor {
+    font-size: 0.74rem;
+    font-weight: 500;
+    color: #00d2ff;
+    text-shadow: 0 0 10px rgba(0, 210, 255, 0.45);
+    letter-spacing: 0.2px;
+    font-family: 'Fredoka', sans-serif;
+}
+
 /* INTERRUPTORES (SWITCH TOGGLE) */
 .switch {
     position: relative;
