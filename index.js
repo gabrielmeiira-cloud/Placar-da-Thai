@@ -125,7 +125,7 @@
                 proximaPartida = this.data.partidas.find(p => p.status === 'ativa');
             }
 
-            // Se não houver próxima partida pré-agendada e houver times disponíveis no modo automático:
+            // Se não houver próxima partida pré-agendada e houver times disponíveis no modo de filas:
             if (!proximaPartida && this.data.times && this.data.times.length >= 2 && pa) {
                 const todosTimesNomes = [];
                 this.data.times.forEach((time, index) => {
@@ -137,6 +137,11 @@
                 if (todosTimesNomes.length >= 2) {
                     const modalidade = this.data.modalidadeFilaAuto || 'ganha2_descansa1_volta';
                     const perdedor = (pa.nomeAzul === nomeVencedor) ? pa.nomeVermelho : pa.nomeAzul;
+
+                    // Inicializa a fila de espera se não existir
+                    if (!this.data.filaTimes || !Array.isArray(this.data.filaTimes)) {
+                        this.data.filaTimes = todosTimesNomes.filter(t => t !== nomeVencedor && t !== perdedor);
+                    }
 
                     // Contar vitórias consecutivas do time vencedor no histórico
                     const concluidas = this.data.partidas.filter(p => p.status === 'concluida');
@@ -151,27 +156,32 @@
 
                     let proxT1 = null, proxT2 = null;
                     if (vitoriasSeguidas >= 2) {
-                        // Ganhou 2 seguidas: sai da quadra
-                        let outrosTimes = todosTimesNomes.filter(t => t !== nomeVencedor && t !== perdedor);
-                        if (outrosTimes.length >= 2) {
-                            proxT1 = outrosTimes[0];
-                            proxT2 = outrosTimes[1];
-                        } else if (outrosTimes.length === 1) {
-                            proxT1 = outrosTimes[0];
-                            proxT2 = perdedor;
+                        // Ganhou 2 seguidas: time vencedor sai da quadra
+                        if (modalidade === 'ganha2_descansa1_volta') {
+                            this.data.filaTimes = this.data.filaTimes.filter(t => t !== perdedor && t !== nomeVencedor);
+                            this.data.filaTimes.push(perdedor);
+
+                            proxT1 = this.data.filaTimes.shift() || perdedor;
+                            proxT2 = this.data.filaTimes.shift() || (proxT1 === perdedor ? nomeVencedor : perdedor);
+
+                            // Descansa este 1 jogo e volta na frente da fila
+                            this.data.filaTimes.unshift(nomeVencedor);
                         } else {
-                            proxT1 = perdedor;
-                            proxT2 = nomeVencedor;
+                            // Ganha duas e vai pro final da fila
+                            this.data.filaTimes = this.data.filaTimes.filter(t => t !== perdedor && t !== nomeVencedor);
+                            this.data.filaTimes.push(perdedor);
+                            this.data.filaTimes.push(nomeVencedor);
+
+                            proxT1 = this.data.filaTimes.shift() || perdedor;
+                            proxT2 = this.data.filaTimes.shift() || (proxT1 === perdedor ? nomeVencedor : perdedor);
                         }
                     } else {
-                        // Ganhou 1: Vencedor continua na quadra e próximo da fila desafia
+                        // Ganhou 1: Vencedor continua na quadra
                         proxT1 = nomeVencedor;
-                        let desafiantes = todosTimesNomes.filter(t => t !== nomeVencedor && t !== perdedor);
-                        if (desafiantes.length > 0) {
-                            proxT2 = desafiantes[0];
-                        } else {
-                            proxT2 = perdedor;
-                        }
+                        this.data.filaTimes = this.data.filaTimes.filter(t => t !== perdedor && t !== nomeVencedor);
+                        this.data.filaTimes.push(perdedor);
+
+                        proxT2 = this.data.filaTimes.shift() || perdedor;
                     }
 
                     if (proxT1 && proxT2) {
@@ -1166,7 +1176,7 @@
 
     // 6. PARTIDAS
     const PartidasModule = {
-        timesDisponiveis: [], partidas: [], contadorPartidasTimes: {}, modoAberturaModal: 'automatico',
+        timesDisponiveis: [], partidas: [], contadorPartidasTimes: {}, modoAberturaModal: 'filas',
         init() {
             State.subscribe((tipo) => { if (tipo === 'times' || tipo === 'partidas' || tipo === 'partida_ativa' || tipo === 'partida_finalizada') this.atualizar(); });
             const btnGerar = document.getElementById('btnGerarLista'); if (btnGerar) btnGerar.addEventListener('click', () => this.abrirModalGerar());
@@ -1178,8 +1188,8 @@
             const alternarModoPartidas = (e) => {
                 const modo = document.querySelector('input[name="modoPartidas"]:checked')?.value || 'sorteio';
                 this.atualizarVisibilidadeModo();
-                if (modo === 'automatico') {
-                    this.abrirModalEscolherTimes('automatico');
+                if (modo === 'filas') {
+                    this.abrirModalEscolherTimes('filas');
                 }
             };
             document.querySelectorAll('input[name="modoPartidas"]').forEach(r => r.addEventListener('change', alternarModoPartidas));
@@ -1254,7 +1264,7 @@
                 info.innerHTML = '⚠️ <strong>Nenhum time sorteado encontrado.</strong> Vá na seção <a href="#topico-sorteio" class="link-interno" onclick="OverlayModule.irPara(\'topico-sorteio\')">👥 Times</a> para sortear ou montar seus times primeiro!';
             }
         },
-        abrirModalEscolherTimes(tipo = 'automatico') {
+        abrirModalEscolherTimes(tipo = 'filas') {
             this.modoAberturaModal = tipo;
             if (this.timesDisponiveis.length < 2) {
                 alert("Você precisa ter pelo menos 2 times cadastrados para criar uma partida!");
@@ -1271,9 +1281,9 @@
 
             if (!select1 || !select2 || !modal) return;
             
-            if (tipo === 'automatico') {
-                if (tituloModal) tituloModal.textContent = "Nova Partida Automática";
-                if (subTxt) subTxt.textContent = "Escolha os times e a modalidade da partida:";
+            if (tipo === 'filas') {
+                if (tituloModal) tituloModal.textContent = "Nova Fila Automática";
+                if (subTxt) subTxt.textContent = "Escolha os times iniciais e a regra de rotação da fila:";
                 if (campoMod) campoMod.style.display = 'flex';
                 if (btnConf) btnConf.textContent = "▶ Começar Partidas";
             } else {
@@ -1305,7 +1315,7 @@
             const modal = document.getElementById('modalEscolherTimes');
             if (modal) modal.style.display = 'none';
             document.body.classList.remove('modal-aberto');
-            if (cancelou && this.modoAberturaModal === 'automatico') {
+            if (cancelou && this.modoAberturaModal === 'filas') {
                 const rSorteio = document.querySelector('input[name="modoPartidas"][value="sorteio"]');
                 if (rSorteio) rSorteio.checked = true;
                 this.atualizarVisibilidadeModo();
@@ -1322,9 +1332,10 @@
                 return;
             }
 
-            if (this.modoAberturaModal === 'automatico') {
+            if (this.modoAberturaModal === 'filas') {
                 const modalidade = document.querySelector('input[name="modalidadeFilaAuto"]:checked')?.value || 'ganha2_descansa1_volta';
                 State.data.modalidadeFilaAuto = modalidade;
+                State.data.filaTimes = this.timesDisponiveis.filter(t => t !== t1 && t !== t2);
                 State.salvar();
 
                 const novoId = this.partidas.length > 0 ? Math.max(...this.partidas.map(p => p.id)) + 1 : 1;

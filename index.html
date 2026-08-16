@@ -25,7 +25,7 @@
          ========================================================================== -->
     <div class="secao-placar-wrapper">
         <section id="secao-placar">
-            <div class="versao-placar">Placar da Thai V9.2</div>
+            <div class="versao-placar">Placar da Thai V9.3</div>
 
             <div class="controles-topo-centro">
                 <button class="btn-central" id="btnToggleControlesTopo" type="button" title="Configurações e Gestão">
@@ -293,7 +293,7 @@
                             <div id="infoTimesStatus"></div>
                         </div>
 
-                        <!-- BLOCO 2: MODO DE PARTIDAS: SORTEIO VS MANUAL VS AUTOMÁTICA -->
+                        <!-- BLOCO 2: MODO DE PARTIDAS: SORTEIO VS MANUAL VS FILAS -->
                         <div class="sub-bloco-secao" id="blocoModoPartidas">
                             <div class="card-painel-titulo">Modo de Partidas</div>
                             <div class="grupo-form-linha" style="gap: 8px;">
@@ -304,7 +304,7 @@
                                     <input type="radio" name="modoPartidas" value="manual"> ✋ Manual
                                 </label>
                                 <label class="radio-chip" style="flex: 1; justify-content: center;">
-                                    <input type="radio" name="modoPartidas" value="automatico"> ⚡ Automática
+                                    <input type="radio" name="modoPartidas" value="filas"> ⚡ Filas
                                 </label>
                             </div>
 
@@ -386,12 +386,12 @@
     <!-- ==========================================================================
          MODAIS (ZERAR / FIM DE JOGO / ESCOLHER TIMES)
          ========================================================================== -->
-    <!-- Modal Escolher Times da Partida -->
+    <!-- Modal Escolher Times da Partida / Fila -->
     <div class="modal-overlay" id="modalEscolherTimes" style="display: none;">
         <div class="modal-card" style="max-width: 440px; text-align: left;">
             <div class="modal-icone-status">🏐</div>
-            <div class="modal-titulo" id="tituloModalEscolherTimes" style="text-align: center;">Nova Partida Automática</div>
-            <div class="modal-texto" id="textoSubtituloModalTimes" style="text-align: center; margin-bottom: 14px;">Escolha os times e a modalidade da partida:</div>
+            <div class="modal-titulo" id="tituloModalEscolherTimes" style="text-align: center;">Nova Fila Automática</div>
+            <div class="modal-texto" id="textoSubtituloModalTimes" style="text-align: center; margin-bottom: 14px;">Escolha os times iniciais e a regra de rotação da fila:</div>
             
             <div style="display: flex; flex-direction: column; gap: 12px; width: 100%; box-sizing: border-box;">
                 <div class="form-grupo-campo">
