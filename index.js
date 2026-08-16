@@ -1198,6 +1198,17 @@
             const alternarModoPartidas = (e) => {
                 const modo = document.querySelector('input[name="modoPartidas"]:checked')?.value || 'sorteio';
                 if (modo === 'filas') {
+                    const temPartidasAtivas = this.partidas && this.partidas.length > 0;
+                    if (temPartidasAtivas) {
+                        const confirmou = confirm("Atenção: Ao iniciar o Modo Filas, todas as partidas atuais e o histórico serão resetados. Deseja continuar?");
+                        if (!confirmou) {
+                            const radioAnterior = document.querySelector(`input[name="modoPartidas"][value="${this.modoAnterior || 'sorteio'}"]`);
+                            if (radioAnterior) radioAnterior.checked = true;
+                            this.atualizarVisibilidadeModo();
+                            return;
+                        }
+                    }
+                    this.modoAnterior = 'filas';
                     this.atualizarVisibilidadeModo();
                     this.abrirModalEscolherTimes('filas');
                 } else {
@@ -1229,6 +1240,7 @@
             const blocoSorteio = document.getElementById('blocoGeradorSorteio');
             const blocoListaPartidas = document.getElementById('blocoListaPartidas');
             const btnAddManual = document.getElementById('btnAddPartidaManual');
+            const infoRegraFila = document.getElementById('infoRegraFilaPartidas');
 
             if (blocoSorteio) {
                 blocoSorteio.style.display = (modo === 'sorteio') ? 'flex' : 'none';
@@ -1244,6 +1256,17 @@
                     blocoListaPartidas.style.display = 'flex';
                 } else {
                     blocoListaPartidas.style.display = (this.partidas && this.partidas.length > 0) ? 'flex' : 'none';
+                }
+            }
+
+            if (infoRegraFila) {
+                if (modo === 'filas' && this.partidas && this.partidas.length > 0) {
+                    const mod = (this.partidas.find(p => p.modalidade)?.modalidade) || State.data.modalidadeFilaAuto || 'ganha2_descansa1_volta';
+                    const txtRegra = mod === 'ganha2_descansa1_volta' ? '🔄 <strong>Regra da Fila:</strong> Ganha duas, descansa uma e volta' : '🔚 <strong>Regra da Fila:</strong> Ganha duas e vai pro final da fila';
+                    infoRegraFila.innerHTML = txtRegra;
+                    infoRegraFila.style.display = 'flex';
+                } else {
+                    infoRegraFila.style.display = 'none';
                 }
             }
         },
@@ -1350,14 +1373,6 @@
             }
 
             if (this.modoAberturaModal === 'filas') {
-                const temPartidas = this.partidas && this.partidas.length > 0;
-                if (temPartidas) {
-                    const confirmou = confirm("Atenção: Ao iniciar o Modo Filas, todas as partidas anteriores e o histórico serão resetados. Deseja continuar?");
-                    if (!confirmou) {
-                        return;
-                    }
-                }
-
                 const modalidade = document.querySelector('input[name="modalidadeFilaAuto"]:checked')?.value || 'ganha2_descansa1_volta';
                 State.data.modalidadeFilaAuto = modalidade;
                 State.data.filaTimes = this.timesDisponiveis.filter(t => t !== t1 && t !== t2);
