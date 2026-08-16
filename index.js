@@ -137,8 +137,9 @@
                 proximaPartida = this.data.partidas.find(p => p.status === 'ativa');
             }
 
-            // Se não houver próxima partida pré-agendada e houver times disponíveis no modo de filas:
-            if (!proximaPartida && this.data.times && this.data.times.length >= 2 && pa) {
+            // Se estiver explicitamente no modo de filas E não houver próxima partida pré-agendada:
+            const isModoFilas = this.data.modoPartidas === 'filas';
+            if (isModoFilas && !proximaPartida && this.data.times && this.data.times.length >= 2 && pa) {
                 const todosTimesNomes = [];
                 this.data.times.forEach((time, index) => {
                     if (Array.isArray(time) && time.length > 0) {
@@ -1212,6 +1213,8 @@
                         State.salvarPartidas([]);
                     }
                     this.modoAnterior = modo;
+                    State.data.modoPartidas = modo;
+                    localStorage.setItem('modo_partidas', modo);
                     this.atualizarVisibilidadeModo();
                     return;
                 }
@@ -1228,14 +1231,23 @@
                         }
                     }
                     this.modoAnterior = 'filas';
+                    State.data.modoPartidas = 'filas';
+                    localStorage.setItem('modo_partidas', 'filas');
                     this.atualizarVisibilidadeModo();
                     this.abrirModalEscolherTimes('filas');
                 } else {
                     this.modoAnterior = modo;
+                    State.data.modoPartidas = modo;
+                    localStorage.setItem('modo_partidas', modo);
                     this.atualizarVisibilidadeModo();
                 }
             };
             document.querySelectorAll('input[name="modoPartidas"]').forEach(r => r.addEventListener('change', alternarModoPartidas));
+            const modoSalvo = localStorage.getItem('modo_partidas') || 'sorteio';
+            State.data.modoPartidas = modoSalvo;
+            this.modoAnterior = modoSalvo;
+            const rAtual = document.querySelector(`input[name="modoPartidas"][value="${modoSalvo}"]`);
+            if (rAtual) rAtual.checked = true;
             this.atualizar();
         },
         atualizar() {
@@ -1392,6 +1404,9 @@
             }
 
             if (this.modoAberturaModal === 'filas') {
+                State.data.modoPartidas = 'filas';
+                this.modoAnterior = 'filas';
+                localStorage.setItem('modo_partidas', 'filas');
                 const modalidade = document.querySelector('input[name="modalidadeFilaAuto"]:checked')?.value || 'ganha2_descansa1_volta';
                 State.data.modalidadeFilaAuto = modalidade;
                 State.data.filaTimes = this.timesDisponiveis.filter(t => t !== t1 && t !== t2);
@@ -1414,6 +1429,9 @@
                 }
             } else {
                 // Modo Manual
+                State.data.modoPartidas = 'manual';
+                this.modoAnterior = 'manual';
+                localStorage.setItem('modo_partidas', 'manual');
                 const novoId = this.partidas.length > 0 ? Math.max(...this.partidas.map(p => p.id)) + 1 : 1;
                 const deveSerAtiva = this.partidas.length === 0 || !this.partidas.some(p => p.status === 'ativa');
                 this.partidas.push({ id: novoId, time1: t1, time2: t2, vencedor: null, status: deveSerAtiva ? 'ativa' : 'bloqueada' });
@@ -1491,11 +1509,18 @@
                 }
             }
 
+            State.data.modoPartidas = 'sorteio';
+            this.modoAnterior = 'sorteio';
+            localStorage.setItem('modo_partidas', 'sorteio');
+            const rSorteio = document.querySelector('input[name="modoPartidas"][value="sorteio"]');
+            if (rSorteio) rSorteio.checked = true;
+
             State.salvarPartidas(this.partidas);
             if (this.partidas.length > 0) {
                 const p = this.partidas[0];
                 State.carregarPartidaNoPlacar(p.time1, p.time2, p.id);
             }
+            this.atualizarVisibilidadeModo();
         },
         adicionarPartidaManual() {
             this.abrirModalEscolherTimes('manual');
