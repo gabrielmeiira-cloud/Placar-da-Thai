@@ -1188,7 +1188,7 @@
 
     // 6. PARTIDAS
     const PartidasModule = {
-        timesDisponiveis: [], partidas: [], contadorPartidasTimes: {}, modoAberturaModal: 'filas',
+        timesDisponiveis: [], partidas: [], contadorPartidasTimes: {}, modoAberturaModal: 'filas', modoAnterior: 'sorteio',
         init() {
             State.subscribe((tipo) => { if (tipo === 'times' || tipo === 'partidas' || tipo === 'partida_ativa' || tipo === 'partida_finalizada') this.atualizar(); });
             const btnGerar = document.getElementById('btnGerarLista'); if (btnGerar) btnGerar.addEventListener('click', () => this.abrirModalGerar());
@@ -1199,9 +1199,24 @@
 
             const alternarModoPartidas = (e) => {
                 const modo = document.querySelector('input[name="modoPartidas"]:checked')?.value || 'sorteio';
-                this.atualizarVisibilidadeModo();
                 if (modo === 'filas') {
+                    const temPartidasAtivas = this.partidas && this.partidas.length > 0;
+                    if (temPartidasAtivas) {
+                        const confirmou = confirm("Atenção: Ao iniciar o Modo Filas, todas as partidas atuais e o histórico serão resetados. Deseja continuar?");
+                        if (!confirmou) {
+                            const radioAnterior = document.querySelector(`input[name="modoPartidas"][value="${this.modoAnterior || 'sorteio'}"]`);
+                            if (radioAnterior) radioAnterior.checked = true;
+                            this.atualizarVisibilidadeModo();
+                            return;
+                        }
+                        State.salvarPartidas([]);
+                    }
+                    this.modoAnterior = 'filas';
+                    this.atualizarVisibilidadeModo();
                     this.abrirModalEscolherTimes('filas');
+                } else {
+                    this.modoAnterior = modo;
+                    this.atualizarVisibilidadeModo();
                 }
             };
             document.querySelectorAll('input[name="modoPartidas"]').forEach(r => r.addEventListener('change', alternarModoPartidas));
