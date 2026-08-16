@@ -19,7 +19,7 @@
             times: [],
             partidas: [],
             partidaAtual: null,
-            figurinhas: ['Thai01.webp', 'Thai02.webp', 'Thai03.webp'],
+            figurinhas: [],
             configs: {
                 tema: 'claro',
                 figurinhas: false,
@@ -82,7 +82,7 @@
                         this.data.figurinhas = [];
                     }
                 } else {
-                    this.data.figurinhas = ['Thai01.webp', 'Thai02.webp', 'Thai03.webp'];
+                    this.data.figurinhas = [];
                 }
 
                 const cfg = localStorage.getItem(this.KEYS.CONFIGS);
@@ -825,14 +825,6 @@
             const antiga = document.querySelector('.figurinha-ponto'); if (antiga) antiga.remove();
             this.limparConfetes();
             this.atualizarPlacar();
-
-            // Animação de giro do botão de reset
-            const botoesReset = [this.btnResetBaixo, this.btnReset, document.getElementById('btnResetBaixo')].filter(Boolean);
-            botoesReset.forEach(btn => {
-                btn.classList.remove('girando');
-                void btn.offsetWidth;
-                btn.classList.add('girando');
-            });
         },
         dispararAviso(texto) {
             const aviso = document.createElement('div');
@@ -2000,7 +1992,6 @@
         grade: null,
         inputUpload: null,
         btnAdicionar: null,
-        btnRestaurar: null,
         btnFechar: null,
         btnConcluir: null,
         contadorTotal: null,
@@ -2009,7 +2000,6 @@
             this.grade = document.getElementById('gradeFigurinhasGestao');
             this.inputUpload = document.getElementById('inputUploadFigurinha');
             this.btnAdicionar = document.getElementById('btnAdicionarFigurinha');
-            this.btnRestaurar = document.getElementById('btnRestaurarFigurinhasPadrao');
             this.btnFechar = document.getElementById('btnFecharModalFigurinhas');
             this.btnConcluir = document.getElementById('btnConcluirFigurinhas');
             this.contadorTotal = document.getElementById('contadorFigurinhasTotal');
@@ -2019,13 +2009,6 @@
             if (this.btnAdicionar && this.inputUpload) {
                 this.btnAdicionar.addEventListener('click', () => this.inputUpload.click());
                 this.inputUpload.addEventListener('change', (e) => this.processarUpload(e));
-            }
-            if (this.btnRestaurar) {
-                this.btnRestaurar.addEventListener('click', () => {
-                    if (confirm("Deseja restaurar as figurinhas padrão da Thai (Thai01, Thai02, Thai03)?")) {
-                        State.restaurarFigurinhasPadrao();
-                    }
-                });
             }
 
             State.subscribe((tipo) => {

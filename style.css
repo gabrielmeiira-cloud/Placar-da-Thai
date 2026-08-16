@@ -894,12 +894,16 @@ body.tema-escuro .time-header {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.btn-central svg {
-    display: block;
+.btn-central svg,
+.btn-central span,
+.btn-central i {
+    display: inline-block;
     transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.btn-central:hover svg {
+.btn-central:hover svg,
+.btn-central:hover span,
+.btn-central:hover i {
     transform: rotate(60deg) scale(1.1);
 }
 
@@ -912,24 +916,6 @@ body.tema-escuro .time-header {
 .btn-central:active {
     transform: scale(0.94);
     background-color: rgba(255, 255, 255, 0.42);
-}
-
-@keyframes girarBotaoReset {
-    0% {
-        transform: rotate(0deg) scale(1);
-    }
-    40% {
-        transform: rotate(-180deg) scale(1.22);
-    }
-    100% {
-        transform: rotate(-360deg) scale(1);
-    }
-}
-
-.btn-central.girando,
-#btnResetBaixo.girando,
-#btnReset.girando {
-    animation: girarBotaoReset 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .versao-placar {
