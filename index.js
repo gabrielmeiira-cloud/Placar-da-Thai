@@ -1212,7 +1212,8 @@
             }
 
             if (btnAddManual) {
-                btnAddManual.style.display = (modo === 'manual') ? 'inline-flex' : 'none';
+                // No modo sorteio e manual, o botão de jogo avulso fica disponível no card de partidas
+                btnAddManual.style.display = (modo === 'sorteio' || modo === 'manual') ? 'inline-flex' : 'none';
             }
 
             if (blocoListaPartidas) {
@@ -1484,12 +1485,7 @@
                 let acoes = '';
                 if (p.vencedor) {
                     const placarTxt = (p.placar1 !== undefined && p.placar2 !== undefined) ? ` (${p.placar1} x ${p.placar2})` : '';
-                    acoes = `
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span class="badge-vencedor">🏆 ${p.vencedor}${placarTxt}</span>
-                            <button class="btn-apagar-partida-redondo" type="button" title="Apagar Partida" onclick="PartidasModule.apagarPartida(${p.id})">✕</button>
-                        </div>
-                    `;
+                    acoes = `<span class="badge-vencedor">🏆 ${p.vencedor}${placarTxt}</span>`;
                 } else if (p.status === 'ativa') {
                     const isJogando = pa && pa.idPartida === p.id;
                     acoes = `
@@ -1498,18 +1494,13 @@
                                 ${isJogando ? '▶ No Placar (Jogando)' : '▶ Jogar no Placar'}
                             </button>
                             ${isJogando ? `<button class="btn-pausar-partida" type="button" onclick="PartidasModule.pausarPartida(${p.id})">⏸️ Pausar Partida</button>` : ''}
-                            <button class="btn-apagar-partida-redondo" type="button" title="Apagar Partida" onclick="PartidasModule.apagarPartida(${p.id})">✕</button>
                         </div>
                     `;
                 } else {
-                    acoes = `
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span class="badge-aguardando">⏳ Aguardando...</span>
-                            <button class="btn-apagar-partida-redondo" type="button" title="Apagar Partida" onclick="PartidasModule.apagarPartida(${p.id})">✕</button>
-                        </div>
-                    `;
+                    acoes = '<span class="badge-aguardando">⏳ Aguardando...</span>';
                 }
                 linha.innerHTML = `
+                    <button class="btn-fechar-partida" onclick="PartidasModule.apagarPartida(${p.id})" type="button" title="Excluir Partida">✕</button>
                     <div class="col-partida">
                         <div class="partida-info-texto">
                             <span class="partida-numero">Jogo ${p.id}</span>
