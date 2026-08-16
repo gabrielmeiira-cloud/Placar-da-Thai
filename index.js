@@ -124,6 +124,71 @@
                 this.data.partidas.push(itemHist);
                 proximaPartida = this.data.partidas.find(p => p.status === 'ativa');
             }
+
+            // Se não houver próxima partida pré-agendada e houver times disponíveis no modo automático:
+            if (!proximaPartida && this.data.times && this.data.times.length >= 2 && pa) {
+                const todosTimesNomes = [];
+                this.data.times.forEach((time, index) => {
+                    if (Array.isArray(time) && time.length > 0) {
+                        todosTimesNomes.push(`Time ${index + 1} (${time.map(j => j.nome).join(' & ')})`);
+                    }
+                });
+
+                if (todosTimesNomes.length >= 2) {
+                    const modalidade = this.data.modalidadeFilaAuto || 'ganha2_descansa1_volta';
+                    const perdedor = (pa.nomeAzul === nomeVencedor) ? pa.nomeVermelho : pa.nomeAzul;
+
+                    // Contar vitórias consecutivas do time vencedor no histórico
+                    const concluidas = this.data.partidas.filter(p => p.status === 'concluida');
+                    let vitoriasSeguidas = 0;
+                    for (let i = concluidas.length - 1; i >= 0; i--) {
+                        if (concluidas[i].vencedor === nomeVencedor) {
+                            vitoriasSeguidas++;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    let proxT1 = null, proxT2 = null;
+                    if (vitoriasSeguidas >= 2) {
+                        // Ganhou 2 seguidas: sai da quadra
+                        let outrosTimes = todosTimesNomes.filter(t => t !== nomeVencedor && t !== perdedor);
+                        if (outrosTimes.length >= 2) {
+                            proxT1 = outrosTimes[0];
+                            proxT2 = outrosTimes[1];
+                        } else if (outrosTimes.length === 1) {
+                            proxT1 = outrosTimes[0];
+                            proxT2 = perdedor;
+                        } else {
+                            proxT1 = perdedor;
+                            proxT2 = nomeVencedor;
+                        }
+                    } else {
+                        // Ganhou 1: Vencedor continua na quadra e próximo da fila desafia
+                        proxT1 = nomeVencedor;
+                        let desafiantes = todosTimesNomes.filter(t => t !== nomeVencedor && t !== perdedor);
+                        if (desafiantes.length > 0) {
+                            proxT2 = desafiantes[0];
+                        } else {
+                            proxT2 = perdedor;
+                        }
+                    }
+
+                    if (proxT1 && proxT2) {
+                        const novoId = this.data.partidas.length + 1;
+                        proximaPartida = {
+                            id: novoId,
+                            time1: proxT1,
+                            time2: proxT2,
+                            vencedor: null,
+                            status: 'ativa',
+                            modalidade
+                        };
+                        this.data.partidas.push(proximaPartida);
+                    }
+                }
+            }
+
             this.salvarPartidas(this.data.partidas);
             
             if (proximaPartida) {
@@ -1107,18 +1172,20 @@
             const btnGerar = document.getElementById('btnGerarLista'); if (btnGerar) btnGerar.addEventListener('click', () => this.abrirModalGerar());
             const btnAdd = document.getElementById('btnAddPartidaManual'); if (btnAdd) btnAdd.addEventListener('click', () => this.abrirModalEscolherTimes());
             const btnLimpar = document.getElementById('btnLimparPartidas'); if (btnLimpar) btnLimpar.addEventListener('click', () => this.limparPartidas());
-            const btnCancEscolha = document.getElementById('btnCancelarEscolhaTimes'); if (btnCancEscolha) btnCancEscolha.addEventListener('click', () => this.fecharModalEscolherTimes());
+            const btnCancEscolha = document.getElementById('btnCancelarEscolhaTimes'); if (btnCancEscolha) btnCancEscolha.addEventListener('click', () => this.fecharModalEscolherTimes(true));
             const btnConfEscolha = document.getElementById('btnConfirmarEscolhaTimes'); if (btnConfEscolha) btnConfEscolha.addEventListener('click', () => this.confirmarPartidaEscolhida());
 
-            const alternarModoPartidas = () => {
-                const modo = document.querySelector('input[name="modoPartidas"]:checked')?.value || 'automatico';
+            const alternarModoPartidas = (e) => {
+                const modo = document.querySelector('input[name="modoPartidas"]:checked')?.value || 'sorteio';
                 const blocoSorteio = document.getElementById('blocoGeradorSorteio');
                 if (blocoSorteio) {
                     blocoSorteio.style.display = modo === 'sorteio' ? 'flex' : 'none';
                 }
+                if (modo === 'automatico') {
+                    this.abrirModalEscolherTimes();
+                }
             };
             document.querySelectorAll('input[name="modoPartidas"]').forEach(r => r.addEventListener('change', alternarModoPartidas));
-            alternarModoPartidas();
             this.atualizar();
         },
         atualizar() {
@@ -1169,6 +1236,7 @@
         abrirModalEscolherTimes() {
             if (this.timesDisponiveis.length < 2) {
                 alert("Você precisa ter pelo menos 2 times cadastrados para criar uma partida!");
+                this.fecharModalEscolherTimes(true);
                 return;
             }
             const select1 = document.getElementById('selectTime1');
@@ -1194,10 +1262,16 @@
             modal.style.display = 'flex';
             document.body.classList.add('modal-aberto');
         },
-        fecharModalEscolherTimes() {
+        fecharModalEscolherTimes(cancelou = false) {
             const modal = document.getElementById('modalEscolherTimes');
             if (modal) modal.style.display = 'none';
             document.body.classList.remove('modal-aberto');
+            if (cancelou) {
+                const rSorteio = document.querySelector('input[name="modoPartidas"][value="sorteio"]');
+                if (rSorteio) rSorteio.checked = true;
+                const blocoSorteio = document.getElementById('blocoGeradorSorteio');
+                if (blocoSorteio) blocoSorteio.style.display = 'flex';
+            }
         },
         confirmarPartidaEscolhida() {
             const select1 = document.getElementById('selectTime1');
@@ -1209,14 +1283,17 @@
                 alert("Escolha dois times diferentes para o confronto!");
                 return;
             }
+            const modalidade = document.querySelector('input[name="modalidadeFilaAuto"]:checked')?.value || 'ganha2_descansa1_volta';
+            State.data.modalidadeFilaAuto = modalidade;
+            State.salvar();
+
             const novoId = this.partidas.length > 0 ? Math.max(...this.partidas.map(p => p.id)) + 1 : 1;
-            const deveSerAtiva = this.partidas.length === 0 || !this.partidas.some(p => p.status === 'ativa');
-            this.partidas.push({ id: novoId, time1: t1, time2: t2, vencedor: null, status: deveSerAtiva ? 'ativa' : 'bloqueada' });
+            this.partidas.forEach(p => { if (p.status === 'ativa') p.status = 'bloqueada'; });
+            this.partidas.push({ id: novoId, time1: t1, time2: t2, vencedor: null, status: 'ativa', modalidade });
             State.salvarPartidas(this.partidas);
-            if (deveSerAtiva || !State.data.partidaAtual) {
-                State.carregarPartidaNoPlacar(t1, t2, novoId);
-            }
-            this.fecharModalEscolherTimes();
+            State.carregarPartidaNoPlacar(t1, t2, novoId);
+            this.fecharModalEscolherTimes(false);
+            OverlayModule.fechar(); // Vai direto pro placar com os times!
         },
         abrirModalGerar() {
             if (this.timesDisponiveis.length < 2) { alert("Você precisa ter pelo menos 2 times sorteados para gerar a lista de partidas!"); return; }

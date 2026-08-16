@@ -25,7 +25,7 @@
          ========================================================================== -->
     <div class="secao-placar-wrapper">
         <section id="secao-placar">
-            <div class="versao-placar">Placar da Thai V8.9</div>
+            <div class="versao-placar">Placar da Thai V9.0</div>
 
             <div class="controles-topo-centro">
                 <button class="btn-central" id="btnToggleControlesTopo" type="button" title="Configurações e Gestão">
@@ -293,20 +293,20 @@
                             <div id="infoTimesStatus"></div>
                         </div>
 
-                        <!-- BLOCO 2: MODO DE PARTIDAS: AUTOMÁTICA VS SORTEIO -->
+                        <!-- BLOCO 2: MODO DE PARTIDAS: SORTEIO VS AUTOMÁTICA -->
                         <div class="sub-bloco-secao" id="blocoModoPartidas">
                             <div class="card-painel-titulo">Modo de Partidas</div>
                             <div class="grupo-form-linha" style="gap: 8px;">
                                 <label class="radio-chip" style="flex: 1; justify-content: center;">
-                                    <input type="radio" name="modoPartidas" value="automatico" checked> ⚡ Automática
+                                    <input type="radio" name="modoPartidas" value="sorteio" checked> 🎲 Sorteio
                                 </label>
                                 <label class="radio-chip" style="flex: 1; justify-content: center;">
-                                    <input type="radio" name="modoPartidas" value="sorteio"> 🎲 Sorteio
+                                    <input type="radio" name="modoPartidas" value="automatico"> ⚡ Automática
                                 </label>
                             </div>
 
-                            <!-- OPÇÕES DE SORTEIO (VISÍVEL APENAS QUANDO MODO = SORTEIO) -->
-                            <div id="blocoGeradorSorteio" style="display: none; flex-direction: column; gap: 10px; margin-top: 10px;">
+                            <!-- OPÇÕES DE SORTEIO (VISÍVEL QUANDO MODO = SORTEIO) -->
+                            <div id="blocoGeradorSorteio" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
                                 <div style="display: flex; flex-direction: column; gap: 6px;">
                                     <span style="font-size: 0.9rem; color: var(--texto-secundario); font-weight: 500;">Ritmo de Jogos:</span>
                                     <div class="grupo-form-linha" style="gap: 8px;">
@@ -385,10 +385,10 @@
          ========================================================================== -->
     <!-- Modal Escolher Times da Partida -->
     <div class="modal-overlay" id="modalEscolherTimes" style="display: none;">
-        <div class="modal-card" style="max-width: 420px; text-align: left;">
+        <div class="modal-card" style="max-width: 440px; text-align: left;">
             <div class="modal-icone-status">🏐</div>
-            <div class="modal-titulo" style="text-align: center;">Nova Partida</div>
-            <div class="modal-texto" style="text-align: center; margin-bottom: 14px;">Escolha os times que vão se enfrentar:</div>
+            <div class="modal-titulo" style="text-align: center;">Nova Partida Automática</div>
+            <div class="modal-texto" style="text-align: center; margin-bottom: 14px;">Escolha os times e a modalidade da partida:</div>
             
             <div style="display: flex; flex-direction: column; gap: 12px; width: 100%; box-sizing: border-box;">
                 <div class="form-grupo-campo">
@@ -399,11 +399,24 @@
                     <span class="form-subtitulo-label" style="color: #f87171; font-weight: 600;">🔴 Time 2 (Lado Vermelho)</span>
                     <select id="selectTime2" class="input-padrao" style="width: 100%;"></select>
                 </div>
+                <div class="form-grupo-campo">
+                    <span class="form-subtitulo-label" style="font-weight: 600;">🏆 Modalidade da Fila:</span>
+                    <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+                        <label class="radio-chip" style="justify-content: flex-start; gap: 8px; padding: 8px 12px;">
+                            <input type="radio" name="modalidadeFilaAuto" value="ganha2_descansa1_volta" checked>
+                            <span>🔄 <strong>Ganha duas, descansa uma e volta</strong></span>
+                        </label>
+                        <label class="radio-chip" style="justify-content: flex-start; gap: 8px; padding: 8px 12px;">
+                            <input type="radio" name="modalidadeFilaAuto" value="ganha2_fim_fila">
+                            <span>🔚 <strong>Ganha duas e vai pro final da fila</strong></span>
+                        </label>
+                    </div>
+                </div>
             </div>
 
             <div class="modal-botoes" style="display: flex; gap: 10px; width: 100%; margin-top: 18px;">
                 <button class="modal-btn modal-btn-cancelar" type="button" id="btnCancelarEscolhaTimes" style="flex: 1;">Cancelar</button>
-                <button class="modal-btn modal-btn-confirmar" type="button" id="btnConfirmarEscolhaTimes" style="flex: 1; background-color: var(--cor-verde);">✓ Criar Partida</button>
+                <button class="modal-btn modal-btn-confirmar" type="button" id="btnConfirmarEscolhaTimes" style="flex: 1.3; background-color: var(--cor-verde); font-weight: 600;">▶ Começar Partidas</button>
             </div>
         </div>
     </div>
