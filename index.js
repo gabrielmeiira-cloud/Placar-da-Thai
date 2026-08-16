@@ -2157,6 +2157,18 @@
             container.appendChild(img);
             img.addEventListener('animationend', () => img.remove());
         },
+        toggleAberturaComConfirmacao(src) {
+            const ehAbertura = src === State.data.figurinhaAbertura;
+            if (ehAbertura) {
+                if (confirm("Deseja desativar esta figurinha da tela de abertura?\n(O app passará a abrir normalmente sem tela de introdução)")) {
+                    State.definirFigurinhaAbertura(null);
+                }
+            } else {
+                if (confirm("Deseja definir esta figurinha como a tela de abertura do Placar da Thai?\n(Ela será exibida em destaque toda vez que o app for aberto)")) {
+                    State.definirFigurinhaAbertura(src);
+                }
+            }
+        },
         render() {
             if (!this.grade) return;
             const lista = State.obterFigurinhas();
@@ -2175,15 +2187,14 @@
                 card.className = `card-figurinha-item ${ehAbertura ? 'eh-abertura' : ''}`;
                 card.title = 'Toque na imagem para testar animação de ponto';
                 card.innerHTML = `
-                    ${ehAbertura ? '<span class="badge-estrela-abertura" title="Figurinha de Abertura Ativa">🌟</span>' : ''}
+                    <button class="btn-estrela-abertura" type="button" title="${ehAbertura ? 'Figurinha de Abertura Ativa ⭐ (Toque para desativar)' : 'Definir como Figurinha de Abertura ☆'}" onclick="event.stopPropagation(); FigurinhasModule.toggleAberturaComConfirmacao('${src}')">
+                        ${ehAbertura ? '⭐' : '☆'}
+                    </button>
                     <button class="btn-excluir-figurinha" type="button" title="Excluir figurinha" onclick="event.stopPropagation(); FigurinhasModule.remover(${idx})">✕</button>
                     <div class="card-figurinha-img-wrap" onclick="FigurinhasModule.testarAnimacao('${src}')">
                         <img src="${src}" class="card-figurinha-img" alt="Figurinha #${idx + 1}" loading="lazy">
                     </div>
                     <span class="card-figurinha-badge">Figurinha #${idx + 1}</span>
-                    <button class="btn-toggle-abertura" type="button" onclick="event.stopPropagation(); State.definirFigurinhaAbertura('${src}')" title="Definir/remover como figurinha de abertura do app">
-                        ${ehAbertura ? '⭐ Abertura Ativa' : '☆ Definir Abertura'}
-                    </button>
                 `;
                 this.grade.appendChild(card);
             });
