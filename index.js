@@ -2205,12 +2205,14 @@
     const AberturaModule = {
         overlay: null,
         img: null,
+        jaExibido: false,
         init() {
             this.overlay = document.getElementById('overlayAberturaApp');
             this.img = document.getElementById('imgFigurinhaAbertura');
 
             if (this.overlay) {
                 const fechar = () => {
+                    this.jaExibido = true;
                     this.overlay.classList.add('saindo');
                     setTimeout(() => {
                         this.overlay.style.display = 'none';
@@ -2221,17 +2223,15 @@
                 this.overlay.addEventListener('pointerup', fechar);
             }
 
-            State.subscribe((tipo) => {
-                if (tipo === 'abertura') this.verificar();
-            });
-
-            this.verificar();
+            this.exibirAberturaInicial();
         },
-        verificar() {
+        exibirAberturaInicial() {
+            if (this.jaExibido) return;
             const src = State.data.figurinhaAbertura;
             if (src && this.overlay && this.img) {
                 this.img.src = src;
                 this.overlay.style.display = 'flex';
+                this.jaExibido = true;
             } else if (this.overlay) {
                 this.overlay.style.display = 'none';
             }
