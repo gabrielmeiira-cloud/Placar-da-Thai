@@ -25,7 +25,7 @@
          ========================================================================== -->
     <div class="secao-placar-wrapper">
         <section id="secao-placar">
-            <div class="versao-placar">Placar da Thai V8.5</div>
+            <div class="versao-placar">Placar da Thai V8.6</div>
 
             <div class="controles-topo-centro">
                 <button class="btn-central" id="btnToggleControlesTopo" type="button" title="Configurações e Gestão">
@@ -288,50 +288,25 @@
                     </div>
 
                     <div id="conteudoSecaoPartidas">
-                        <!-- BLOCO 1: ALGORITMO DE DISTRIBUIÇÃO -->
+                        <!-- BLOCO: GERADOR DE PARTIDAS -->
                         <div class="sub-bloco-secao">
-                            <div class="card-painel-titulo">
-                                <span>🏐 Algoritmo de Distribuição</span>
-                                <span style="font-size: 0.78rem; background: rgba(255,255,255,0.22); padding: 2px 8px; border-radius: 12px; font-weight: 500;">Padrões Vôlei de Areia</span>
-                            </div>
-                            <div class="grupo-form-linha" style="gap: 8px;">
-                                <label class="radio-chip" style="flex: 1; min-width: 210px;">
-                                    <input type="radio" name="algoritmoDistribuicao" value="reidapraia" checked>
-                                    <span>🔄 <strong>Rei da Praia</strong> (Todos Contra Todos)</span>
-                                </label>
-                                <label class="radio-chip" style="flex: 1; min-width: 210px;">
-                                    <input type="radio" name="algoritmoDistribuicao" value="dupla_eliminacao">
-                                    <span>⚡ <strong>Dupla Eliminação</strong> (Repescagem CBV)</span>
-                                </label>
-                                <label class="radio-chip" style="flex: 1; min-width: 210px;">
-                                    <input type="radio" name="algoritmoDistribuicao" value="grupos_matamata">
-                                    <span>🏆 <strong>Grupos + Mata-Mata</strong> (FIVB / Olímpico)</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- BLOCO 2: GERADOR DE RODADAS -->
-                        <div class="sub-bloco-secao">
-                            <div class="card-painel-titulo">Gerador de Rodadas</div>
                             <div id="infoTimesStatus"></div>
                             <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
                                 <span style="font-size: 0.9rem; color: var(--texto-secundario); font-weight: 500;">Duração prevista:</span>
-                                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                    <select id="selectHoras" class="input-padrao" style="flex: 1; min-width: 160px;">
-                                        <option value="1">1 hora (~12 jogos)</option>
-                                        <option value="2" selected>2 horas (~24 jogos)</option>
-                                        <option value="3">3 horas (~36 jogos)</option>
-                                        <option value="4">4 horas (~48 jogos)</option>
-                                    </select>
-                                    <button class="btn-sucesso" id="btnGerarLista" type="button" style="padding: 10px 18px;">📅 Gerar Partidas</button>
-                                </div>
+                                <select id="selectHoras" class="input-padrao" style="width: 100%;">
+                                    <option value="1">1 hora (~12 jogos)</option>
+                                    <option value="2" selected>2 horas (~24 jogos)</option>
+                                    <option value="3">3 horas (~36 jogos)</option>
+                                    <option value="4">4 horas (~48 jogos)</option>
+                                </select>
+                                <button class="btn-sucesso" id="btnGerarLista" type="button" style="width: 100%; padding: 12px; font-size: 1.02rem; margin-top: 2px;">📅 Gerar Partidas</button>
                             </div>
                         </div>
 
-                        <!-- BLOCO 3: CONFRONTOS DA RODADA -->
+                        <!-- BLOCO: PARTIDAS (CONFRONTOS) -->
                         <div class="sub-bloco-secao">
                             <div class="card-painel-titulo">
-                                <span>Confrontos da Rodada</span>
+                                <span>Partidas</span>
                                 <div style="display: flex; gap: 6px;">
                                     <button class="btn-atalho" id="btnAddPartidaManual" type="button">+ Jogo Avulso</button>
                                     <button class="btn-perigo" id="btnLimparPartidas" type="button" style="padding: 4px 10px; font-size: 0.82rem;">🗑️ Limpar</button>
