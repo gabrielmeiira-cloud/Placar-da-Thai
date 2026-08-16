@@ -2233,18 +2233,14 @@ input:checked + .slider:before {
             <div class="menu-container">
                 <button class="btn-menu" id="btnMenuToggle" type="button" title="Configurações">☰</button>
                 <div class="dropdown-menu" id="dropdownMenu">
-                    <div class="dropdown-item" id="btnToggleFigurinhas" style="cursor: pointer;">
+                    <div class="dropdown-item" id="btnToggleFigurinhas" style="cursor: pointer;" title="Toque no texto para gerenciar figurinhas ou no botão para ligar/desligar">
                         <span id="labelFigurinhas">🖼️ Figurinhas: Ativadas</span>
                         <label class="switch">
                             <input type="checkbox" id="checkFigurinhas">
                             <span class="slider"></span>
                         </label>
                     </div>
-                    <div class="dropdown-item" id="btnAbrirModalFigurinhas" style="cursor: pointer; border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 10px;">
-                        <span>🎨 Gerenciar Figurinhas</span>
-                        <span style="font-size: 1.1rem; opacity: 0.9;">⚙️</span>
-                    </div>
-                    <div class="dropdown-item" id="btnToggleTema" style="cursor: pointer; border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 10px;">
+                    <div class="dropdown-item" id="btnToggleTema" style="cursor: pointer;">
                         <span id="labelTema">☀️ Tema: Vidro</span>
                         <label class="switch">
                             <input type="checkbox" id="checkTema">
@@ -4597,18 +4593,23 @@ input:checked + .slider:before {
 
         if (btnToggleFig) {
             btnToggleFig.addEventListener('click', (e) => {
-                if (e.target !== checkFig && !e.target.closest('.switch')) {
-                    if (checkFig) {
-                        checkFig.checked = !checkFig.checked;
-                        State.salvarConfigs({ figurinhas: checkFig.checked });
-                        atualizarFigurinhasUI();
-                    }
+                if (e.target === checkFig || e.target.closest('.switch')) {
+                    // Clicou diretamente no switch (ligar/desligar) -> apenas altera o estado
+                    return;
+                }
+                // Clicou no botão/texto -> abre a interface de gerenciar figurinhas
+                e.stopPropagation();
+                const dropdown = document.getElementById('dropdownMenu');
+                if (dropdown) dropdown.classList.remove('ativo');
+                if (typeof FigurinhasModule !== 'undefined' && FigurinhasModule.abrirModal) {
+                    FigurinhasModule.abrirModal();
                 }
             });
         }
 
         if (checkFig) {
-            checkFig.addEventListener('change', () => {
+            checkFig.addEventListener('change', (e) => {
+                e.stopPropagation();
                 State.salvarConfigs({ figurinhas: checkFig.checked });
                 atualizarFigurinhasUI();
             });

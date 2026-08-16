@@ -1918,18 +1918,23 @@
 
         if (btnToggleFig) {
             btnToggleFig.addEventListener('click', (e) => {
-                if (e.target !== checkFig && !e.target.closest('.switch')) {
-                    if (checkFig) {
-                        checkFig.checked = !checkFig.checked;
-                        State.salvarConfigs({ figurinhas: checkFig.checked });
-                        atualizarFigurinhasUI();
-                    }
+                if (e.target === checkFig || e.target.closest('.switch')) {
+                    // Clicou diretamente no switch (ligar/desligar) -> apenas altera o estado
+                    return;
+                }
+                // Clicou no botão/texto -> abre a interface de gerenciar figurinhas
+                e.stopPropagation();
+                const dropdown = document.getElementById('dropdownMenu');
+                if (dropdown) dropdown.classList.remove('ativo');
+                if (typeof FigurinhasModule !== 'undefined' && FigurinhasModule.abrirModal) {
+                    FigurinhasModule.abrirModal();
                 }
             });
         }
 
         if (checkFig) {
-            checkFig.addEventListener('change', () => {
+            checkFig.addEventListener('change', (e) => {
+                e.stopPropagation();
                 State.salvarConfigs({ figurinhas: checkFig.checked });
                 atualizarFigurinhasUI();
             });
