@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
@@ -2556,6 +2556,33 @@ input:checked + .slider:before {
                 this.data.partidas = p ? JSON.parse(p) : [];
                 const pa = localStorage.getItem(this.KEYS.PARTIDA_ATUAL);
                 this.data.partidaAtual = pa ? JSON.parse(pa) : null;
+
+                const timesValidos = (this.data.times || []).filter(t => Array.isArray(t) && t.length > 0);
+                const temJogadores = this.data.jogadores && this.data.jogadores.length >= 2;
+                const temTimes = timesValidos.length >= 2;
+                const temPartidas = this.data.partidas && this.data.partidas.length > 0;
+
+                if (!temJogadores || !temTimes || !temPartidas) {
+                    this.data.partidaAtual = null;
+                    localStorage.removeItem(this.KEYS.PARTIDA_ATUAL);
+                    if (!temJogadores || !temTimes) {
+                        this.data.partidas = [];
+                        localStorage.removeItem(this.KEYS.PARTIDAS);
+                    }
+                } else if (this.data.partidaAtual && this.data.partidaAtual.idPartida) {
+                    const existe = this.data.partidas.some(part => part.id === this.data.partidaAtual.idPartida);
+                    if (!existe) {
+                        const proxAtiva = this.data.partidas.find(part => part.status === 'ativa');
+                        if (proxAtiva) {
+                            this.data.partidaAtual = { idPartida: proxAtiva.id, nomeAzul: proxAtiva.time1, nomeVermelho: proxAtiva.time2 };
+                            localStorage.setItem(this.KEYS.PARTIDA_ATUAL, JSON.stringify(this.data.partidaAtual));
+                        } else {
+                            this.data.partidaAtual = null;
+                            localStorage.removeItem(this.KEYS.PARTIDA_ATUAL);
+                        }
+                    }
+                }
+
                 const modFila = localStorage.getItem('modalidade_fila_auto'); if (modFila) this.data.modalidadeFilaAuto = modFila;
                 const fila = localStorage.getItem('fila_times_auto'); if (fila) this.data.filaTimes = JSON.parse(fila);
                 const cfg = localStorage.getItem(this.KEYS.CONFIGS);
@@ -2583,6 +2610,13 @@ input:checked + .slider:before {
         salvarJogadores(lista) {
             this.data.jogadores = lista;
             localStorage.setItem(this.KEYS.JOGADORES, JSON.stringify(lista));
+            if (!lista || lista.length < 2) {
+                this.data.partidaAtual = null;
+                localStorage.removeItem(this.KEYS.PARTIDA_ATUAL);
+                this.salvarTimes([]);
+                this.salvarPartidas([]);
+                this.notify('partida_ativa', null);
+            }
             this.notify('jogadores', lista);
         },
         adicionarJogador(nome, genero, nivel) {
@@ -2596,6 +2630,13 @@ input:checked + .slider:before {
         salvarTimes(times) {
             this.data.times = times;
             localStorage.setItem(this.KEYS.TIMES, JSON.stringify(times));
+            const timesValidos = (times || []).filter(t => Array.isArray(t) && t.length > 0);
+            if (timesValidos.length < 2) {
+                this.data.partidaAtual = null;
+                localStorage.removeItem(this.KEYS.PARTIDA_ATUAL);
+                this.salvarPartidas([]);
+                this.notify('partida_ativa', null);
+            }
             this.notify('times', times);
         },
         salvarPartidas(partidas) {
@@ -2605,6 +2646,18 @@ input:checked + .slider:before {
                 this.data.partidaAtual = null;
                 localStorage.removeItem(this.KEYS.PARTIDA_ATUAL);
                 this.notify('partida_ativa', null);
+            } else if (this.data.partidaAtual && this.data.partidaAtual.idPartida) {
+                const existe = partidas.some(p => p.id === this.data.partidaAtual.idPartida);
+                if (!existe) {
+                    const prox = partidas.find(p => p.status === 'ativa');
+                    if (prox) {
+                        this.carregarPartidaNoPlacar(prox.time1, prox.time2, prox.id);
+                    } else {
+                        this.data.partidaAtual = null;
+                        localStorage.removeItem(this.KEYS.PARTIDA_ATUAL);
+                        this.notify('partida_ativa', null);
+                    }
+                }
             }
             this.notify('partidas', partidas);
         },
@@ -2934,7 +2987,11 @@ input:checked + .slider:before {
             this.bindEvents();
             this.aplicarConfigs();
             this.iniciarFisica();
-            State.subscribe((tipo) => { if (tipo === 'partida_ativa') this.carregarPartidaAtiva(); });
+            State.subscribe((tipo) => {
+                if (tipo === 'partida_ativa' || tipo === 'times' || tipo === 'partidas' || tipo === 'jogadores') {
+                    this.carregarPartidaAtiva();
+                }
+            });
             this.carregarPartidaAtiva();
         },
         cacheDOM() {
@@ -3071,12 +3128,24 @@ input:checked + .slider:before {
         },
         carregarPartidaAtiva() {
             const pa = State.data.partidaAtual;
-            if (pa && pa.nomeAzul && pa.nomeVermelho) {
+            const timesValidos = (State.data.times || []).filter(t => Array.isArray(t) && t.length > 0);
+            const temJogadores = State.data.jogadores && State.data.jogadores.length >= 2;
+            const temTimes = timesValidos.length >= 2;
+            const temPartidas = State.data.partidas && State.data.partidas.length > 0;
+
+            if (pa && pa.nomeAzul && pa.nomeVermelho && temJogadores && temTimes && temPartidas) {
                 if (this.labelAzul) { this.labelAzul.textContent = pa.nomeAzul; this.labelAzul.style.display = 'block'; }
                 if (this.labelVermelho) { this.labelVermelho.textContent = pa.nomeVermelho; this.labelVermelho.style.display = 'block'; }
             } else {
                 if (this.labelAzul) { this.labelAzul.textContent = ''; this.labelAzul.style.display = 'none'; }
                 if (this.labelVermelho) { this.labelVermelho.textContent = ''; this.labelVermelho.style.display = 'none'; }
+                // Quando não há partida ou times válidos, zera a contagem e estado do placar
+                this.scoreAzul = 0;
+                this.scoreVermelho = 0;
+                this.jogoEncerrado = false;
+                this.limparConfetes();
+                const antiga = document.querySelector('.figurinha-ponto');
+                if (antiga) antiga.remove();
             }
             this.atualizarPlacar();
         },
@@ -3323,7 +3392,13 @@ input:checked + .slider:before {
             State.adicionarJogador(nome, genero, nivel);
             if (inputNome) { inputNome.value = ''; inputNome.focus(); }
         },
-        remover(index) { State.removerJogador(index); },
+        remover(index) {
+            State.removerJogador(index);
+            if (State.data.jogadores.length < 2) {
+                State.salvarTimes([]);
+                State.salvarPartidas([]);
+            }
+        },
         render() {
             const lista = document.getElementById('listaJogadores');
             const contador = document.getElementById('contadorJogadores');
@@ -3455,28 +3530,28 @@ input:checked + .slider:before {
             if (!jOriginal) return;
             const modoPrincipal = document.querySelector('input[name="modoPrincipal"]:checked')?.value || 'manual';
 
-            if (modoPrincipal === 'manual') {
-                if (this.modoVisualizacao !== 'manual') {
-                    this.modoVisualizacao = 'manual';
-                    if (this.timesAtuais.length === 0) this.timesAtuais = [[], []];
-                }
-
-                if (selecionou) {
+            if (selecionou) {
+                if (modoPrincipal === 'manual') {
+                    if (this.modoVisualizacao !== 'manual') {
+                        this.modoVisualizacao = 'manual';
+                        if (this.timesAtuais.length === 0) this.timesAtuais = [[], []];
+                    }
                     let jaExiste = this.filaEspera.some(j => j.nome === jOriginal.nome) ||
                         this.timesAtuais.some(t => Array.isArray(t) && t.some(j => j.nome === jOriginal.nome));
                     if (!jaExiste) {
                         this.filaEspera.push({ ...jOriginal });
                         this.filaEspera.sort((a, b) => b.nivel - a.nivel);
                     }
-                } else {
-                    this.filaEspera = this.filaEspera.filter(j => j.nome !== jOriginal.nome);
-                    this.timesAtuais.forEach((time, tIdx) => {
-                        if (Array.isArray(time)) {
-                            this.timesAtuais[tIdx] = time.filter(j => j.nome !== jOriginal.nome);
-                        }
-                    });
-                    State.salvarTimes(this.timesAtuais);
+                    this.renderizarVisualizacao();
                 }
+            } else {
+                this.filaEspera = this.filaEspera.filter(j => j.nome !== jOriginal.nome);
+                this.timesAtuais.forEach((time, tIdx) => {
+                    if (Array.isArray(time)) {
+                        this.timesAtuais[tIdx] = time.filter(j => j.nome !== jOriginal.nome);
+                    }
+                });
+                State.salvarTimes(this.timesAtuais);
                 this.renderizarVisualizacao();
             }
         },
@@ -3636,7 +3711,11 @@ input:checked + .slider:before {
         },
         limparTodosTimes() {
             if (confirm("Tem certeza que deseja apagar todos os times sorteados?")) {
-                this.timesAtuais = []; this.filaEspera = []; State.salvarTimes([]); this.renderizarVisualizacao();
+                this.timesAtuais = [];
+                this.filaEspera = [];
+                State.salvarTimes([]);
+                State.salvarPartidas([]);
+                this.renderizarVisualizacao();
             }
         },
         renderizarVisualizacao() {
