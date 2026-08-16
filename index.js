@@ -1197,6 +1197,25 @@
 
             const alternarModoPartidas = (e) => {
                 const modo = document.querySelector('input[name="modoPartidas"]:checked')?.value || 'sorteio';
+
+                // Se estava em Filas e quer mudar para Manual ou Sorteio
+                if (this.modoAnterior === 'filas' && modo !== 'filas') {
+                    const temPartidas = this.partidas && this.partidas.length > 0;
+                    if (temPartidas) {
+                        const confirmou = confirm("Ao sair da Fila as Partidas serão resetadas, deseja continuar?");
+                        if (!confirmou) {
+                            const radioFilas = document.querySelector('input[name="modoPartidas"][value="filas"]');
+                            if (radioFilas) radioFilas.checked = true;
+                            this.atualizarVisibilidadeModo();
+                            return;
+                        }
+                        State.salvarPartidas([]);
+                    }
+                    this.modoAnterior = modo;
+                    this.atualizarVisibilidadeModo();
+                    return;
+                }
+
                 if (modo === 'filas') {
                     const temPartidasAtivas = this.partidas && this.partidas.length > 0;
                     if (temPartidasAtivas) {
