@@ -2684,7 +2684,7 @@ input:checked + .slider:before {
                     <div class="dropdown-item" id="btnToggleFigurinhas" style="cursor: pointer;" title="Toque no texto para gerenciar figurinhas ou no botão para ligar/desligar">
                         <span id="labelFigurinhas">🖼️ Figurinhas: Ativadas</span>
                         <label class="switch">
-                            <input type="checkbox" id="checkFigurinhas">
+                            <input type="checkbox" id="checkFigurinhas" checked>
                             <span class="slider"></span>
                         </label>
                     </div>
@@ -3155,7 +3155,7 @@ input:checked + .slider:before {
             figurinhaAbertura: null,
             configs: {
                 tema: 'claro',
-                figurinhas: false,
+                figurinhas: true,
                 ladosInvertidos: false,
                 controlesEscondidos: false
             }
@@ -3226,7 +3226,7 @@ input:checked + .slider:before {
                 } else {
                     this.data.configs.tema = localStorage.getItem('tema_placar') || 'claro';
                     const valFig = localStorage.getItem('figurinhas_ativas');
-                    this.data.configs.figurinhas = valFig === null ? false : (valFig === 'true' || valFig === true);
+                    this.data.configs.figurinhas = valFig === null ? true : (valFig === 'true' || valFig === true);
                     this.data.configs.ladosInvertidos = localStorage.getItem('lados_invertidos') === 'true';
                     this.data.configs.controlesEscondidos = localStorage.getItem('controles_topo_escondidos') === 'true';
                 }
