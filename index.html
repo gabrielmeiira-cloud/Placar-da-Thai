@@ -27,6 +27,21 @@
         </div>
     </div>
 
+    <!-- BANNER / GUIA DE INSTALAÇÃO MULTIPLATAFORMA (ANDROID / IPHONE / PC) -->
+    <div id="bannerInstalacaoApp" class="banner-instalacao-app" style="display: none;">
+        <div class="banner-instalacao-conteudo">
+            <div class="banner-instalacao-icone">
+                <img src="icon-192.png" alt="Duo Placar" class="banner-app-icon">
+            </div>
+            <div class="banner-instalacao-info">
+                <div class="banner-instalacao-titulo" id="bannerInstalacaoTitulo">Instalar Duo Placar</div>
+                <div class="banner-instalacao-desc" id="bannerInstalacaoDesc">Adicione à tela inicial para usar como app nativo!</div>
+            </div>
+            <div class="banner-instalacao-acoes" id="bannerInstalacaoAcoes"></div>
+            <button class="btn-fechar-banner" id="btnFecharBannerInstalacao" type="button" title="Fechar">✕</button>
+        </div>
+    </div>
+
     <!-- ==========================================================================
          SEÇÃO 1: PLACAR AO VIVO (BASE PERMANENTE FULLSCREEN 100dvh)
          ========================================================================== -->
@@ -96,6 +111,10 @@
                             <input type="checkbox" id="checkFullscreen">
                             <span class="slider"></span>
                         </label>
+                    </div>
+                    <div class="dropdown-item" id="btnMenuInstalarApp" style="cursor: pointer;" title="Instalar aplicativo no celular ou computador">
+                        <span>📲 Instalar App (Atalho)</span>
+                        <span class="badge-atalho-tag" id="badgePlataformaInstalar">Instalar</span>
                     </div>
                     <div class="dropdown-rodape-creditos">
                         <span class="credito-versao">Placar da Thai V10.2</span>

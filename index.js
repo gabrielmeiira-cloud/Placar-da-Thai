@@ -2238,7 +2238,169 @@
         }
     };
 
-    // 10. INICIALIZAÇÃO
+    // 10. MÓDULO DE INSTALAÇÃO MULTIPLATAFORMA (ANDROID / IPHONE / PC)
+    const InstaladorModule = {
+        deferredPrompt: null,
+        plataforma: 'desktop', // 'android', 'ios', 'desktop'
+        jaInstalado: false,
+        banner: null,
+        init() {
+            this.banner = document.getElementById('bannerInstalacaoApp');
+            this.detectarPlataforma();
+            this.verificarInstalado();
+
+            // Service Worker para PWA (offline e instalação nativa)
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js').catch(() => {});
+            }
+
+            // Captura o evento nativo de instalação do navegador
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                this.deferredPrompt = e;
+                if (!this.jaInstalado && !sessionStorage.getItem('recusou_instalacao')) {
+                    this.exibirBanner();
+                    if (this.plataforma === 'android') {
+                        this.dispararPromptAutomatico();
+                    }
+                }
+            });
+
+            // App instalado com sucesso
+            window.addEventListener('appinstalled', () => {
+                this.jaInstalado = true;
+                this.fecharBanner();
+            });
+
+            // Botão no menu de configurações
+            const btnMenu = document.getElementById('btnMenuInstalarApp');
+            if (btnMenu) {
+                btnMenu.addEventListener('click', () => {
+                    const menu = document.getElementById('dropdownMenu');
+                    if (menu) menu.classList.remove('ativo');
+                    this.abrirGuiaManual();
+                });
+            }
+
+            // Botão fechar do banner
+            const btnFechar = document.getElementById('btnFecharBannerInstalacao');
+            if (btnFechar) {
+                btnFechar.addEventListener('click', () => {
+                    sessionStorage.setItem('recusou_instalacao', 'true');
+                    this.fecharBanner();
+                });
+            }
+
+            // No iPhone (iOS Safari), exibe guia após breve delay se não estiver em modo standalone
+            if (this.plataforma === 'ios' && !this.jaInstalado && !sessionStorage.getItem('recusou_instalacao')) {
+                setTimeout(() => this.exibirBanner(), 3000);
+            }
+        },
+        detectarPlataforma() {
+            const ua = navigator.userAgent || navigator.vendor || window.opera || '';
+            const isIOS = (/iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) && !window.MSStream;
+            const isAndroid = /android/i.test(ua);
+
+            if (isIOS) this.plataforma = 'ios';
+            else if (isAndroid) this.plataforma = 'android';
+            else this.plataforma = 'desktop';
+
+            const badge = document.getElementById('badgePlataformaInstalar');
+            if (badge) {
+                badge.textContent = this.plataforma === 'ios' ? 'iPhone' : (this.plataforma === 'android' ? 'Android' : 'PC');
+            }
+        },
+        verificarInstalado() {
+            this.jaInstalado = window.matchMedia('(display-mode: standalone)').matches || 
+                               window.navigator.standalone === true ||
+                               document.referrer.includes('android-app://');
+        },
+        dispararPromptAutomatico() {
+            if (!this.deferredPrompt || this.jaInstalado) return;
+            const tentarPrompt = () => {
+                if (this.deferredPrompt) {
+                    this.deferredPrompt.prompt();
+                    this.deferredPrompt.userChoice.then(() => {
+                        this.deferredPrompt = null;
+                        this.fecharBanner();
+                    });
+                }
+                window.removeEventListener('pointerdown', tentarPrompt);
+            };
+            try {
+                this.deferredPrompt.prompt();
+            } catch(e) {
+                window.addEventListener('pointerdown', tentarPrompt, { once: true });
+            }
+        },
+        exibirBanner() {
+            if (this.jaInstalado || !this.banner) return;
+            const titulo = document.getElementById('bannerInstalacaoTitulo');
+            const desc = document.getElementById('bannerInstalacaoDesc');
+            const acoes = document.getElementById('bannerInstalacaoAcoes');
+
+            if (this.plataforma === 'android') {
+                if (titulo) titulo.textContent = '📲 Instalar Duo Placar no Celular';
+                if (desc) desc.textContent = 'Adicione à tela inicial para ter acesso rápido sem barras de navegador!';
+                if (acoes) {
+                    acoes.innerHTML = '<button class="btn-instalar-primario" type="button" id="btnAcaoInstalar">⚡ Instalar Agora</button>';
+                    const btn = document.getElementById('btnAcaoInstalar');
+                    if (btn) {
+                        btn.onclick = () => {
+                            if (this.deferredPrompt) {
+                                this.deferredPrompt.prompt();
+                                this.deferredPrompt.userChoice.then(() => {
+                                    this.deferredPrompt = null;
+                                    this.fecharBanner();
+                                });
+                            } else {
+                                alert("Toque no menu ⋮ do seu navegador Chrome e selecione 'Instalar aplicativo' ou 'Adicionar à tela inicial'.");
+                            }
+                        };
+                    }
+                }
+            } else if (this.plataforma === 'ios') {
+                if (titulo) titulo.textContent = '🍏 Instalar no seu iPhone / iPad';
+                if (desc) desc.innerHTML = '1. Toque em <strong>Compartilhar <span class="icone-ios-share">⎋</span></strong> (rodapé do Safari).<br>2. Selecione <strong>"Adicionar à Tela de Início" ➕</strong>.';
+                if (acoes) {
+                    acoes.innerHTML = '<button class="btn-instalar-primario" type="button" onclick="InstaladorModule.fecharBanner()">✓ Entendi</button>';
+                }
+            } else {
+                if (titulo) titulo.textContent = '💻 Instalar Duo Placar no seu PC';
+                if (desc) desc.textContent = 'Tenha o placar em janela dedicada e na sua Área de Trabalho!';
+                if (acoes) {
+                    acoes.innerHTML = '<button class="btn-instalar-primario" type="button" id="btnAcaoInstalarPC">💻 Instalar no PC</button>';
+                    const btn = document.getElementById('btnAcaoInstalarPC');
+                    if (btn) {
+                        btn.onclick = () => {
+                            if (this.deferredPrompt) {
+                                this.deferredPrompt.prompt();
+                                this.deferredPrompt.userChoice.then(() => {
+                                    this.deferredPrompt = null;
+                                    this.fecharBanner();
+                                });
+                            } else {
+                                alert("No seu navegador no PC (Chrome/Edge), clique no ícone ⊕ ou 'Instalar' na barra de endereços acima.");
+                            }
+                        };
+                    }
+                }
+            }
+
+            this.banner.style.display = 'flex';
+        },
+        abrirGuiaManual() {
+            this.exibirBanner();
+            if (this.plataforma === 'android' && this.deferredPrompt) {
+                this.deferredPrompt.prompt();
+            }
+        },
+        fecharBanner() {
+            if (this.banner) this.banner.style.display = 'none';
+        }
+    };
+
+    // 11. INICIALIZAÇÃO
     function inicializarApp() {
         Placar.init();
         OverlayModule.init();
@@ -2248,6 +2410,7 @@
         RankingModule.init();
         FigurinhasModule.init();
         AberturaModule.init();
+        InstaladorModule.init();
         initMenuConfig();
     }
 
@@ -2257,6 +2420,7 @@
     window.RankingModule = RankingModule;
     window.FigurinhasModule = FigurinhasModule;
     window.AberturaModule = AberturaModule;
+    window.InstaladorModule = InstaladorModule;
     window.Placar = Placar;
 
     if (document.readyState === 'loading') {
