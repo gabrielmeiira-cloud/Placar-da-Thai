@@ -2395,141 +2395,169 @@ input:checked + .slider:before {
 }
 
 /* ==========================================================================
-   BANNER DE INSTALAÇÃO MULTIPLATAFORMA (ANDROID / IPHONE / PC)
+   MODAL DE INSTALAÇÃO MULTIPLATAFORMA FULLSCREEN (ANDROID / IPHONE / PC)
    ========================================================================== */
-.banner-instalacao-app {
+.modal-instalacao-overlay {
     position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: min(94vw, 520px);
-    background: rgba(22, 28, 42, 0.92);
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    background: rgba(10, 14, 22, 0.88);
     backdrop-filter: blur(24px) saturate(140%);
     -webkit-backdrop-filter: blur(24px) saturate(140%);
-    border: 1.5px solid rgba(0, 210, 255, 0.45);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 210, 255, 0.25);
-    border-radius: 18px;
     z-index: 99998;
     display: flex;
-    flex-direction: column;
-    padding: 14px 16px;
-    box-sizing: border-box;
-    animation: animBannerSubir 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-    user-select: none;
-}
-
-@keyframes animBannerSubir {
-    0% { transform: translate(-50%, 40px); opacity: 0; }
-    100% { transform: translate(-50%, 0); opacity: 1; }
-}
-
-.banner-instalacao-conteudo {
-    position: relative;
-    display: flex;
     align-items: center;
-    gap: 14px;
-    width: 100%;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    animation: animModalFadeIn 0.3s ease forwards;
 }
 
-.banner-instalacao-icone {
-    flex-shrink: 0;
-    width: 46px;
-    height: 46px;
-    border-radius: 12px;
+@keyframes animModalFadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.card-instalacao-modal {
+    background: rgba(26, 32, 48, 0.95);
+    border: 1.5px solid rgba(0, 210, 255, 0.45);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 210, 255, 0.25);
+    border-radius: 22px;
+    padding: 28px 22px 22px 22px;
+    max-width: 420px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+    box-sizing: border-box;
+    animation: animCardPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes animCardPop {
+    0% { transform: scale(0.85); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.modal-instalacao-icone {
+    width: 68px;
+    height: 68px;
+    border-radius: 18px;
     overflow: hidden;
     background: #007bff;
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+    box-shadow: 0 8px 24px rgba(0, 123, 255, 0.5);
 }
 
-.banner-app-icon {
+.modal-instalacao-icone img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.banner-instalacao-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    padding-right: 14px;
-}
-
-.banner-instalacao-titulo {
+.modal-instalacao-titulo {
     font-family: 'Fredoka', sans-serif;
-    font-size: 0.96rem;
+    font-size: 1.35rem;
     font-weight: 700;
     color: #ffffff;
-    letter-spacing: 0.2px;
+    letter-spacing: 0.3px;
 }
 
-.banner-instalacao-desc {
+.modal-instalacao-desc {
     font-family: 'Fredoka', sans-serif;
-    font-size: 0.82rem;
-    color: rgba(255, 255, 255, 0.82);
-    line-height: 1.35;
+    font-size: 0.92rem;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.45;
+    text-align: center;
+}
+
+.modal-passos-ios {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 14px;
+    padding: 12px 14px;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: #ffffff;
+}
+
+.modal-passo-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    line-height: 1.3;
 }
 
 .icone-ios-share {
-    display: inline-block;
-    background: rgba(255, 255, 255, 0.22);
-    padding: 1px 6px;
-    border-radius: 5px;
-    font-weight: bold;
-    color: #00d2ff;
-}
-
-.banner-instalacao-acoes {
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-}
-
-.btn-instalar-primario {
-    background: linear-gradient(135deg, #007bff, #00d2ff);
-    color: #ffffff;
-    border: none;
-    padding: 9px 15px;
-    border-radius: 12px;
-    font-family: 'Fredoka', sans-serif;
-    font-size: 0.86rem;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 4px 14px rgba(0, 123, 255, 0.45);
-    transition: transform 0.18s ease, filter 0.18s ease;
-    white-space: nowrap;
-}
-
-.btn-instalar-primario:hover {
-    transform: scale(1.04);
-    filter: brightness(1.1);
-}
-
-.btn-instalar-primario:active {
-    transform: scale(0.96);
-}
-
-.btn-fechar-banner {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: rgba(255, 255, 255, 0.85);
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    font-size: 0.72rem;
-    cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s;
+    background: rgba(0, 210, 255, 0.25);
+    color: #00d2ff;
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 1rem;
     line-height: 1;
 }
 
-.btn-fechar-banner:hover {
-    background: rgba(255, 255, 255, 0.3);
+.modal-instalacao-botoes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    margin-top: 4px;
+}
+
+.btn-modal-instalar-primario {
+    background: linear-gradient(135deg, #007bff, #00d2ff);
+    color: #ffffff;
+    border: none;
+    padding: 13px 20px;
+    border-radius: 14px;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0, 123, 255, 0.45);
+    transition: transform 0.18s ease, filter 0.18s ease;
+    width: 100%;
+}
+
+.btn-modal-instalar-primario:hover {
+    transform: scale(1.02);
+    filter: brightness(1.1);
+}
+
+.btn-modal-instalar-primario:active {
+    transform: scale(0.98);
+}
+
+.btn-modal-continuar-secundario {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    width: 100%;
+}
+
+.btn-modal-continuar-secundario:hover {
+    background: rgba(255, 255, 255, 0.1);
     color: #ffffff;
 }
 
@@ -2555,18 +2583,15 @@ input:checked + .slider:before {
         </div>
     </div>
 
-    <!-- BANNER / GUIA DE INSTALAÇÃO MULTIPLATAFORMA (ANDROID / IPHONE / PC) -->
-    <div id="bannerInstalacaoApp" class="banner-instalacao-app" style="display: none;">
-        <div class="banner-instalacao-conteudo">
-            <div class="banner-instalacao-icone">
-                <img src="icon-192.png" alt="Duo Placar" class="banner-app-icon">
+    <!-- MODAL DE INSTALAÇÃO MULTIPLATAFORMA FULLSCREEN (ANDROID / IPHONE / PC) -->
+    <div id="modalInstalacaoApp" class="modal-instalacao-overlay" style="display: none;">
+        <div class="card-instalacao-modal">
+            <div class="modal-instalacao-icone">
+                <img src="icon-192.png" alt="Duo Placar">
             </div>
-            <div class="banner-instalacao-info">
-                <div class="banner-instalacao-titulo" id="bannerInstalacaoTitulo">Instalar Duo Placar</div>
-                <div class="banner-instalacao-desc" id="bannerInstalacaoDesc">Adicione à tela inicial para usar como app nativo!</div>
-            </div>
-            <div class="banner-instalacao-acoes" id="bannerInstalacaoAcoes"></div>
-            <button class="btn-fechar-banner" id="btnFecharBannerInstalacao" type="button" title="Fechar">✕</button>
+            <div class="modal-instalacao-titulo" id="modalInstalacaoTitulo">Instalar Duo Placar</div>
+            <div class="modal-instalacao-desc" id="modalInstalacaoDesc">Adicione o Duo Placar à tela inicial para usar em tela cheia nativa e com acesso rápido!</div>
+            <div class="modal-instalacao-botoes" id="modalInstalacaoBotoes"></div>
         </div>
     </div>
 
@@ -4960,6 +4985,14 @@ input:checked + .slider:before {
         }
 
         function alternarFullscreen() {
+            // Se for iPhone no navegador normal, o Safari não suporta a API Fullscreen nativa em páginas
+            if (window.InstaladorModule && window.InstaladorModule.plataforma === 'ios' && !window.InstaladorModule.jaInstalado) {
+                if (checkFullscreen) checkFullscreen.checked = false;
+                fecharDropdown();
+                window.InstaladorModule.exibirModal(true);
+                return;
+            }
+
             if (!document.fullscreenElement && !document.webkitFullscreenElement) {
                 if (document.documentElement.requestFullscreen) {
                     document.documentElement.requestFullscreen().catch(() => {});
@@ -5307,14 +5340,14 @@ input:checked + .slider:before {
         }
     };
 
-    // 10. MÓDULO DE INSTALAÇÃO MULTIPLATAFORMA (ANDROID / IPHONE / PC)
+    // 10. MÓDULO DE INSTALAÇÃO MULTIPLATAFORMA FULLSCREEN (ANDROID / IPHONE / PC)
     const InstaladorModule = {
         deferredPrompt: null,
         plataforma: 'desktop', // 'android', 'ios', 'desktop'
         jaInstalado: false,
-        banner: null,
+        modal: null,
         init() {
-            this.banner = document.getElementById('bannerInstalacaoApp');
+            this.modal = document.getElementById('modalInstalacaoApp');
             this.detectarPlataforma();
             this.verificarInstalado();
 
@@ -5323,22 +5356,23 @@ input:checked + .slider:before {
                 navigator.serviceWorker.register('./sw.js').catch(() => {});
             }
 
+            // Oculta opções no menu se o app já estiver instalado
+            this.ajustarMenuParaInstalado();
+
             // Captura o evento nativo de instalação do navegador
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
                 this.deferredPrompt = e;
                 if (!this.jaInstalado && !sessionStorage.getItem('recusou_instalacao')) {
-                    this.exibirBanner();
-                    if (this.plataforma === 'android') {
-                        this.dispararPromptAutomatico();
-                    }
+                    this.exibirModal();
                 }
             });
 
             // App instalado com sucesso
             window.addEventListener('appinstalled', () => {
                 this.jaInstalado = true;
-                this.fecharBanner();
+                this.fecharModal();
+                this.ajustarMenuParaInstalado();
             });
 
             // Botão no menu de configurações
@@ -5347,22 +5381,24 @@ input:checked + .slider:before {
                 btnMenu.addEventListener('click', () => {
                     const menu = document.getElementById('dropdownMenu');
                     if (menu) menu.classList.remove('ativo');
-                    this.abrirGuiaManual();
+                    this.exibirModal();
                 });
             }
 
-            // Botão fechar do banner
-            const btnFechar = document.getElementById('btnFecharBannerInstalacao');
-            if (btnFechar) {
-                btnFechar.addEventListener('click', () => {
-                    sessionStorage.setItem('recusou_instalacao', 'true');
-                    this.fecharBanner();
-                });
-            }
-
-            // No iPhone (iOS Safari), exibe guia após breve delay se não estiver em modo standalone
-            if (this.plataforma === 'ios' && !this.jaInstalado && !sessionStorage.getItem('recusou_instalacao')) {
-                setTimeout(() => this.exibirBanner(), 3000);
+            // Se ainda não estiver instalado e não foi dispensado nesta sessão, exibe modal em tela cheia
+            if (!this.jaInstalado && !sessionStorage.getItem('recusou_instalacao')) {
+                // Abre após breve pausa para uma entrada suave
+                setTimeout(() => {
+                    const overlayAbertura = document.getElementById('overlayAberturaApp');
+                    if (!overlayAbertura || overlayAbertura.style.display === 'none') {
+                        this.exibirModal();
+                    } else {
+                        // Se houver tela de abertura inicial com figurinha, aguarda ela ser fechada
+                        overlayAbertura.addEventListener('click', () => {
+                            setTimeout(() => this.exibirModal(), 400);
+                        }, { once: true });
+                    }
+                }, 1500);
             }
         },
         detectarPlataforma() {
@@ -5384,88 +5420,118 @@ input:checked + .slider:before {
                                window.navigator.standalone === true ||
                                document.referrer.includes('android-app://');
         },
-        dispararPromptAutomatico() {
-            if (!this.deferredPrompt || this.jaInstalado) return;
-            const tentarPrompt = () => {
-                if (this.deferredPrompt) {
-                    this.deferredPrompt.prompt();
-                    this.deferredPrompt.userChoice.then(() => {
-                        this.deferredPrompt = null;
-                        this.fecharBanner();
-                    });
+        ajustarMenuParaInstalado() {
+            if (!this.jaInstalado) return;
+
+            // 1. Some com a opção de instalar app do menu
+            const btnMenuInstalar = document.getElementById('btnMenuInstalarApp');
+            if (btnMenuInstalar) {
+                btnMenuInstalar.style.display = 'none';
+            }
+
+            // 2. No Android e iPhone quando rodando como app instalado, some também a opção de tela cheia (já é full nativo)
+            if (this.plataforma === 'android' || this.plataforma === 'ios') {
+                const btnToggleFullscreen = document.getElementById('btnToggleFullscreen');
+                if (btnToggleFullscreen) {
+                    btnToggleFullscreen.style.display = 'none';
                 }
-                window.removeEventListener('pointerdown', tentarPrompt);
-            };
-            try {
-                this.deferredPrompt.prompt();
-            } catch(e) {
-                window.addEventListener('pointerdown', tentarPrompt, { once: true });
             }
         },
-        exibirBanner() {
-            if (this.jaInstalado || !this.banner) return;
-            const titulo = document.getElementById('bannerInstalacaoTitulo');
-            const desc = document.getElementById('bannerInstalacaoDesc');
-            const acoes = document.getElementById('bannerInstalacaoAcoes');
+        exibirModal(motivoTelaCheia = false) {
+            if (this.jaInstalado || !this.modal) return;
+
+            const titulo = document.getElementById('modalInstalacaoTitulo');
+            const desc = document.getElementById('modalInstalacaoDesc');
+            const botoes = document.getElementById('modalInstalacaoBotoes');
 
             if (this.plataforma === 'android') {
-                if (titulo) titulo.textContent = '📲 Instalar Duo Placar no Celular';
-                if (desc) desc.textContent = 'Adicione à tela inicial para ter acesso rápido sem barras de navegador!';
-                if (acoes) {
-                    acoes.innerHTML = '<button class="btn-instalar-primario" type="button" id="btnAcaoInstalar">⚡ Instalar Agora</button>';
-                    const btn = document.getElementById('btnAcaoInstalar');
+                if (titulo) titulo.textContent = '📲 Instalar Duo Placar';
+                if (desc) desc.textContent = 'Instale o aplicativo na sua tela inicial para jogar em tela cheia automática e com carregamento instantâneo!';
+                if (botoes) {
+                    botoes.innerHTML = `
+                        <button class="btn-modal-instalar-primario" type="button" id="btnModalAcaoInstalar">
+                            ⚡ Instalar Aplicativo
+                        </button>
+                        <button class="btn-modal-continuar-secundario" type="button" onclick="InstaladorModule.fecharModal()">
+                            Continuar no Navegador
+                        </button>
+                    `;
+                    const btn = document.getElementById('btnModalAcaoInstalar');
                     if (btn) {
                         btn.onclick = () => {
                             if (this.deferredPrompt) {
                                 this.deferredPrompt.prompt();
                                 this.deferredPrompt.userChoice.then(() => {
                                     this.deferredPrompt = null;
-                                    this.fecharBanner();
+                                    this.fecharModal();
                                 });
                             } else {
-                                alert("Toque no menu ⋮ do seu navegador Chrome e selecione 'Instalar aplicativo' ou 'Adicionar à tela inicial'.");
+                                alert("Toque no menu ⋮ do seu Chrome e selecione 'Instalar aplicativo' ou 'Adicionar à tela inicial'.");
+                                this.fecharModal();
                             }
                         };
                     }
                 }
             } else if (this.plataforma === 'ios') {
-                if (titulo) titulo.textContent = '🍏 Instalar no seu iPhone / iPad';
-                if (desc) desc.innerHTML = '1. Toque em <strong>Compartilhar <span class="icone-ios-share">⎋</span></strong> (rodapé do Safari).<br>2. Selecione <strong>"Adicionar à Tela de Início" ➕</strong>.';
-                if (acoes) {
-                    acoes.innerHTML = '<button class="btn-instalar-primario" type="button" onclick="InstaladorModule.fecharBanner()">✓ Entendi</button>';
+                if (titulo) titulo.textContent = motivoTelaCheia ? '🖥️ Tela Cheia no iPhone' : '🍏 Instalar Duo Placar';
+                if (desc) {
+                    desc.innerHTML = `
+                        <p style="margin: 0 0 12px 0;">No Safari do iPhone, instale o app na tela inicial para ter <strong>tela cheia automática</strong> sem barras de navegador:</p>
+                        <div class="modal-passos-ios">
+                            <div class="modal-passo-item">
+                                <span>1️⃣</span>
+                                <span>Toque no botão <strong>Compartilhar <span class="icone-ios-share">⎋</span></strong> no rodapé do Safari.</span>
+                            </div>
+                            <div class="modal-passo-item">
+                                <span>2️⃣</span>
+                                <span>Role para baixo e toque em <strong>"Adicionar à Tela de Início" ➕</strong>.</span>
+                            </div>
+                        </div>
+                    `;
+                }
+                if (botoes) {
+                    botoes.innerHTML = `
+                        <button class="btn-modal-instalar-primario" type="button" onclick="InstaladorModule.fecharModal()">
+                            ✓ Entendi, Continuar
+                        </button>
+                    `;
                 }
             } else {
-                if (titulo) titulo.textContent = '💻 Instalar Duo Placar no seu PC';
-                if (desc) desc.textContent = 'Tenha o placar em janela dedicada e na sua Área de Trabalho!';
-                if (acoes) {
-                    acoes.innerHTML = '<button class="btn-instalar-primario" type="button" id="btnAcaoInstalarPC">💻 Instalar no PC</button>';
-                    const btn = document.getElementById('btnAcaoInstalarPC');
+                // Desktop / PC
+                if (titulo) titulo.textContent = '💻 Instalar Duo Placar no PC';
+                if (desc) desc.textContent = 'Tenha o placar em janela dedicada, sem distrações e com atalho direto na sua Área de Trabalho!';
+                if (botoes) {
+                    botoes.innerHTML = `
+                        <button class="btn-modal-instalar-primario" type="button" id="btnModalAcaoInstalarPC">
+                            💻 Instalar no Computador
+                        </button>
+                        <button class="btn-modal-continuar-secundario" type="button" onclick="InstaladorModule.fecharModal()">
+                            Continuar no Navegador
+                        </button>
+                    `;
+                    const btn = document.getElementById('btnModalAcaoInstalarPC');
                     if (btn) {
                         btn.onclick = () => {
                             if (this.deferredPrompt) {
                                 this.deferredPrompt.prompt();
                                 this.deferredPrompt.userChoice.then(() => {
                                     this.deferredPrompt = null;
-                                    this.fecharBanner();
+                                    this.fecharModal();
                                 });
                             } else {
-                                alert("No seu navegador no PC (Chrome/Edge), clique no ícone ⊕ ou 'Instalar' na barra de endereços acima.");
+                                alert("No seu navegador (Chrome/Edge), clique no ícone ⊕ ou 'Instalar' na barra de endereços acima.");
+                                this.fecharModal();
                             }
                         };
                     }
                 }
             }
 
-            this.banner.style.display = 'flex';
+            this.modal.style.display = 'flex';
         },
-        abrirGuiaManual() {
-            this.exibirBanner();
-            if (this.plataforma === 'android' && this.deferredPrompt) {
-                this.deferredPrompt.prompt();
-            }
-        },
-        fecharBanner() {
-            if (this.banner) this.banner.style.display = 'none';
+        fecharModal() {
+            sessionStorage.setItem('recusou_instalacao', 'true');
+            if (this.modal) this.modal.style.display = 'none';
         }
     };
 

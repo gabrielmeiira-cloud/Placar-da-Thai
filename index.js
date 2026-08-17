@@ -1891,6 +1891,14 @@
         }
 
         function alternarFullscreen() {
+            // Se for iPhone no navegador normal, o Safari não suporta a API Fullscreen nativa em páginas
+            if (window.InstaladorModule && window.InstaladorModule.plataforma === 'ios' && !window.InstaladorModule.jaInstalado) {
+                if (checkFullscreen) checkFullscreen.checked = false;
+                fecharDropdown();
+                window.InstaladorModule.exibirModal(true);
+                return;
+            }
+
             if (!document.fullscreenElement && !document.webkitFullscreenElement) {
                 if (document.documentElement.requestFullscreen) {
                     document.documentElement.requestFullscreen().catch(() => {});
@@ -2238,14 +2246,14 @@
         }
     };
 
-    // 10. MÓDULO DE INSTALAÇÃO MULTIPLATAFORMA (ANDROID / IPHONE / PC)
+    // 10. MÓDULO DE INSTALAÇÃO MULTIPLATAFORMA FULLSCREEN (ANDROID / IPHONE / PC)
     const InstaladorModule = {
         deferredPrompt: null,
         plataforma: 'desktop', // 'android', 'ios', 'desktop'
         jaInstalado: false,
-        banner: null,
+        modal: null,
         init() {
-            this.banner = document.getElementById('bannerInstalacaoApp');
+            this.modal = document.getElementById('modalInstalacaoApp');
             this.detectarPlataforma();
             this.verificarInstalado();
 
@@ -2254,22 +2262,23 @@
                 navigator.serviceWorker.register('./sw.js').catch(() => {});
             }
 
+            // Oculta opções no menu se o app já estiver instalado
+            this.ajustarMenuParaInstalado();
+
             // Captura o evento nativo de instalação do navegador
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
                 this.deferredPrompt = e;
                 if (!this.jaInstalado && !sessionStorage.getItem('recusou_instalacao')) {
-                    this.exibirBanner();
-                    if (this.plataforma === 'android') {
-                        this.dispararPromptAutomatico();
-                    }
+                    this.exibirModal();
                 }
             });
 
             // App instalado com sucesso
             window.addEventListener('appinstalled', () => {
                 this.jaInstalado = true;
-                this.fecharBanner();
+                this.fecharModal();
+                this.ajustarMenuParaInstalado();
             });
 
             // Botão no menu de configurações
@@ -2278,22 +2287,24 @@
                 btnMenu.addEventListener('click', () => {
                     const menu = document.getElementById('dropdownMenu');
                     if (menu) menu.classList.remove('ativo');
-                    this.abrirGuiaManual();
+                    this.exibirModal();
                 });
             }
 
-            // Botão fechar do banner
-            const btnFechar = document.getElementById('btnFecharBannerInstalacao');
-            if (btnFechar) {
-                btnFechar.addEventListener('click', () => {
-                    sessionStorage.setItem('recusou_instalacao', 'true');
-                    this.fecharBanner();
-                });
-            }
-
-            // No iPhone (iOS Safari), exibe guia após breve delay se não estiver em modo standalone
-            if (this.plataforma === 'ios' && !this.jaInstalado && !sessionStorage.getItem('recusou_instalacao')) {
-                setTimeout(() => this.exibirBanner(), 3000);
+            // Se ainda não estiver instalado e não foi dispensado nesta sessão, exibe modal em tela cheia
+            if (!this.jaInstalado && !sessionStorage.getItem('recusou_instalacao')) {
+                // Abre após breve pausa para uma entrada suave
+                setTimeout(() => {
+                    const overlayAbertura = document.getElementById('overlayAberturaApp');
+                    if (!overlayAbertura || overlayAbertura.style.display === 'none') {
+                        this.exibirModal();
+                    } else {
+                        // Se houver tela de abertura inicial com figurinha, aguarda ela ser fechada
+                        overlayAbertura.addEventListener('click', () => {
+                            setTimeout(() => this.exibirModal(), 400);
+                        }, { once: true });
+                    }
+                }, 1500);
             }
         },
         detectarPlataforma() {
@@ -2315,88 +2326,118 @@
                                window.navigator.standalone === true ||
                                document.referrer.includes('android-app://');
         },
-        dispararPromptAutomatico() {
-            if (!this.deferredPrompt || this.jaInstalado) return;
-            const tentarPrompt = () => {
-                if (this.deferredPrompt) {
-                    this.deferredPrompt.prompt();
-                    this.deferredPrompt.userChoice.then(() => {
-                        this.deferredPrompt = null;
-                        this.fecharBanner();
-                    });
+        ajustarMenuParaInstalado() {
+            if (!this.jaInstalado) return;
+
+            // 1. Some com a opção de instalar app do menu
+            const btnMenuInstalar = document.getElementById('btnMenuInstalarApp');
+            if (btnMenuInstalar) {
+                btnMenuInstalar.style.display = 'none';
+            }
+
+            // 2. No Android e iPhone quando rodando como app instalado, some também a opção de tela cheia (já é full nativo)
+            if (this.plataforma === 'android' || this.plataforma === 'ios') {
+                const btnToggleFullscreen = document.getElementById('btnToggleFullscreen');
+                if (btnToggleFullscreen) {
+                    btnToggleFullscreen.style.display = 'none';
                 }
-                window.removeEventListener('pointerdown', tentarPrompt);
-            };
-            try {
-                this.deferredPrompt.prompt();
-            } catch(e) {
-                window.addEventListener('pointerdown', tentarPrompt, { once: true });
             }
         },
-        exibirBanner() {
-            if (this.jaInstalado || !this.banner) return;
-            const titulo = document.getElementById('bannerInstalacaoTitulo');
-            const desc = document.getElementById('bannerInstalacaoDesc');
-            const acoes = document.getElementById('bannerInstalacaoAcoes');
+        exibirModal(motivoTelaCheia = false) {
+            if (this.jaInstalado || !this.modal) return;
+
+            const titulo = document.getElementById('modalInstalacaoTitulo');
+            const desc = document.getElementById('modalInstalacaoDesc');
+            const botoes = document.getElementById('modalInstalacaoBotoes');
 
             if (this.plataforma === 'android') {
-                if (titulo) titulo.textContent = '📲 Instalar Duo Placar no Celular';
-                if (desc) desc.textContent = 'Adicione à tela inicial para ter acesso rápido sem barras de navegador!';
-                if (acoes) {
-                    acoes.innerHTML = '<button class="btn-instalar-primario" type="button" id="btnAcaoInstalar">⚡ Instalar Agora</button>';
-                    const btn = document.getElementById('btnAcaoInstalar');
+                if (titulo) titulo.textContent = '📲 Instalar Duo Placar';
+                if (desc) desc.textContent = 'Instale o aplicativo na sua tela inicial para jogar em tela cheia automática e com carregamento instantâneo!';
+                if (botoes) {
+                    botoes.innerHTML = `
+                        <button class="btn-modal-instalar-primario" type="button" id="btnModalAcaoInstalar">
+                            ⚡ Instalar Aplicativo
+                        </button>
+                        <button class="btn-modal-continuar-secundario" type="button" onclick="InstaladorModule.fecharModal()">
+                            Continuar no Navegador
+                        </button>
+                    `;
+                    const btn = document.getElementById('btnModalAcaoInstalar');
                     if (btn) {
                         btn.onclick = () => {
                             if (this.deferredPrompt) {
                                 this.deferredPrompt.prompt();
                                 this.deferredPrompt.userChoice.then(() => {
                                     this.deferredPrompt = null;
-                                    this.fecharBanner();
+                                    this.fecharModal();
                                 });
                             } else {
-                                alert("Toque no menu ⋮ do seu navegador Chrome e selecione 'Instalar aplicativo' ou 'Adicionar à tela inicial'.");
+                                alert("Toque no menu ⋮ do seu Chrome e selecione 'Instalar aplicativo' ou 'Adicionar à tela inicial'.");
+                                this.fecharModal();
                             }
                         };
                     }
                 }
             } else if (this.plataforma === 'ios') {
-                if (titulo) titulo.textContent = '🍏 Instalar no seu iPhone / iPad';
-                if (desc) desc.innerHTML = '1. Toque em <strong>Compartilhar <span class="icone-ios-share">⎋</span></strong> (rodapé do Safari).<br>2. Selecione <strong>"Adicionar à Tela de Início" ➕</strong>.';
-                if (acoes) {
-                    acoes.innerHTML = '<button class="btn-instalar-primario" type="button" onclick="InstaladorModule.fecharBanner()">✓ Entendi</button>';
+                if (titulo) titulo.textContent = motivoTelaCheia ? '🖥️ Tela Cheia no iPhone' : '🍏 Instalar Duo Placar';
+                if (desc) {
+                    desc.innerHTML = `
+                        <p style="margin: 0 0 12px 0;">No Safari do iPhone, instale o app na tela inicial para ter <strong>tela cheia automática</strong> sem barras de navegador:</p>
+                        <div class="modal-passos-ios">
+                            <div class="modal-passo-item">
+                                <span>1️⃣</span>
+                                <span>Toque no botão <strong>Compartilhar <span class="icone-ios-share">⎋</span></strong> no rodapé do Safari.</span>
+                            </div>
+                            <div class="modal-passo-item">
+                                <span>2️⃣</span>
+                                <span>Role para baixo e toque em <strong>"Adicionar à Tela de Início" ➕</strong>.</span>
+                            </div>
+                        </div>
+                    `;
+                }
+                if (botoes) {
+                    botoes.innerHTML = `
+                        <button class="btn-modal-instalar-primario" type="button" onclick="InstaladorModule.fecharModal()">
+                            ✓ Entendi, Continuar
+                        </button>
+                    `;
                 }
             } else {
-                if (titulo) titulo.textContent = '💻 Instalar Duo Placar no seu PC';
-                if (desc) desc.textContent = 'Tenha o placar em janela dedicada e na sua Área de Trabalho!';
-                if (acoes) {
-                    acoes.innerHTML = '<button class="btn-instalar-primario" type="button" id="btnAcaoInstalarPC">💻 Instalar no PC</button>';
-                    const btn = document.getElementById('btnAcaoInstalarPC');
+                // Desktop / PC
+                if (titulo) titulo.textContent = '💻 Instalar Duo Placar no PC';
+                if (desc) desc.textContent = 'Tenha o placar em janela dedicada, sem distrações e com atalho direto na sua Área de Trabalho!';
+                if (botoes) {
+                    botoes.innerHTML = `
+                        <button class="btn-modal-instalar-primario" type="button" id="btnModalAcaoInstalarPC">
+                            💻 Instalar no Computador
+                        </button>
+                        <button class="btn-modal-continuar-secundario" type="button" onclick="InstaladorModule.fecharModal()">
+                            Continuar no Navegador
+                        </button>
+                    `;
+                    const btn = document.getElementById('btnModalAcaoInstalarPC');
                     if (btn) {
                         btn.onclick = () => {
                             if (this.deferredPrompt) {
                                 this.deferredPrompt.prompt();
                                 this.deferredPrompt.userChoice.then(() => {
                                     this.deferredPrompt = null;
-                                    this.fecharBanner();
+                                    this.fecharModal();
                                 });
                             } else {
-                                alert("No seu navegador no PC (Chrome/Edge), clique no ícone ⊕ ou 'Instalar' na barra de endereços acima.");
+                                alert("No seu navegador (Chrome/Edge), clique no ícone ⊕ ou 'Instalar' na barra de endereços acima.");
+                                this.fecharModal();
                             }
                         };
                     }
                 }
             }
 
-            this.banner.style.display = 'flex';
+            this.modal.style.display = 'flex';
         },
-        abrirGuiaManual() {
-            this.exibirBanner();
-            if (this.plataforma === 'android' && this.deferredPrompt) {
-                this.deferredPrompt.prompt();
-            }
-        },
-        fecharBanner() {
-            if (this.banner) this.banner.style.display = 'none';
+        fecharModal() {
+            sessionStorage.setItem('recusou_instalacao', 'true');
+            if (this.modal) this.modal.style.display = 'none';
         }
     };
 
