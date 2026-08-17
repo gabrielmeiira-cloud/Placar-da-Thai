@@ -2271,8 +2271,9 @@
         exibirAberturaInicial() {
             if (this.jaExibido) return;
             this.jaExibido = true; // Trava para nunca reabrir durante a sessão do usuário
+            const figurinhasAtivas = !!(State.data.configs && State.data.configs.figurinhas);
             const src = State.data.figurinhaAbertura;
-            if (src && this.overlay && this.img) {
+            if (figurinhasAtivas && src && this.overlay && this.img) {
                 this.img.src = src;
                 this.overlay.style.display = 'flex';
             } else if (this.overlay) {
