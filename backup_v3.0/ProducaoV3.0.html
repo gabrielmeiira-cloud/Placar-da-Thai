@@ -5376,6 +5376,10 @@ input:checked + .slider:before {
                     setTimeout(() => {
                         this.overlay.style.display = 'none';
                         this.overlay.classList.remove('saindo');
+                        // Se não estiver instalado, exibe imediatamente o modal de instalação após fechar a abertura
+                        if (window.InstaladorModule && !window.InstaladorModule.jaInstalado) {
+                            window.InstaladorModule.exibirModal();
+                        }
                     }, 350);
                 };
 
@@ -5400,13 +5404,16 @@ input:checked + .slider:before {
         },
         exibirAberturaInicial() {
             if (this.jaExibido) return;
+            this.jaExibido = true; // Trava para nunca reabrir durante a sessão do usuário
             const src = State.data.figurinhaAbertura;
             if (src && this.overlay && this.img) {
                 this.img.src = src;
                 this.overlay.style.display = 'flex';
-                this.jaExibido = true;
             } else if (this.overlay) {
                 this.overlay.style.display = 'none';
+                if (window.InstaladorModule && !window.InstaladorModule.jaInstalado) {
+                    setTimeout(() => window.InstaladorModule.exibirModal(), 400);
+                }
             }
         }
     };
@@ -5456,22 +5463,14 @@ input:checked + .slider:before {
                 });
             }
 
-            // Sempre que entrar pelo navegador e não estiver instalado, exibe o modal
+            // Se não estiver instalado e não houver tela de abertura ativa, exibe o modal
             if (!this.jaInstalado) {
                 setTimeout(() => {
                     const overlayAbertura = document.getElementById('overlayAberturaApp');
                     if (!overlayAbertura || overlayAbertura.style.display === 'none') {
                         this.exibirModal();
-                    } else {
-                        // Se houver tela de abertura inicial com figurinha, aguarda ela ser fechada
-                        overlayAbertura.addEventListener('click', () => {
-                            setTimeout(() => this.exibirModal(), 400);
-                        }, { once: true });
-                        overlayAbertura.addEventListener('touchend', () => {
-                            setTimeout(() => this.exibirModal(), 400);
-                        }, { once: true });
                     }
-                }, 1200);
+                }, 600);
             }
         },
         detectarPlataforma() {
