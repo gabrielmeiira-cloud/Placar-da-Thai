@@ -523,6 +523,10 @@
     const Placar = {
         IMAGENS_DA_THAI: ['Thai01.webp', 'Thai02.webp', 'Thai03.webp'],
         scoreAzul: 0, scoreVermelho: 0, ladosInvertidos: false, jogoEncerrado: false, confetesAtivos: [],
+        bloqueioToqueAte: 0,
+        bloquearToquesBrevemente(ms = 600) {
+            this.bloqueioToqueAte = Date.now() + ms;
+        },
         init() {
             this.cacheDOM();
             this.bindEvents();
@@ -709,6 +713,7 @@
                 return { x: e.clientX, y: e.clientY };
             };
             const estaBloqueado = () => {
+                if (Date.now() < (Placar.bloqueioToqueAte || 0)) return true;
                 if (document.body.classList.contains('painel-aberto') || document.body.classList.contains('modal-aberto')) return true;
                 const painel = document.getElementById('painelGestaoOverlay');
                 if (painel && (painel.classList.contains('aberto') || (typeof OverlayModule !== 'undefined' && OverlayModule.estaAberto()))) return true;
@@ -718,6 +723,10 @@
                 if (dropdown && dropdown.classList.contains('ativo')) return true;
                 const modal = document.querySelector('.modal-overlay:not([style*="display: none"])');
                 if (modal) return true;
+                const modalInstalacao = document.getElementById('modalInstalacaoApp');
+                if (modalInstalacao && modalInstalacao.style.display !== 'none') return true;
+                const overlayAbertura = document.getElementById('overlayAberturaApp');
+                if (overlayAbertura && overlayAbertura.style.display !== 'none') return true;
                 return false;
             };
 
@@ -2219,7 +2228,15 @@
             this.img = document.getElementById('imgFigurinhaAbertura');
 
             if (this.overlay) {
-                const fechar = () => {
+                const fechar = (e) => {
+                    if (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
+                    }
+                    if (window.Placar && window.Placar.bloquearToquesBrevemente) {
+                        window.Placar.bloquearToquesBrevemente(700);
+                    }
                     this.jaExibido = true;
                     this.overlay.classList.add('saindo');
                     setTimeout(() => {
@@ -2227,8 +2244,22 @@
                         this.overlay.classList.remove('saindo');
                     }, 350);
                 };
+
+                const absorverToque = (e) => {
+                    if (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    if (window.Placar && window.Placar.bloquearToquesBrevemente) {
+                        window.Placar.bloquearToquesBrevemente(700);
+                    }
+                };
+
+                this.overlay.addEventListener('pointerdown', absorverToque, { passive: false });
+                this.overlay.addEventListener('touchstart', absorverToque, { passive: false });
                 this.overlay.addEventListener('click', fechar);
                 this.overlay.addEventListener('pointerup', fechar);
+                this.overlay.addEventListener('touchend', fechar);
             }
 
             this.exibirAberturaInicial();
@@ -2269,7 +2300,7 @@
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
                 this.deferredPrompt = e;
-                if (!this.jaInstalado && !sessionStorage.getItem('recusou_instalacao')) {
+                if (!this.jaInstalado) {
                     this.exibirModal();
                 }
             });
@@ -2291,9 +2322,8 @@
                 });
             }
 
-            // Se ainda não estiver instalado e não foi dispensado nesta sessão, exibe modal em tela cheia
-            if (!this.jaInstalado && !sessionStorage.getItem('recusou_instalacao')) {
-                // Abre após breve pausa para uma entrada suave
+            // Sempre que entrar pelo navegador e não estiver instalado, exibe o modal
+            if (!this.jaInstalado) {
                 setTimeout(() => {
                     const overlayAbertura = document.getElementById('overlayAberturaApp');
                     if (!overlayAbertura || overlayAbertura.style.display === 'none') {
@@ -2303,8 +2333,11 @@
                         overlayAbertura.addEventListener('click', () => {
                             setTimeout(() => this.exibirModal(), 400);
                         }, { once: true });
+                        overlayAbertura.addEventListener('touchend', () => {
+                            setTimeout(() => this.exibirModal(), 400);
+                        }, { once: true });
                     }
-                }, 1500);
+                }, 1200);
             }
         },
         detectarPlataforma() {
@@ -2435,8 +2468,14 @@
 
             this.modal.style.display = 'flex';
         },
-        fecharModal() {
-            sessionStorage.setItem('recusou_instalacao', 'true');
+        fecharModal(e) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            if (window.Placar && window.Placar.bloquearToquesBrevemente) {
+                window.Placar.bloquearToquesBrevemente(700);
+            }
             if (this.modal) this.modal.style.display = 'none';
         }
     };
