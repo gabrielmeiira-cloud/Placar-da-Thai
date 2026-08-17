@@ -520,7 +520,8 @@ body.painel-aberto .barreira-touch-placar {
     text-shadow: 0 0 10px rgba(0, 210, 255, 0.45);
     letter-spacing: 0.2px;
     font-family: 'Fredoka', sans-serif;
-    text-decoration: none;
+    text-decoration: underline;
+    text-underline-offset: 3px;
     cursor: pointer;
     pointer-events: auto;
     transition: color 0.2s ease, transform 0.2s ease, text-shadow 0.2s ease;
