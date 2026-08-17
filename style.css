@@ -2000,10 +2000,6 @@ body.tema-escuro .modal-btn-cancelar {
 }
 
 .titulo-abertura-app {
-    position: absolute;
-    top: max(20px, env(safe-area-inset-top, 20px));
-    left: 0;
-    right: 0;
     text-align: center;
     font-family: 'Fredoka', sans-serif;
     font-size: clamp(1.9rem, 6.5vw, 3rem);
@@ -2021,22 +2017,66 @@ body.tema-escuro .modal-btn-cancelar {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    height: 100%;
-    padding: max(65px, calc(env(safe-area-inset-top, 0px) + 58px)) 10px max(12px, env(safe-area-inset-bottom, 12px)) 10px;
     box-sizing: border-box;
 }
 
 .img-figurinha-abertura {
-    width: min(95vw, calc(95dvh - 75px));
-    height: min(95vw, calc(95dvh - 75px));
-    max-width: 95vw;
-    max-height: calc(95dvh - 70px);
     object-fit: contain;
     filter: drop-shadow(0 14px 30px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 25px rgba(0, 123, 255, 0.35));
     animation: animFigurinhaAberturaDupla 2.4s ease-in-out forwards;
     user-select: none;
     -webkit-user-drag: none;
+}
+
+/* Modo Horizontal / Paisagem */
+@media (orientation: landscape) {
+    .titulo-abertura-app {
+        position: absolute;
+        top: max(14px, env(safe-area-inset-top, 14px));
+        left: 0;
+        right: 0;
+    }
+    .container-figurinha-abertura {
+        width: 100%;
+        height: 100%;
+        padding: max(55px, calc(env(safe-area-inset-top, 0px) + 50px)) 10px max(10px, env(safe-area-inset-bottom, 10px)) 10px;
+    }
+    .img-figurinha-abertura {
+        width: min(95vw, calc(95dvh - 65px));
+        height: min(95vw, calc(95dvh - 65px));
+        max-width: 95vw;
+        max-height: calc(95dvh - 60px);
+    }
+}
+
+/* Modo Vertical / Retrato: título bem pertinho da figurinha e conjunto harmonioso */
+@media (orientation: portrait) {
+    .overlay-abertura-app {
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+    }
+    .titulo-abertura-app {
+        position: relative;
+        top: auto;
+        left: auto;
+        right: auto;
+        font-size: clamp(1.85rem, 7.5vw, 2.7rem);
+        margin: 0;
+        padding-top: max(8px, env(safe-area-inset-top, 8px));
+    }
+    .container-figurinha-abertura {
+        width: 100%;
+        height: auto;
+        flex: 0 0 auto;
+        padding: 0 10px max(14px, env(safe-area-inset-bottom, 14px)) 10px;
+    }
+    .img-figurinha-abertura {
+        width: min(92vw, calc(82dvh - 95px));
+        height: min(92vw, calc(82dvh - 95px));
+        max-width: 92vw;
+        max-height: calc(82dvh - 95px);
+    }
 }
 
 @keyframes animFigurinhaAberturaDupla {
