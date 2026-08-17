@@ -11,13 +11,17 @@
             TIMES: 'times_salvos',
             PARTIDAS: 'partidas_geradas',
             PARTIDA_ATUAL: 'thai_partida_ativa',
-            CONFIGS: 'thai_configs'
+            CONFIGS: 'thai_configs',
+            FIGURINHAS: 'thai_figurinhas_custom',
+            ABERTURA: 'thai_figurinha_abertura'
         },
         data: {
             jogadores: [],
             times: [],
             partidas: [],
             partidaAtual: null,
+            figurinhas: [],
+            figurinhaAbertura: null,
             configs: {
                 tema: 'claro',
                 figurinhas: false,
@@ -41,8 +45,50 @@
                 this.data.partidas = p ? JSON.parse(p) : [];
                 const pa = localStorage.getItem(this.KEYS.PARTIDA_ATUAL);
                 this.data.partidaAtual = pa ? JSON.parse(pa) : null;
+
+                const timesValidos = (this.data.times || []).filter(t => Array.isArray(t) && t.length > 0);
+                const temJogadores = this.data.jogadores && this.data.jogadores.length >= 2;
+                const temTimes = timesValidos.length >= 2;
+                const temPartidas = this.data.partidas && this.data.partidas.length > 0;
+
+                if (!temJogadores || !temTimes || !temPartidas) {
+                    this.data.partidaAtual = null;
+                    localStorage.removeItem(this.KEYS.PARTIDA_ATUAL);
+                    if (!temJogadores || !temTimes) {
+                        this.data.partidas = [];
+                        localStorage.removeItem(this.KEYS.PARTIDAS);
+                    }
+                } else if (this.data.partidaAtual && this.data.partidaAtual.idPartida) {
+                    const existe = this.data.partidas.some(part => part.id === this.data.partidaAtual.idPartida);
+                    if (!existe) {
+                        const proxAtiva = this.data.partidas.find(part => part.status === 'ativa');
+                        if (proxAtiva) {
+                            this.data.partidaAtual = { idPartida: proxAtiva.id, nomeAzul: proxAtiva.time1, nomeVermelho: proxAtiva.time2 };
+                            localStorage.setItem(this.KEYS.PARTIDA_ATUAL, JSON.stringify(this.data.partidaAtual));
+                        } else {
+                            this.data.partidaAtual = null;
+                            localStorage.removeItem(this.KEYS.PARTIDA_ATUAL);
+                        }
+                    }
+                }
+
                 const modFila = localStorage.getItem('modalidade_fila_auto'); if (modFila) this.data.modalidadeFilaAuto = modFila;
                 const fila = localStorage.getItem('fila_times_auto'); if (fila) this.data.filaTimes = JSON.parse(fila);
+
+                const fig = localStorage.getItem(this.KEYS.FIGURINHAS);
+                if (fig !== null) {
+                    try {
+                        const parsed = JSON.parse(fig);
+                        this.data.figurinhas = Array.isArray(parsed) ? parsed : [];
+                    } catch (e) {
+                        this.data.figurinhas = [];
+                    }
+                } else {
+                    this.data.figurinhas = [];
+                }
+
+                this.data.figurinhaAbertura = localStorage.getItem(this.KEYS.ABERTURA) || null;
+
                 const cfg = localStorage.getItem(this.KEYS.CONFIGS);
                 if (cfg) {
                     this.data.configs = { ...this.data.configs, ...JSON.parse(cfg) };
@@ -68,6 +114,13 @@
         salvarJogadores(lista) {
             this.data.jogadores = lista;
             localStorage.setItem(this.KEYS.JOGADORES, JSON.stringify(lista));
+            if (!lista || lista.length < 2) {
+                this.data.partidaAtual = null;
+                localStorage.removeItem(this.KEYS.PARTIDA_ATUAL);
+                this.salvarTimes([]);
+                this.salvarPartidas([]);
+                this.notify('partida_ativa', null);
+            }
             this.notify('jogadores', lista);
         },
         adicionarJogador(nome, genero, nivel) {
@@ -81,6 +134,13 @@
         salvarTimes(times) {
             this.data.times = times;
             localStorage.setItem(this.KEYS.TIMES, JSON.stringify(times));
+            const timesValidos = (times || []).filter(t => Array.isArray(t) && t.length > 0);
+            if (timesValidos.length < 2) {
+                this.data.partidaAtual = null;
+                localStorage.removeItem(this.KEYS.PARTIDA_ATUAL);
+                this.salvarPartidas([]);
+                this.notify('partida_ativa', null);
+            }
             this.notify('times', times);
         },
         salvarPartidas(partidas) {
@@ -90,8 +150,57 @@
                 this.data.partidaAtual = null;
                 localStorage.removeItem(this.KEYS.PARTIDA_ATUAL);
                 this.notify('partida_ativa', null);
+            } else if (this.data.partidaAtual && this.data.partidaAtual.idPartida) {
+                const existe = partidas.some(p => p.id === this.data.partidaAtual.idPartida);
+                if (!existe) {
+                    const prox = partidas.find(p => p.status === 'ativa');
+                    if (prox) {
+                        this.carregarPartidaNoPlacar(prox.time1, prox.time2, prox.id);
+                    } else {
+                        this.data.partidaAtual = null;
+                        localStorage.removeItem(this.KEYS.PARTIDA_ATUAL);
+                        this.notify('partida_ativa', null);
+                    }
+                }
             }
             this.notify('partidas', partidas);
+        },
+        obterFigurinhas() {
+            return Array.isArray(this.data.figurinhas) ? this.data.figurinhas : [];
+        },
+        salvarFigurinhas(lista) {
+            this.data.figurinhas = Array.isArray(lista) ? lista : [];
+            localStorage.setItem(this.KEYS.FIGURINHAS, JSON.stringify(this.data.figurinhas));
+            if (typeof FigurinhasModule !== 'undefined' && FigurinhasModule.salvarNuvem) {
+                FigurinhasModule.salvarNuvem(this.data.figurinhas);
+            }
+            this.notify('figurinhas', this.data.figurinhas);
+        },
+        adicionarFigurinha(src) {
+            const lista = [...this.obterFigurinhas(), src];
+            this.salvarFigurinhas(lista);
+        },
+        removerFigurinha(index) {
+            const lista = [...this.obterFigurinhas()];
+            const removida = lista[index];
+            lista.splice(index, 1);
+            if (this.data.figurinhaAbertura === removida) {
+                this.definirFigurinhaAbertura(null);
+            }
+            this.salvarFigurinhas(lista);
+        },
+        definirFigurinhaAbertura(src) {
+            if (this.data.figurinhaAbertura === src || !src) {
+                this.data.figurinhaAbertura = null;
+                localStorage.removeItem(this.KEYS.ABERTURA);
+            } else {
+                this.data.figurinhaAbertura = src;
+                localStorage.setItem(this.KEYS.ABERTURA, src);
+            }
+            if (typeof FigurinhasModule !== 'undefined' && FigurinhasModule.salvarAberturaNuvem) {
+                FigurinhasModule.salvarAberturaNuvem(this.data.figurinhaAbertura);
+            }
+            this.notify('abertura', this.data.figurinhaAbertura);
         },
         salvarConfigs(parciais) {
             this.data.configs = { ...this.data.configs, ...parciais };
@@ -419,7 +528,11 @@
             this.bindEvents();
             this.aplicarConfigs();
             this.iniciarFisica();
-            State.subscribe((tipo) => { if (tipo === 'partida_ativa') this.carregarPartidaAtiva(); });
+            State.subscribe((tipo) => {
+                if (tipo === 'partida_ativa' || tipo === 'times' || tipo === 'partidas' || tipo === 'jogadores') {
+                    this.carregarPartidaAtiva();
+                }
+            });
             this.carregarPartidaAtiva();
         },
         cacheDOM() {
@@ -556,12 +669,24 @@
         },
         carregarPartidaAtiva() {
             const pa = State.data.partidaAtual;
-            if (pa && pa.nomeAzul && pa.nomeVermelho) {
+            const timesValidos = (State.data.times || []).filter(t => Array.isArray(t) && t.length > 0);
+            const temJogadores = State.data.jogadores && State.data.jogadores.length >= 2;
+            const temTimes = timesValidos.length >= 2;
+            const temPartidas = State.data.partidas && State.data.partidas.length > 0;
+
+            if (pa && pa.nomeAzul && pa.nomeVermelho && temJogadores && temTimes && temPartidas) {
                 if (this.labelAzul) { this.labelAzul.textContent = pa.nomeAzul; this.labelAzul.style.display = 'block'; }
                 if (this.labelVermelho) { this.labelVermelho.textContent = pa.nomeVermelho; this.labelVermelho.style.display = 'block'; }
             } else {
                 if (this.labelAzul) { this.labelAzul.textContent = ''; this.labelAzul.style.display = 'none'; }
                 if (this.labelVermelho) { this.labelVermelho.textContent = ''; this.labelVermelho.style.display = 'none'; }
+                // Quando não há partida ou times válidos, zera a contagem e estado do placar
+                this.scoreAzul = 0;
+                this.scoreVermelho = 0;
+                this.jogoEncerrado = false;
+                this.limparConfetes();
+                const antiga = document.querySelector('.figurinha-ponto');
+                if (antiga) antiga.remove();
             }
             this.atualizarPlacar();
         },
@@ -734,9 +859,11 @@
             const antiga = document.querySelector('.figurinha-ponto'); if (antiga) antiga.remove();
             const container = lado === 'azul' ? this.containerAzul : this.containerVermelho;
             if (!container) return;
+            const lista = State.obterFigurinhas();
+            if (!lista || lista.length === 0) return;
             const img = document.createElement('img');
             img.className = 'figurinha-ponto';
-            img.src = this.IMAGENS_DA_THAI[Math.floor(Math.random() * this.IMAGENS_DA_THAI.length)];
+            img.src = lista[Math.floor(Math.random() * lista.length)];
             container.appendChild(img);
             img.addEventListener('animationend', () => img.remove());
         },
@@ -808,7 +935,13 @@
             State.adicionarJogador(nome, genero, nivel);
             if (inputNome) { inputNome.value = ''; inputNome.focus(); }
         },
-        remover(index) { State.removerJogador(index); },
+        remover(index) {
+            State.removerJogador(index);
+            if (State.data.jogadores.length < 2) {
+                State.salvarTimes([]);
+                State.salvarPartidas([]);
+            }
+        },
         render() {
             const lista = document.getElementById('listaJogadores');
             const contador = document.getElementById('contadorJogadores');
@@ -940,28 +1073,28 @@
             if (!jOriginal) return;
             const modoPrincipal = document.querySelector('input[name="modoPrincipal"]:checked')?.value || 'manual';
 
-            if (modoPrincipal === 'manual') {
-                if (this.modoVisualizacao !== 'manual') {
-                    this.modoVisualizacao = 'manual';
-                    if (this.timesAtuais.length === 0) this.timesAtuais = [[], []];
-                }
-
-                if (selecionou) {
+            if (selecionou) {
+                if (modoPrincipal === 'manual') {
+                    if (this.modoVisualizacao !== 'manual') {
+                        this.modoVisualizacao = 'manual';
+                        if (this.timesAtuais.length === 0) this.timesAtuais = [[], []];
+                    }
                     let jaExiste = this.filaEspera.some(j => j.nome === jOriginal.nome) ||
                         this.timesAtuais.some(t => Array.isArray(t) && t.some(j => j.nome === jOriginal.nome));
                     if (!jaExiste) {
                         this.filaEspera.push({ ...jOriginal });
                         this.filaEspera.sort((a, b) => b.nivel - a.nivel);
                     }
-                } else {
-                    this.filaEspera = this.filaEspera.filter(j => j.nome !== jOriginal.nome);
-                    this.timesAtuais.forEach((time, tIdx) => {
-                        if (Array.isArray(time)) {
-                            this.timesAtuais[tIdx] = time.filter(j => j.nome !== jOriginal.nome);
-                        }
-                    });
-                    State.salvarTimes(this.timesAtuais);
+                    this.renderizarVisualizacao();
                 }
+            } else {
+                this.filaEspera = this.filaEspera.filter(j => j.nome !== jOriginal.nome);
+                this.timesAtuais.forEach((time, tIdx) => {
+                    if (Array.isArray(time)) {
+                        this.timesAtuais[tIdx] = time.filter(j => j.nome !== jOriginal.nome);
+                    }
+                });
+                State.salvarTimes(this.timesAtuais);
                 this.renderizarVisualizacao();
             }
         },
@@ -1121,7 +1254,11 @@
         },
         limparTodosTimes() {
             if (confirm("Tem certeza que deseja apagar todos os times sorteados?")) {
-                this.timesAtuais = []; this.filaEspera = []; State.salvarTimes([]); this.renderizarVisualizacao();
+                this.timesAtuais = [];
+                this.filaEspera = [];
+                State.salvarTimes([]);
+                State.salvarPartidas([]);
+                this.renderizarVisualizacao();
             }
         },
         renderizarVisualizacao() {
@@ -1799,18 +1936,23 @@
 
         if (btnToggleFig) {
             btnToggleFig.addEventListener('click', (e) => {
-                if (e.target !== checkFig && !e.target.closest('.switch')) {
-                    if (checkFig) {
-                        checkFig.checked = !checkFig.checked;
-                        State.salvarConfigs({ figurinhas: checkFig.checked });
-                        atualizarFigurinhasUI();
-                    }
+                if (e.target === checkFig || e.target.closest('.switch')) {
+                    // Clicou diretamente no switch (ligar/desligar) -> apenas altera o estado
+                    return;
+                }
+                // Clicou no botão/texto -> abre a interface de gerenciar figurinhas
+                e.stopPropagation();
+                const dropdown = document.getElementById('dropdownMenu');
+                if (dropdown) dropdown.classList.remove('ativo');
+                if (typeof FigurinhasModule !== 'undefined' && FigurinhasModule.abrirModal) {
+                    FigurinhasModule.abrirModal();
                 }
             });
         }
 
         if (checkFig) {
-            checkFig.addEventListener('change', () => {
+            checkFig.addEventListener('change', (e) => {
+                e.stopPropagation();
                 State.salvarConfigs({ figurinhas: checkFig.checked });
                 atualizarFigurinhasUI();
             });
@@ -1853,19 +1995,250 @@
         }
         aplicarTemaUI();
 
-        if (overlayIntro) {
-            if (State.data.configs.figurinhas === true) {
-                overlayIntro.style.display = 'flex';
-                const fechar = () => { overlayIntro.style.display = 'none'; overlayIntro.remove(); };
-                overlayIntro.addEventListener('click', fechar);
-                overlayIntro.addEventListener('pointerup', fechar);
-            } else {
-                overlayIntro.remove();
-            }
-        }
     }
 
-    // 9. INICIALIZAÇÃO
+    // 8. GERENCIADOR DE FIGURINHAS EM TEMPO REAL (FIREBASE)
+    const FigurinhasModule = {
+        modal: null,
+        grade: null,
+        inputUpload: null,
+        btnAdicionar: null,
+        btnFechar: null,
+        btnConcluir: null,
+        contadorTotal: null,
+        badgeNuvem: null,
+        eventSource: null,
+        FIREBASE_URL: 'https://placardathai-default-rtdb.firebaseio.com/figurinhas.json',
+        FIREBASE_ABERTURA_URL: 'https://placardathai-default-rtdb.firebaseio.com/figurinhaAbertura.json',
+        init() {
+            this.modal = document.getElementById('modalGerenciarFigurinhas');
+            this.grade = document.getElementById('gradeFigurinhasGestao');
+            this.inputUpload = document.getElementById('inputUploadFigurinha');
+            this.btnAdicionar = document.getElementById('btnAdicionarFigurinha');
+            this.btnFechar = document.getElementById('btnFecharModalFigurinhas');
+            this.btnConcluir = document.getElementById('btnConcluirFigurinhas');
+            this.contadorTotal = document.getElementById('contadorFigurinhasTotal');
+            this.badgeNuvem = document.getElementById('badgeStatusNuvem');
+
+            if (this.btnFechar) this.btnFechar.addEventListener('click', () => this.fecharModal());
+            if (this.btnConcluir) this.btnConcluir.addEventListener('click', () => this.fecharModal());
+            if (this.btnAdicionar && this.inputUpload) {
+                this.btnAdicionar.addEventListener('click', () => this.inputUpload.click());
+                this.inputUpload.addEventListener('change', (e) => this.processarUpload(e));
+            }
+
+            State.subscribe((tipo) => {
+                if (tipo === 'figurinhas' || tipo === 'abertura') this.render();
+            });
+
+            this.conectarFirebase();
+            this.render();
+        },
+        conectarFirebase() {
+            this.sincronizarNuvem();
+            if (window.EventSource) {
+                try {
+                    if (this.eventSource) this.eventSource.close();
+                    this.eventSource = new EventSource(this.FIREBASE_URL);
+                    this.eventSource.addEventListener('put', (e) => {
+                        try {
+                            const res = JSON.parse(e.data);
+                            const lista = res && res.data && Array.isArray(res.data) ? res.data : (Array.isArray(res) ? res : []);
+                            if (JSON.stringify(lista) !== JSON.stringify(State.obterFigurinhas())) {
+                                State.data.figurinhas = lista;
+                                localStorage.setItem(State.KEYS.FIGURINHAS, JSON.stringify(lista));
+                                State.notify('figurinhas', lista);
+                            }
+                            if (this.badgeNuvem) {
+                                this.badgeNuvem.textContent = '🟢 Ao Vivo';
+                                this.badgeNuvem.style.color = '#4ade80';
+                            }
+                        } catch (err) {}
+                    });
+                } catch (err) {}
+            }
+        },
+        sincronizarNuvem() {
+            fetch(this.FIREBASE_URL)
+                .then(r => r.json())
+                .then(res => {
+                    if (Array.isArray(res)) {
+                        State.data.figurinhas = res;
+                        localStorage.setItem(State.KEYS.FIGURINHAS, JSON.stringify(res));
+                        State.notify('figurinhas', res);
+                    }
+                    if (this.badgeNuvem) {
+                        this.badgeNuvem.textContent = '🟢 Ao Vivo';
+                        this.badgeNuvem.style.color = '#4ade80';
+                    }
+                })
+                .catch(() => {});
+
+            fetch(this.FIREBASE_ABERTURA_URL)
+                .then(r => r.json())
+                .then(abertura => {
+                    if (abertura !== undefined) {
+                        const val = abertura || null;
+                        State.data.figurinhaAbertura = val;
+                        if (val) localStorage.setItem(State.KEYS.ABERTURA, val);
+                        else localStorage.removeItem(State.KEYS.ABERTURA);
+                        State.notify('abertura', val);
+                    }
+                })
+                .catch(() => {});
+        },
+        salvarNuvem(lista) {
+            fetch(this.FIREBASE_URL, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(lista)
+            }).catch(() => {});
+        },
+        salvarAberturaNuvem(src) {
+            fetch(this.FIREBASE_ABERTURA_URL, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(src)
+            }).catch(() => {});
+        },
+        abrirModal() {
+            if (this.modal) {
+                this.modal.style.display = 'flex';
+                document.body.classList.add('modal-aberto');
+                this.sincronizarNuvem();
+                this.render();
+            }
+        },
+        fecharModal() {
+            if (this.modal) {
+                this.modal.style.display = 'none';
+                document.body.classList.remove('modal-aberto');
+            }
+        },
+        processarUpload(e) {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+            Array.from(files).forEach(file => {
+                if (!file.type.startsWith('image/')) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const maxDim = 380;
+                        let w = img.width, h = img.height;
+                        if (w > h && w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; }
+                        else if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        const dataUrl = canvas.toDataURL('image/webp', 0.85);
+                        State.adicionarFigurinha(dataUrl);
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+            this.inputUpload.value = '';
+        },
+        remover(index) {
+            if (confirm("Deseja realmente excluir esta figurinha do mural compartilhado?")) {
+                State.removerFigurinha(index);
+            }
+        },
+        testarAnimacao(src) {
+            const antiga = document.querySelector('.figurinha-ponto');
+            if (antiga) antiga.remove();
+            const container = document.getElementById('btnAzul') || document.body;
+            const img = document.createElement('img');
+            img.className = 'figurinha-ponto';
+            img.src = src;
+            container.appendChild(img);
+            img.addEventListener('animationend', () => img.remove());
+        },
+        toggleAberturaComConfirmacao(src) {
+            const ehAbertura = src === State.data.figurinhaAbertura;
+            if (ehAbertura) {
+                if (confirm("Deseja desativar esta figurinha da tela de abertura?\n(O app passará a abrir normalmente sem tela de introdução)")) {
+                    State.definirFigurinhaAbertura(null);
+                }
+            } else {
+                if (confirm("Deseja definir esta figurinha como a tela de abertura do Placar da Thai?\n(Ela será exibida em destaque toda vez que o app for aberto)")) {
+                    State.definirFigurinhaAbertura(src);
+                }
+            }
+        },
+        render() {
+            if (!this.grade) return;
+            const lista = State.obterFigurinhas();
+            const aberturaAtual = State.data.figurinhaAbertura;
+            if (this.contadorTotal) {
+                this.contadorTotal.textContent = `Total: ${lista.length} figurinha${lista.length === 1 ? '' : 's'}`;
+            }
+            this.grade.innerHTML = '';
+            if (lista.length === 0) {
+                this.grade.innerHTML = '<div class="aviso-vazio" style="grid-column: 1 / -1; padding: 24px 12px; font-size: 0.92rem; text-align: center;">Nenhuma figurinha cadastrada.<br>Clique em "+ Adicionar Figurinha" acima para adicionar suas fotos!</div>';
+                return;
+            }
+            lista.forEach((src, idx) => {
+                const ehAbertura = src === aberturaAtual;
+                const card = document.createElement('div');
+                card.className = `card-figurinha-item ${ehAbertura ? 'eh-abertura' : ''}`;
+                card.title = 'Toque na imagem para testar animação de ponto';
+                card.innerHTML = `
+                    <button class="btn-estrela-abertura" type="button" title="${ehAbertura ? 'Figurinha de Abertura Ativa ⭐ (Toque para desativar)' : 'Definir como Figurinha de Abertura ☆'}" onclick="event.stopPropagation(); FigurinhasModule.toggleAberturaComConfirmacao('${src}')">
+                        ${ehAbertura ? '⭐' : '☆'}
+                    </button>
+                    <button class="btn-excluir-figurinha" type="button" title="Excluir figurinha" onclick="event.stopPropagation(); FigurinhasModule.remover(${idx})">✕</button>
+                    <div class="card-figurinha-img-wrap" onclick="FigurinhasModule.testarAnimacao('${src}')">
+                        <img src="${src}" class="card-figurinha-img" alt="Figurinha #${idx + 1}" loading="lazy">
+                    </div>
+                    <span class="card-figurinha-badge">Figurinha #${idx + 1}</span>
+                `;
+                this.grade.appendChild(card);
+            });
+        }
+    };
+
+    // 9. TELA DE ABERTURA / BLOQUEIO (SPLASH)
+    const AberturaModule = {
+        overlay: null,
+        img: null,
+        jaExibido: false,
+        init() {
+            this.overlay = document.getElementById('overlayAberturaApp');
+            this.img = document.getElementById('imgFigurinhaAbertura');
+
+            if (this.overlay) {
+                const fechar = () => {
+                    this.jaExibido = true;
+                    this.overlay.classList.add('saindo');
+                    setTimeout(() => {
+                        this.overlay.style.display = 'none';
+                        this.overlay.classList.remove('saindo');
+                    }, 350);
+                };
+                this.overlay.addEventListener('click', fechar);
+                this.overlay.addEventListener('pointerup', fechar);
+            }
+
+            this.exibirAberturaInicial();
+        },
+        exibirAberturaInicial() {
+            if (this.jaExibido) return;
+            const src = State.data.figurinhaAbertura;
+            if (src && this.overlay && this.img) {
+                this.img.src = src;
+                this.overlay.style.display = 'flex';
+                this.jaExibido = true;
+            } else if (this.overlay) {
+                this.overlay.style.display = 'none';
+            }
+        }
+    };
+
+    // 10. INICIALIZAÇÃO
     function inicializarApp() {
         Placar.init();
         OverlayModule.init();
@@ -1873,6 +2246,8 @@
         SorteioModule.init();
         PartidasModule.init();
         RankingModule.init();
+        FigurinhasModule.init();
+        AberturaModule.init();
         initMenuConfig();
     }
 
@@ -1880,6 +2255,8 @@
     window.SorteioModule = SorteioModule;
     window.PartidasModule = PartidasModule;
     window.RankingModule = RankingModule;
+    window.FigurinhasModule = FigurinhasModule;
+    window.AberturaModule = AberturaModule;
     window.Placar = Placar;
 
     if (document.readyState === 'loading') {

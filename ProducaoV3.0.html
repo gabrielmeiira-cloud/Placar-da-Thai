@@ -519,14 +519,13 @@ body.painel-aberto .barreira-touch-placar {
     justify-content: center;
     gap: 3px;
     text-align: center;
-    pointer-events: none;
     user-select: none;
 }
 
 .credito-versao {
     font-size: 0.78rem;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.65);
+    color: rgba(255, 255, 255, 0.7);
     letter-spacing: 0.3px;
     font-family: 'Fredoka', sans-serif;
 }
@@ -538,6 +537,27 @@ body.painel-aberto .barreira-touch-placar {
     text-shadow: 0 0 10px rgba(0, 210, 255, 0.45);
     letter-spacing: 0.2px;
     font-family: 'Fredoka', sans-serif;
+    text-decoration: none;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: color 0.2s ease, transform 0.2s ease, text-shadow 0.2s ease;
+    display: inline-block;
+}
+
+.credito-autor:hover {
+    color: #38bdf8;
+    text-decoration: underline;
+    transform: scale(1.05);
+    text-shadow: 0 0 14px rgba(56, 189, 248, 0.75);
+}
+
+.credito-app-nome {
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.42);
+    letter-spacing: 0.4px;
+    font-family: 'Fredoka', sans-serif;
+    margin-top: 1px;
 }
 
 /* INTERRUPTORES (SWITCH TOGGLE) */
@@ -2460,8 +2480,9 @@ input:checked + .slider:before {
                         </label>
                     </div>
                     <div class="dropdown-rodape-creditos">
-                        <span class="credito-versao">Placar da Thai V10.2</span>
-                        <span class="credito-autor">By Gabriel Meira</span>
+                        <span class="credito-versao">Placar da Thai V3.0</span>
+                        <a href="https://wa.me/55?text=Ol%C3%A1%20Gabriel!" target="_blank" rel="noopener noreferrer" class="credito-autor" title="Falar com Gabriel Meira no WhatsApp">By Gabriel Meira</a>
+                        <span class="credito-app-nome">Duo Placar V3.0</span>
                     </div>
                 </div>
             </div>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Placar da Thai - Partidas</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%2250%22 height=%22100%22 fill=%22%23007bff%22/><rect x=%2250%22 width=%2250%22 height=%22100%22 fill=%22%23dc3545%22/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="modo-app">
+
+<!-- ===================== PARTIDAS ===================== -->
+<section id="pagina-partidas" class="pagina ativa">
+    <header class="app-header">
+        <h1>📋 Partidas</h1>
+        <div class="topo-acoes">
+            <a href="jogadores.html" class="btn-acao">👤 Jogadores</a>
+            <a href="sorteio.html" class="btn-acao">🎲 Sorteio</a>
+            <a href="ranking.html" class="btn-acao">🏆 Ranking</a>
+            <a href="partidas.html" class="btn-acao ativo">📋 Partidas</a>
+            <a href="index.html" class="btn-acao">
+                <span class="icone-placar-blocos">
+                    <span class="bloco-placar bloco-azul-claro"></span>
+                    <span class="bloco-placar bloco-vermelho-escuro"></span>
+                </span> Placar
+            </a>
+        </div>
+    </header>
+
+    <div class="secao">
+        <h2>Gerenciador de Partidas</h2>
+        <div class="info-times" id="infoTimesStatus">
+            <span>Carregando times salvos do sorteio...</span>
+        </div>
+        <div class="form-grupo" style="margin-top: 12px;">
+            <label for="selectHoras">Duração do Baba:</label>
+            <select id="selectHoras" class="select-horas">
+                <option value="1">1 Hora (~12 Partidas Base)</option>
+                <option value="2" selected>2 Horas (~24 Partidas Base)</option>
+                <option value="3">3 Horas (~36 Partidas Base)</option>
+                <option value="4">4 Horas (~48 Partidas Base)</option>
+            </select>
+        </div>
+        <button class="btn-principal" id="btnGerarLista" type="button">🎲 Gerar Novas Partidas</button>
+    </div>
+
+    <div class="tabela-container">
+        <div class="tabela-header-row">
+            <div class="col-partida">Partida / Confronto</div>
+            <div class="col-vencedor">Vencedor</div>
+        </div>
+        <div class="lista-partidas-corpo" id="listaPartidasCorpo">
+            <div class="aviso-vazio">Clique no botão acima para gerar a lista de partidas!</div>
+        </div>
+    </div>
+
+    <button class="btn-secundario" type="button" onclick="adicionarPartidaManual()">➕ Adicionar Partida Manualmente</button>
+    <div id="modalPartidas"></div>
+    <div class="versao-app">Partidas V1.8</div>
+</section>
+
+<script src="partidas.js"></script>
+</body>
+</html>

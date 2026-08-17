@@ -7,8 +7,12 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Placar da Thai</title>
-    <link rel="icon"
-        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%2250%22 height=%22100%22 fill=%22%23007bff%22/><rect x=%2250%22 width=%2250%22 height=%22100%22 fill=%22%23dc3545%22/></svg>">
+    <meta name="theme-color" content="#007bff">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
 /* ==========================================================================
@@ -505,6 +509,57 @@ body.painel-aberto .barreira-touch-placar {
     background-color: rgba(255, 255, 255, 0.22);
 }
 
+.dropdown-rodape-creditos {
+    margin-top: 6px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    text-align: center;
+    user-select: none;
+}
+
+.credito-versao {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 0.3px;
+    font-family: 'Fredoka', sans-serif;
+}
+
+.credito-autor {
+    font-size: 0.74rem;
+    font-weight: 500;
+    color: #00d2ff;
+    text-shadow: 0 0 10px rgba(0, 210, 255, 0.45);
+    letter-spacing: 0.2px;
+    font-family: 'Fredoka', sans-serif;
+    text-decoration: none;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: color 0.2s ease, transform 0.2s ease, text-shadow 0.2s ease;
+    display: inline-block;
+}
+
+.credito-autor:hover {
+    color: #38bdf8;
+    text-decoration: underline;
+    transform: scale(1.05);
+    text-shadow: 0 0 14px rgba(56, 189, 248, 0.75);
+}
+
+.credito-app-nome {
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.42);
+    letter-spacing: 0.4px;
+    font-family: 'Fredoka', sans-serif;
+    margin-top: 1px;
+}
+
 /* INTERRUPTORES (SWITCH TOGGLE) */
 .switch {
     position: relative;
@@ -907,13 +962,27 @@ body.tema-escuro .time-header {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.btn-central svg {
-    display: block;
+.btn-central svg,
+.btn-central span,
+.btn-central i {
+    display: inline-block;
     transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.btn-central:hover svg {
+.btn-central:hover svg,
+.btn-central:hover span,
+.btn-central:hover i {
     transform: rotate(60deg) scale(1.1);
+}
+
+#btnResetBaixo:hover span,
+#btnReset:hover span {
+    transform: rotate(-90deg) scale(1.15);
+}
+
+#btnResetBaixo:active span,
+#btnReset:active span {
+    transform: rotate(-180deg) scale(0.95);
 }
 
 .btn-central:hover {
@@ -1721,6 +1790,7 @@ body.tema-escuro .time-header {
 }
 
 .modal-card {
+    position: relative;
     background: rgba(65, 80, 105, 0.55);
     backdrop-filter: blur(32px) saturate(140%);
     -webkit-backdrop-filter: blur(32px) saturate(140%);
@@ -1796,6 +1866,282 @@ body.tema-escuro .modal-btn-cancelar {
 .modal-btn-confirmar {
     background: #28a745;
     color: white;
+}
+
+.modal-card-largo {
+    max-width: 520px !important;
+    width: 95vw !important;
+}
+
+.btn-fechar-modal-x {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    background: #dc3545;
+    color: #ffffff;
+    border: 2.5px solid #ffffff;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(220, 53, 69, 0.5), 0 2px 6px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, box-shadow 0.2s ease;
+    z-index: 50;
+    line-height: 1;
+    padding: 0;
+}
+
+.btn-fechar-modal-x:hover {
+    background: #bd2130;
+    transform: scale(1.15) rotate(90deg);
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.7);
+}
+
+.btn-fechar-modal-x:active {
+    transform: scale(0.92);
+}
+
+.grade-figurinhas-gestao {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 12px;
+    max-height: 48vh;
+    overflow-y: auto;
+    padding: 6px 2px;
+    scrollbar-width: thin;
+}
+
+.card-figurinha-item {
+    position: relative;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    border-radius: 14px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+
+.card-figurinha-item:hover {
+    transform: translateY(-2px);
+    border-color: #007bff;
+    background: rgba(0, 123, 255, 0.18);
+}
+
+.card-figurinha-item.eh-abertura {
+    border-color: #ffc107 !important;
+    background: rgba(255, 193, 7, 0.18) !important;
+    box-shadow: 0 0 16px rgba(255, 193, 7, 0.45);
+}
+
+.btn-estrela-abertura {
+    position: absolute;
+    bottom: -6px;
+    left: -6px;
+    background: rgba(30, 36, 50, 0.85);
+    color: rgba(255, 255, 255, 0.7);
+    border: 1.5px solid rgba(255, 255, 255, 0.4);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    transition: transform 0.18s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    z-index: 10;
+    line-height: 1;
+    padding: 0;
+}
+
+.btn-estrela-abertura:hover {
+    background: #ffc107;
+    color: #111111;
+    border-color: #ffffff;
+    transform: scale(1.2);
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.7);
+}
+
+.btn-estrela-abertura:active {
+    transform: scale(0.9);
+}
+
+.card-figurinha-item.eh-abertura .btn-estrela-abertura {
+    background: #ffc107;
+    color: #111111;
+    border: 1.5px solid #ffffff;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.75), 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* ==========================================================================
+   TELA DE ABERTURA / BLOQUEIO PERSONALIZADA
+   ========================================================================== */
+.overlay-abertura-app {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    background: rgba(10, 14, 22, 0.68);
+    backdrop-filter: blur(14px) saturate(130%);
+    -webkit-backdrop-filter: blur(14px) saturate(130%);
+    z-index: 99999 !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+    padding: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.overlay-abertura-app.saindo {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.titulo-abertura-app {
+    position: absolute;
+    top: max(20px, env(safe-area-inset-top, 20px));
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-family: 'Fredoka', sans-serif;
+    font-size: clamp(1.9rem, 6.5vw, 3rem);
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 4px 18px rgba(0, 123, 255, 0.75), 0 2px 6px rgba(0, 0, 0, 0.9);
+    letter-spacing: 0.5px;
+    z-index: 2;
+    pointer-events: none;
+    padding: 0 16px;
+    box-sizing: border-box;
+}
+
+.container-figurinha-abertura {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: max(65px, calc(env(safe-area-inset-top, 0px) + 58px)) 10px max(12px, env(safe-area-inset-bottom, 12px)) 10px;
+    box-sizing: border-box;
+}
+
+.img-figurinha-abertura {
+    width: min(95vw, calc(95dvh - 75px));
+    height: min(95vw, calc(95dvh - 75px));
+    max-width: 95vw;
+    max-height: calc(95dvh - 70px);
+    object-fit: contain;
+    filter: drop-shadow(0 14px 30px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 25px rgba(0, 123, 255, 0.35));
+    animation: animFigurinhaAberturaDupla 2.4s ease-in-out forwards;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+@keyframes animFigurinhaAberturaDupla {
+    /* Entrada e Ciclo 1 (mesma dinâmica da animação de ponto) */
+    0% { transform: scale(0.15) rotate(0deg); opacity: 0; }
+    10% { transform: scale(1.0) rotate(-25deg); opacity: 1; }
+    20% { transform: scale(0.92) rotate(25deg); opacity: 1; }
+    30% { transform: scale(1.0) rotate(-25deg); opacity: 1; }
+    40% { transform: scale(0.95) rotate(15deg); opacity: 1; }
+    48% { transform: scale(1.0) rotate(0deg); opacity: 1; }
+    
+    /* Ciclo 2 (segunda repetição) */
+    56% { transform: scale(1.0) rotate(-25deg); opacity: 1; }
+    68% { transform: scale(0.92) rotate(25deg); opacity: 1; }
+    80% { transform: scale(1.0) rotate(-25deg); opacity: 1; }
+    90% { transform: scale(0.96) rotate(15deg); opacity: 1; }
+    
+    /* Para e fica fixa na posição original */
+    100% { transform: scale(1.0) rotate(0deg); opacity: 1; }
+}
+
+@keyframes animPulsarDica {
+    0%, 100% { opacity: 0.5; transform: scale(0.98); }
+    50% { opacity: 1; transform: scale(1.02); }
+}
+
+.card-figurinha-img-wrap {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.25);
+}
+
+.card-figurinha-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transition: transform 0.25s ease;
+}
+
+.card-figurinha-item:hover .card-figurinha-img {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.card-figurinha-badge {
+    font-size: 0.75rem;
+    color: var(--texto-secundario, #e0e0e0);
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.btn-excluir-figurinha {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #dc3545;
+    color: #ffffff;
+    border: 1.5px solid #ffffff;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    transition: transform 0.18s ease, background-color 0.2s ease;
+    z-index: 10;
+    line-height: 1;
+    padding: 0;
+}
+
+.btn-excluir-figurinha:hover {
+    background: #bd2130;
+    transform: scale(1.2);
+}
+
+.btn-excluir-figurinha:active {
+    transform: scale(0.9);
 }
 
 /* Confetes & Figurinhas */
@@ -2055,9 +2401,12 @@ input:checked + .slider:before {
 
 <body>
 
-    <!-- FIGURINHA INICIAL AO ABRIR (SOME AO CLICAR/TOCAR NA TELA) -->
-    <div class="figurinha-inicial-overlay" id="overlayFigurinhaInicial" style="display: none;" onclick="this.style.display='none'; this.remove();">
-        <img src="Thai01.webp" alt="Figurinha 01" class="figurinha-inicial-img" onclick="event.stopPropagation(); this.parentElement.style.display='none'; this.parentElement.remove();">
+    <!-- TELA DE BLOQUEIO / ABERTURA PERSONALIZADA (SOME AO CLICAR EM QUALQUER LUGAR) -->
+    <div id="overlayAberturaApp" class="overlay-abertura-app" style="display: none;">
+        <div class="titulo-abertura-app">🏐 Placar da Thai 🏆</div>
+        <div class="container-figurinha-abertura">
+            <img id="imgFigurinhaAbertura" src="" alt="Figurinha de Abertura" class="img-figurinha-abertura">
+        </div>
     </div>
 
     <!-- ==========================================================================
@@ -2065,8 +2414,6 @@ input:checked + .slider:before {
          ========================================================================== -->
     <div class="secao-placar-wrapper">
         <section id="secao-placar">
-            <div class="versao-placar">Placar da Thai V10.2</div>
-
             <div class="controles-topo-centro">
                 <button class="btn-central" id="btnToggleControlesTopo" type="button" title="Configurações e Gestão">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -2081,7 +2428,7 @@ input:checked + .slider:before {
             </div>
 
             <div class="controles-baixo">
-                <button class="btn-central" id="btnResetBaixo" type="button" title="Zerar placar">↺</button>
+                <button class="btn-central" id="btnResetBaixo" type="button" title="Zerar placar"><span>↺</span></button>
             </div>
 
             <!-- LADO AZUL -->
@@ -2111,7 +2458,7 @@ input:checked + .slider:before {
             <div class="menu-container">
                 <button class="btn-menu" id="btnMenuToggle" type="button" title="Configurações">☰</button>
                 <div class="dropdown-menu" id="dropdownMenu">
-                    <div class="dropdown-item" id="btnToggleFigurinhas" style="cursor: pointer;">
+                    <div class="dropdown-item" id="btnToggleFigurinhas" style="cursor: pointer;" title="Toque no texto para gerenciar figurinhas ou no botão para ligar/desligar">
                         <span id="labelFigurinhas">🖼️ Figurinhas: Ativadas</span>
                         <label class="switch">
                             <input type="checkbox" id="checkFigurinhas">
@@ -2131,6 +2478,11 @@ input:checked + .slider:before {
                             <input type="checkbox" id="checkFullscreen">
                             <span class="slider"></span>
                         </label>
+                    </div>
+                    <div class="dropdown-rodape-creditos">
+                        <span class="credito-versao">Placar da Thai V3.0</span>
+                        <a href="https://wa.me/55?text=Ol%C3%A1%20Gabriel!" target="_blank" rel="noopener noreferrer" class="credito-autor" title="Falar com Gabriel Meira no WhatsApp">By Gabriel Meira</a>
+                        <span class="credito-app-nome">Duo Placar V3.0</span>
                     </div>
                 </div>
             </div>
@@ -2203,7 +2555,7 @@ input:checked + .slider:before {
                                     <option value="5">⭐⭐⭐⭐⭐ (Pro)</option>
                                 </select>
                             </div>
-                            <button class="btn-sucesso" id="btnAdicionar" type="button" style="width: 100%; padding: 12px 18px; font-size: 1.05rem; margin-top: 4px; display: flex; align-items: center; justify-content: flex-start !important; gap: 10px; text-align: left;">
+                            <button class="btn-sucesso" id="btnAdicionar" type="button" style="width: 100%; padding: 12px 18px; font-size: 1.05rem; margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 10px; text-align: center;">
                                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
                                 <span>Cadastrar Jogador</span>
                             </button>
@@ -2512,6 +2864,43 @@ input:checked + .slider:before {
         </div>
     </div>
 
+    <!-- Modal Gerenciar Figurinhas -->
+    <div class="modal-overlay" id="modalGerenciarFigurinhas" style="display: none;">
+        <div class="modal-card modal-card-largo" style="text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 1.5rem;">🖼️</span>
+                    <span class="modal-titulo" style="font-size: 1.25rem;">Gerenciar Figurinhas</span>
+                    <span id="badgeStatusNuvem" style="font-size: 0.75rem; background: rgba(40, 167, 69, 0.22); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); padding: 2px 7px; border-radius: 10px; font-weight: 600; margin-left: 4px;">🟢 Ao Vivo</span>
+                </div>
+                <button class="btn-fechar-modal-x" id="btnFecharModalFigurinhas" type="button" title="Fechar">✕</button>
+            </div>
+            
+            <p class="modal-texto" style="font-size: 0.88rem; margin-top: -4px;">
+                Adicione figurinhas para os pontos e selecione na estrela ⭐ qual será a de Abertura do app!
+            </p>
+
+            <!-- AÇÕES DO TOPO -->
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
+                <input type="file" id="inputUploadFigurinha" accept="image/*" multiple style="display: none;">
+                <button class="btn-sucesso" id="btnAdicionarFigurinha" type="button" style="width: 100%; padding: 10px 14px; font-size: 0.95rem; min-height: 42px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span style="font-size: 1.3rem; font-weight: 700; color: #ffffff; line-height: 1;">+</span>
+                    <span style="color: #ffffff; font-weight: 600;">Adicionar Figurinha</span>
+                </button>
+            </div>
+
+            <!-- GRADE / GALERIA DE FIGURINHAS -->
+            <div class="grade-figurinhas-gestao" id="gradeFigurinhasGestao" style="margin-top: 8px;"></div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.15);">
+                <span id="contadorFigurinhasTotal" style="font-size: 0.85rem; color: var(--texto-secundario);">Total: 0 figurinhas</span>
+                <button class="modal-btn modal-btn-confirmar" id="btnConcluirFigurinhas" type="button" style="max-width: 120px; padding: 8px 16px;">
+                    Concluir
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
 /**
  * PLACAR DA THAI V2.0 - SCRIPT UNIFICADO (TEMA VIDRO + ONE-PAGE SCROLLSPY)
@@ -2526,13 +2915,17 @@ input:checked + .slider:before {
             TIMES: 'times_salvos',
             PARTIDAS: 'partidas_geradas',
             PARTIDA_ATUAL: 'thai_partida_ativa',
-            CONFIGS: 'thai_configs'
+            CONFIGS: 'thai_configs',
+            FIGURINHAS: 'thai_figurinhas_custom',
+            ABERTURA: 'thai_figurinha_abertura'
         },
         data: {
             jogadores: [],
             times: [],
             partidas: [],
             partidaAtual: null,
+            figurinhas: [],
+            figurinhaAbertura: null,
             configs: {
                 tema: 'claro',
                 figurinhas: false,
@@ -2556,8 +2949,50 @@ input:checked + .slider:before {
                 this.data.partidas = p ? JSON.parse(p) : [];
                 const pa = localStorage.getItem(this.KEYS.PARTIDA_ATUAL);
                 this.data.partidaAtual = pa ? JSON.parse(pa) : null;
+
+                const timesValidos = (this.data.times || []).filter(t => Array.isArray(t) && t.length > 0);
+                const temJogadores = this.data.jogadores && this.data.jogadores.length >= 2;
+                const temTimes = timesValidos.length >= 2;
+                const temPartidas = this.data.partidas && this.data.partidas.length > 0;
+
+                if (!temJogadores || !temTimes || !temPartidas) {
+                    this.data.partidaAtual = null;
+                    localStorage.removeItem(this.KEYS.PARTIDA_ATUAL);
+                    if (!temJogadores || !temTimes) {
+                        this.data.partidas = [];
+                        localStorage.removeItem(this.KEYS.PARTIDAS);
+                    }
+                } else if (this.data.partidaAtual && this.data.partidaAtual.idPartida) {
+                    const existe = this.data.partidas.some(part => part.id === this.data.partidaAtual.idPartida);
+                    if (!existe) {
+                        const proxAtiva = this.data.partidas.find(part => part.status === 'ativa');
+                        if (proxAtiva) {
+                            this.data.partidaAtual = { idPartida: proxAtiva.id, nomeAzul: proxAtiva.time1, nomeVermelho: proxAtiva.time2 };
+                            localStorage.setItem(this.KEYS.PARTIDA_ATUAL, JSON.stringify(this.data.partidaAtual));
+                        } else {
+                            this.data.partidaAtual = null;
+                            localStorage.removeItem(this.KEYS.PARTIDA_ATUAL);
+                        }
+                    }
+                }
+
                 const modFila = localStorage.getItem('modalidade_fila_auto'); if (modFila) this.data.modalidadeFilaAuto = modFila;
                 const fila = localStorage.getItem('fila_times_auto'); if (fila) this.data.filaTimes = JSON.parse(fila);
+
+                const fig = localStorage.getItem(this.KEYS.FIGURINHAS);
+                if (fig !== null) {
+                    try {
+                        const parsed = JSON.parse(fig);
+                        this.data.figurinhas = Array.isArray(parsed) ? parsed : [];
+                    } catch (e) {
+                        this.data.figurinhas = [];
+                    }
+                } else {
+                    this.data.figurinhas = [];
+                }
+
+                this.data.figurinhaAbertura = localStorage.getItem(this.KEYS.ABERTURA) || null;
+
                 const cfg = localStorage.getItem(this.KEYS.CONFIGS);
                 if (cfg) {
                     this.data.configs = { ...this.data.configs, ...JSON.parse(cfg) };
@@ -2583,6 +3018,13 @@ input:checked + .slider:before {
         salvarJogadores(lista) {
             this.data.jogadores = lista;
             localStorage.setItem(this.KEYS.JOGADORES, JSON.stringify(lista));
+            if (!lista || lista.length < 2) {
+                this.data.partidaAtual = null;
+                localStorage.removeItem(this.KEYS.PARTIDA_ATUAL);
+                this.salvarTimes([]);
+                this.salvarPartidas([]);
+                this.notify('partida_ativa', null);
+            }
             this.notify('jogadores', lista);
         },
         adicionarJogador(nome, genero, nivel) {
@@ -2596,6 +3038,13 @@ input:checked + .slider:before {
         salvarTimes(times) {
             this.data.times = times;
             localStorage.setItem(this.KEYS.TIMES, JSON.stringify(times));
+            const timesValidos = (times || []).filter(t => Array.isArray(t) && t.length > 0);
+            if (timesValidos.length < 2) {
+                this.data.partidaAtual = null;
+                localStorage.removeItem(this.KEYS.PARTIDA_ATUAL);
+                this.salvarPartidas([]);
+                this.notify('partida_ativa', null);
+            }
             this.notify('times', times);
         },
         salvarPartidas(partidas) {
@@ -2605,8 +3054,57 @@ input:checked + .slider:before {
                 this.data.partidaAtual = null;
                 localStorage.removeItem(this.KEYS.PARTIDA_ATUAL);
                 this.notify('partida_ativa', null);
+            } else if (this.data.partidaAtual && this.data.partidaAtual.idPartida) {
+                const existe = partidas.some(p => p.id === this.data.partidaAtual.idPartida);
+                if (!existe) {
+                    const prox = partidas.find(p => p.status === 'ativa');
+                    if (prox) {
+                        this.carregarPartidaNoPlacar(prox.time1, prox.time2, prox.id);
+                    } else {
+                        this.data.partidaAtual = null;
+                        localStorage.removeItem(this.KEYS.PARTIDA_ATUAL);
+                        this.notify('partida_ativa', null);
+                    }
+                }
             }
             this.notify('partidas', partidas);
+        },
+        obterFigurinhas() {
+            return Array.isArray(this.data.figurinhas) ? this.data.figurinhas : [];
+        },
+        salvarFigurinhas(lista) {
+            this.data.figurinhas = Array.isArray(lista) ? lista : [];
+            localStorage.setItem(this.KEYS.FIGURINHAS, JSON.stringify(this.data.figurinhas));
+            if (typeof FigurinhasModule !== 'undefined' && FigurinhasModule.salvarNuvem) {
+                FigurinhasModule.salvarNuvem(this.data.figurinhas);
+            }
+            this.notify('figurinhas', this.data.figurinhas);
+        },
+        adicionarFigurinha(src) {
+            const lista = [...this.obterFigurinhas(), src];
+            this.salvarFigurinhas(lista);
+        },
+        removerFigurinha(index) {
+            const lista = [...this.obterFigurinhas()];
+            const removida = lista[index];
+            lista.splice(index, 1);
+            if (this.data.figurinhaAbertura === removida) {
+                this.definirFigurinhaAbertura(null);
+            }
+            this.salvarFigurinhas(lista);
+        },
+        definirFigurinhaAbertura(src) {
+            if (this.data.figurinhaAbertura === src || !src) {
+                this.data.figurinhaAbertura = null;
+                localStorage.removeItem(this.KEYS.ABERTURA);
+            } else {
+                this.data.figurinhaAbertura = src;
+                localStorage.setItem(this.KEYS.ABERTURA, src);
+            }
+            if (typeof FigurinhasModule !== 'undefined' && FigurinhasModule.salvarAberturaNuvem) {
+                FigurinhasModule.salvarAberturaNuvem(this.data.figurinhaAbertura);
+            }
+            this.notify('abertura', this.data.figurinhaAbertura);
         },
         salvarConfigs(parciais) {
             this.data.configs = { ...this.data.configs, ...parciais };
@@ -2934,7 +3432,11 @@ input:checked + .slider:before {
             this.bindEvents();
             this.aplicarConfigs();
             this.iniciarFisica();
-            State.subscribe((tipo) => { if (tipo === 'partida_ativa') this.carregarPartidaAtiva(); });
+            State.subscribe((tipo) => {
+                if (tipo === 'partida_ativa' || tipo === 'times' || tipo === 'partidas' || tipo === 'jogadores') {
+                    this.carregarPartidaAtiva();
+                }
+            });
             this.carregarPartidaAtiva();
         },
         cacheDOM() {
@@ -3071,12 +3573,24 @@ input:checked + .slider:before {
         },
         carregarPartidaAtiva() {
             const pa = State.data.partidaAtual;
-            if (pa && pa.nomeAzul && pa.nomeVermelho) {
+            const timesValidos = (State.data.times || []).filter(t => Array.isArray(t) && t.length > 0);
+            const temJogadores = State.data.jogadores && State.data.jogadores.length >= 2;
+            const temTimes = timesValidos.length >= 2;
+            const temPartidas = State.data.partidas && State.data.partidas.length > 0;
+
+            if (pa && pa.nomeAzul && pa.nomeVermelho && temJogadores && temTimes && temPartidas) {
                 if (this.labelAzul) { this.labelAzul.textContent = pa.nomeAzul; this.labelAzul.style.display = 'block'; }
                 if (this.labelVermelho) { this.labelVermelho.textContent = pa.nomeVermelho; this.labelVermelho.style.display = 'block'; }
             } else {
                 if (this.labelAzul) { this.labelAzul.textContent = ''; this.labelAzul.style.display = 'none'; }
                 if (this.labelVermelho) { this.labelVermelho.textContent = ''; this.labelVermelho.style.display = 'none'; }
+                // Quando não há partida ou times válidos, zera a contagem e estado do placar
+                this.scoreAzul = 0;
+                this.scoreVermelho = 0;
+                this.jogoEncerrado = false;
+                this.limparConfetes();
+                const antiga = document.querySelector('.figurinha-ponto');
+                if (antiga) antiga.remove();
             }
             this.atualizarPlacar();
         },
@@ -3249,9 +3763,11 @@ input:checked + .slider:before {
             const antiga = document.querySelector('.figurinha-ponto'); if (antiga) antiga.remove();
             const container = lado === 'azul' ? this.containerAzul : this.containerVermelho;
             if (!container) return;
+            const lista = State.obterFigurinhas();
+            if (!lista || lista.length === 0) return;
             const img = document.createElement('img');
             img.className = 'figurinha-ponto';
-            img.src = this.IMAGENS_DA_THAI[Math.floor(Math.random() * this.IMAGENS_DA_THAI.length)];
+            img.src = lista[Math.floor(Math.random() * lista.length)];
             container.appendChild(img);
             img.addEventListener('animationend', () => img.remove());
         },
@@ -3323,7 +3839,13 @@ input:checked + .slider:before {
             State.adicionarJogador(nome, genero, nivel);
             if (inputNome) { inputNome.value = ''; inputNome.focus(); }
         },
-        remover(index) { State.removerJogador(index); },
+        remover(index) {
+            State.removerJogador(index);
+            if (State.data.jogadores.length < 2) {
+                State.salvarTimes([]);
+                State.salvarPartidas([]);
+            }
+        },
         render() {
             const lista = document.getElementById('listaJogadores');
             const contador = document.getElementById('contadorJogadores');
@@ -3455,28 +3977,28 @@ input:checked + .slider:before {
             if (!jOriginal) return;
             const modoPrincipal = document.querySelector('input[name="modoPrincipal"]:checked')?.value || 'manual';
 
-            if (modoPrincipal === 'manual') {
-                if (this.modoVisualizacao !== 'manual') {
-                    this.modoVisualizacao = 'manual';
-                    if (this.timesAtuais.length === 0) this.timesAtuais = [[], []];
-                }
-
-                if (selecionou) {
+            if (selecionou) {
+                if (modoPrincipal === 'manual') {
+                    if (this.modoVisualizacao !== 'manual') {
+                        this.modoVisualizacao = 'manual';
+                        if (this.timesAtuais.length === 0) this.timesAtuais = [[], []];
+                    }
                     let jaExiste = this.filaEspera.some(j => j.nome === jOriginal.nome) ||
                         this.timesAtuais.some(t => Array.isArray(t) && t.some(j => j.nome === jOriginal.nome));
                     if (!jaExiste) {
                         this.filaEspera.push({ ...jOriginal });
                         this.filaEspera.sort((a, b) => b.nivel - a.nivel);
                     }
-                } else {
-                    this.filaEspera = this.filaEspera.filter(j => j.nome !== jOriginal.nome);
-                    this.timesAtuais.forEach((time, tIdx) => {
-                        if (Array.isArray(time)) {
-                            this.timesAtuais[tIdx] = time.filter(j => j.nome !== jOriginal.nome);
-                        }
-                    });
-                    State.salvarTimes(this.timesAtuais);
+                    this.renderizarVisualizacao();
                 }
+            } else {
+                this.filaEspera = this.filaEspera.filter(j => j.nome !== jOriginal.nome);
+                this.timesAtuais.forEach((time, tIdx) => {
+                    if (Array.isArray(time)) {
+                        this.timesAtuais[tIdx] = time.filter(j => j.nome !== jOriginal.nome);
+                    }
+                });
+                State.salvarTimes(this.timesAtuais);
                 this.renderizarVisualizacao();
             }
         },
@@ -3636,7 +4158,11 @@ input:checked + .slider:before {
         },
         limparTodosTimes() {
             if (confirm("Tem certeza que deseja apagar todos os times sorteados?")) {
-                this.timesAtuais = []; this.filaEspera = []; State.salvarTimes([]); this.renderizarVisualizacao();
+                this.timesAtuais = [];
+                this.filaEspera = [];
+                State.salvarTimes([]);
+                State.salvarPartidas([]);
+                this.renderizarVisualizacao();
             }
         },
         renderizarVisualizacao() {
@@ -4314,18 +4840,23 @@ input:checked + .slider:before {
 
         if (btnToggleFig) {
             btnToggleFig.addEventListener('click', (e) => {
-                if (e.target !== checkFig && !e.target.closest('.switch')) {
-                    if (checkFig) {
-                        checkFig.checked = !checkFig.checked;
-                        State.salvarConfigs({ figurinhas: checkFig.checked });
-                        atualizarFigurinhasUI();
-                    }
+                if (e.target === checkFig || e.target.closest('.switch')) {
+                    // Clicou diretamente no switch (ligar/desligar) -> apenas altera o estado
+                    return;
+                }
+                // Clicou no botão/texto -> abre a interface de gerenciar figurinhas
+                e.stopPropagation();
+                const dropdown = document.getElementById('dropdownMenu');
+                if (dropdown) dropdown.classList.remove('ativo');
+                if (typeof FigurinhasModule !== 'undefined' && FigurinhasModule.abrirModal) {
+                    FigurinhasModule.abrirModal();
                 }
             });
         }
 
         if (checkFig) {
-            checkFig.addEventListener('change', () => {
+            checkFig.addEventListener('change', (e) => {
+                e.stopPropagation();
                 State.salvarConfigs({ figurinhas: checkFig.checked });
                 atualizarFigurinhasUI();
             });
@@ -4368,19 +4899,250 @@ input:checked + .slider:before {
         }
         aplicarTemaUI();
 
-        if (overlayIntro) {
-            if (State.data.configs.figurinhas === true) {
-                overlayIntro.style.display = 'flex';
-                const fechar = () => { overlayIntro.style.display = 'none'; overlayIntro.remove(); };
-                overlayIntro.addEventListener('click', fechar);
-                overlayIntro.addEventListener('pointerup', fechar);
-            } else {
-                overlayIntro.remove();
-            }
-        }
     }
 
-    // 9. INICIALIZAÇÃO
+    // 8. GERENCIADOR DE FIGURINHAS EM TEMPO REAL (FIREBASE)
+    const FigurinhasModule = {
+        modal: null,
+        grade: null,
+        inputUpload: null,
+        btnAdicionar: null,
+        btnFechar: null,
+        btnConcluir: null,
+        contadorTotal: null,
+        badgeNuvem: null,
+        eventSource: null,
+        FIREBASE_URL: 'https://placardathai-default-rtdb.firebaseio.com/figurinhas.json',
+        FIREBASE_ABERTURA_URL: 'https://placardathai-default-rtdb.firebaseio.com/figurinhaAbertura.json',
+        init() {
+            this.modal = document.getElementById('modalGerenciarFigurinhas');
+            this.grade = document.getElementById('gradeFigurinhasGestao');
+            this.inputUpload = document.getElementById('inputUploadFigurinha');
+            this.btnAdicionar = document.getElementById('btnAdicionarFigurinha');
+            this.btnFechar = document.getElementById('btnFecharModalFigurinhas');
+            this.btnConcluir = document.getElementById('btnConcluirFigurinhas');
+            this.contadorTotal = document.getElementById('contadorFigurinhasTotal');
+            this.badgeNuvem = document.getElementById('badgeStatusNuvem');
+
+            if (this.btnFechar) this.btnFechar.addEventListener('click', () => this.fecharModal());
+            if (this.btnConcluir) this.btnConcluir.addEventListener('click', () => this.fecharModal());
+            if (this.btnAdicionar && this.inputUpload) {
+                this.btnAdicionar.addEventListener('click', () => this.inputUpload.click());
+                this.inputUpload.addEventListener('change', (e) => this.processarUpload(e));
+            }
+
+            State.subscribe((tipo) => {
+                if (tipo === 'figurinhas' || tipo === 'abertura') this.render();
+            });
+
+            this.conectarFirebase();
+            this.render();
+        },
+        conectarFirebase() {
+            this.sincronizarNuvem();
+            if (window.EventSource) {
+                try {
+                    if (this.eventSource) this.eventSource.close();
+                    this.eventSource = new EventSource(this.FIREBASE_URL);
+                    this.eventSource.addEventListener('put', (e) => {
+                        try {
+                            const res = JSON.parse(e.data);
+                            const lista = res && res.data && Array.isArray(res.data) ? res.data : (Array.isArray(res) ? res : []);
+                            if (JSON.stringify(lista) !== JSON.stringify(State.obterFigurinhas())) {
+                                State.data.figurinhas = lista;
+                                localStorage.setItem(State.KEYS.FIGURINHAS, JSON.stringify(lista));
+                                State.notify('figurinhas', lista);
+                            }
+                            if (this.badgeNuvem) {
+                                this.badgeNuvem.textContent = '🟢 Ao Vivo';
+                                this.badgeNuvem.style.color = '#4ade80';
+                            }
+                        } catch (err) {}
+                    });
+                } catch (err) {}
+            }
+        },
+        sincronizarNuvem() {
+            fetch(this.FIREBASE_URL)
+                .then(r => r.json())
+                .then(res => {
+                    if (Array.isArray(res)) {
+                        State.data.figurinhas = res;
+                        localStorage.setItem(State.KEYS.FIGURINHAS, JSON.stringify(res));
+                        State.notify('figurinhas', res);
+                    }
+                    if (this.badgeNuvem) {
+                        this.badgeNuvem.textContent = '🟢 Ao Vivo';
+                        this.badgeNuvem.style.color = '#4ade80';
+                    }
+                })
+                .catch(() => {});
+
+            fetch(this.FIREBASE_ABERTURA_URL)
+                .then(r => r.json())
+                .then(abertura => {
+                    if (abertura !== undefined) {
+                        const val = abertura || null;
+                        State.data.figurinhaAbertura = val;
+                        if (val) localStorage.setItem(State.KEYS.ABERTURA, val);
+                        else localStorage.removeItem(State.KEYS.ABERTURA);
+                        State.notify('abertura', val);
+                    }
+                })
+                .catch(() => {});
+        },
+        salvarNuvem(lista) {
+            fetch(this.FIREBASE_URL, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(lista)
+            }).catch(() => {});
+        },
+        salvarAberturaNuvem(src) {
+            fetch(this.FIREBASE_ABERTURA_URL, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(src)
+            }).catch(() => {});
+        },
+        abrirModal() {
+            if (this.modal) {
+                this.modal.style.display = 'flex';
+                document.body.classList.add('modal-aberto');
+                this.sincronizarNuvem();
+                this.render();
+            }
+        },
+        fecharModal() {
+            if (this.modal) {
+                this.modal.style.display = 'none';
+                document.body.classList.remove('modal-aberto');
+            }
+        },
+        processarUpload(e) {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+            Array.from(files).forEach(file => {
+                if (!file.type.startsWith('image/')) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const maxDim = 380;
+                        let w = img.width, h = img.height;
+                        if (w > h && w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; }
+                        else if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        const dataUrl = canvas.toDataURL('image/webp', 0.85);
+                        State.adicionarFigurinha(dataUrl);
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+            this.inputUpload.value = '';
+        },
+        remover(index) {
+            if (confirm("Deseja realmente excluir esta figurinha do mural compartilhado?")) {
+                State.removerFigurinha(index);
+            }
+        },
+        testarAnimacao(src) {
+            const antiga = document.querySelector('.figurinha-ponto');
+            if (antiga) antiga.remove();
+            const container = document.getElementById('btnAzul') || document.body;
+            const img = document.createElement('img');
+            img.className = 'figurinha-ponto';
+            img.src = src;
+            container.appendChild(img);
+            img.addEventListener('animationend', () => img.remove());
+        },
+        toggleAberturaComConfirmacao(src) {
+            const ehAbertura = src === State.data.figurinhaAbertura;
+            if (ehAbertura) {
+                if (confirm("Deseja desativar esta figurinha da tela de abertura?\n(O app passará a abrir normalmente sem tela de introdução)")) {
+                    State.definirFigurinhaAbertura(null);
+                }
+            } else {
+                if (confirm("Deseja definir esta figurinha como a tela de abertura do Placar da Thai?\n(Ela será exibida em destaque toda vez que o app for aberto)")) {
+                    State.definirFigurinhaAbertura(src);
+                }
+            }
+        },
+        render() {
+            if (!this.grade) return;
+            const lista = State.obterFigurinhas();
+            const aberturaAtual = State.data.figurinhaAbertura;
+            if (this.contadorTotal) {
+                this.contadorTotal.textContent = `Total: ${lista.length} figurinha${lista.length === 1 ? '' : 's'}`;
+            }
+            this.grade.innerHTML = '';
+            if (lista.length === 0) {
+                this.grade.innerHTML = '<div class="aviso-vazio" style="grid-column: 1 / -1; padding: 24px 12px; font-size: 0.92rem; text-align: center;">Nenhuma figurinha cadastrada.<br>Clique em "+ Adicionar Figurinha" acima para adicionar suas fotos!</div>';
+                return;
+            }
+            lista.forEach((src, idx) => {
+                const ehAbertura = src === aberturaAtual;
+                const card = document.createElement('div');
+                card.className = `card-figurinha-item ${ehAbertura ? 'eh-abertura' : ''}`;
+                card.title = 'Toque na imagem para testar animação de ponto';
+                card.innerHTML = `
+                    <button class="btn-estrela-abertura" type="button" title="${ehAbertura ? 'Figurinha de Abertura Ativa ⭐ (Toque para desativar)' : 'Definir como Figurinha de Abertura ☆'}" onclick="event.stopPropagation(); FigurinhasModule.toggleAberturaComConfirmacao('${src}')">
+                        ${ehAbertura ? '⭐' : '☆'}
+                    </button>
+                    <button class="btn-excluir-figurinha" type="button" title="Excluir figurinha" onclick="event.stopPropagation(); FigurinhasModule.remover(${idx})">✕</button>
+                    <div class="card-figurinha-img-wrap" onclick="FigurinhasModule.testarAnimacao('${src}')">
+                        <img src="${src}" class="card-figurinha-img" alt="Figurinha #${idx + 1}" loading="lazy">
+                    </div>
+                    <span class="card-figurinha-badge">Figurinha #${idx + 1}</span>
+                `;
+                this.grade.appendChild(card);
+            });
+        }
+    };
+
+    // 9. TELA DE ABERTURA / BLOQUEIO (SPLASH)
+    const AberturaModule = {
+        overlay: null,
+        img: null,
+        jaExibido: false,
+        init() {
+            this.overlay = document.getElementById('overlayAberturaApp');
+            this.img = document.getElementById('imgFigurinhaAbertura');
+
+            if (this.overlay) {
+                const fechar = () => {
+                    this.jaExibido = true;
+                    this.overlay.classList.add('saindo');
+                    setTimeout(() => {
+                        this.overlay.style.display = 'none';
+                        this.overlay.classList.remove('saindo');
+                    }, 350);
+                };
+                this.overlay.addEventListener('click', fechar);
+                this.overlay.addEventListener('pointerup', fechar);
+            }
+
+            this.exibirAberturaInicial();
+        },
+        exibirAberturaInicial() {
+            if (this.jaExibido) return;
+            const src = State.data.figurinhaAbertura;
+            if (src && this.overlay && this.img) {
+                this.img.src = src;
+                this.overlay.style.display = 'flex';
+                this.jaExibido = true;
+            } else if (this.overlay) {
+                this.overlay.style.display = 'none';
+            }
+        }
+    };
+
+    // 10. INICIALIZAÇÃO
     function inicializarApp() {
         Placar.init();
         OverlayModule.init();
@@ -4388,6 +5150,8 @@ input:checked + .slider:before {
         SorteioModule.init();
         PartidasModule.init();
         RankingModule.init();
+        FigurinhasModule.init();
+        AberturaModule.init();
         initMenuConfig();
     }
 
@@ -4395,6 +5159,8 @@ input:checked + .slider:before {
     window.SorteioModule = SorteioModule;
     window.PartidasModule = PartidasModule;
     window.RankingModule = RankingModule;
+    window.FigurinhasModule = FigurinhasModule;
+    window.AberturaModule = AberturaModule;
     window.Placar = Placar;
 
     if (document.readyState === 'loading') {
